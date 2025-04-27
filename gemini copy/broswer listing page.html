@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCC Campus Shopping - Fixed</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <style>
+        /* Custom Styles & Tailwind Configuration */
+        @layer base {
+          html {
+            scroll-behavior: smooth;
+            /* Ensure html tag doesn't default to white */
+            background-color: #FFCC08;
+          }
+          body {
+            @apply bg-primary antialiased font-sans text-gray-800;
+          }
+        }
+
+        /* Configuration for Tailwind */
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FFCC08',
+                        'primary-dark': '#E6B807',
+                        'primary-light': '#FFD63A',
+                        'text-dark': '#1F2937', /* gray-800 */
+                        'text-light': '#6B7280', /* gray-500 */
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', '"Noto Sans"', 'sans-serif', '"Apple Color Emoji"', '"Segoe UI Emoji"', '"Segoe UI Symbol"', '"Noto Color Emoji"'],
+                    },
+                    borderRadius: {
+                        'xl': '1rem',
+                        '2xl': '1.5rem',
+                        '3xl': '2rem',
+                    },
+                    boxShadow: {
+                        'subtle': '0 4px 12px rgba(0, 0, 0, 0.05)',
+                        'lifted': '0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)',
+                    },
+                    transitionTimingFunction: {
+                        'modern': 'cubic-bezier(0.4, 0, 0.2, 1)',
+                    },
+                     keyframes: {
+                        shimmer: {
+                            '0%': { backgroundPosition: '-1000px 0' },
+                            '100%': { backgroundPosition: '1000px 0' },
+                        },
+                        fadeIn: { /* Simpler fade-in */
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideInRight: {
+                            '0%': { transform: 'translateX(100%)', opacity: '0.5' },
+                            '100%': { transform: 'translateX(0)', opacity: '1' },
+                        },
+                        slideOutRight: {
+                            '0%': { transform: 'translateX(0)', opacity: '1' },
+                            '100%': { transform: 'translateX(100%)', opacity: '0' },
+                        },
+                        pulse: {
+                            '0%, 100%': { transform: 'scale(1)' },
+                            '50%': { transform: 'scale(1.08)' }, /* Slightly more pulse */
+                        }
+                    },
+                    animation: {
+                        shimmer: 'shimmer 2s infinite linear',
+                        fadeIn: 'fadeIn 0.6s ease-out forwards', /* Use simpler fadeIn */
+                        slideInRight: 'slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards',
+                        slideOutRight: 'slideOutRight 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards',
+                        pulse: 'pulse 0.3s ease-in-out',
+                    }
+                }
+            }
+        }
+
+        /* Additional Custom CSS */
+        .skeleton {
+            background: linear-gradient(to right, #e2e8f0 8%, #f1f5f9 18%, #e2e8f0 33%);
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite linear;
+            border-radius: inherit; /* Inherit parent's radius */
+        }
+
+        .filter-panel {
+            transform: translateX(100%);
+            opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            visibility: hidden;
+        }
+        .filter-panel.show {
+            transform: translateX(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .overlay {
+             opacity: 0;
+             visibility: hidden;
+             transition: opacity 0.4s ease-in-out, visibility 0s linear 0.4s;
+        }
+        .overlay.show {
+             opacity: 1;
+             visibility: visible;
+             transition: opacity 0.4s ease-in-out;
+        }
+
+        .scroll-top {
+            opacity: 0;
+            transform: translateY(100%);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            visibility: hidden;
+        }
+        .scroll-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+            visibility: visible;
+        }
+
+        .sort-dropdown {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px) scale(0.95);
+            transition: all 0.2s ease-out;
+        }
+        .sort-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .top-header {
+            transition: transform 0.3s ease-in-out;
+            position: sticky; /* Make top header sticky initially */
+            top: 0;
+            z-index: 40; /* Ensure above search header before scroll */
+            border-bottom: none !important;
+        }
+        .top-header-hidden {
+            transform: translateY(-100%);
+        }
+        .search-header {
+            position: sticky;
+             /* Adjust top based on potential top-header height */
+             /* Let's dynamically calculate or use a fixed reasonable value */
+            top: 0; /* Will be adjusted by JS if top-header is visible */
+            z-index: 30; /* Below top-header initially */
+            transition: top 0.3s ease-in-out;
+            border-bottom: none !important;
+        }
+
+        /* Custom Checkbox Styling */
+        .custom-checkbox:checked {
+            background-color: #FFCC08;
+            border-color: #E6B807;
+        }
+        .custom-checkbox:checked:hover {
+             background-color: #E6B807;
+        }
+        .custom-checkbox:focus {
+            --tw-ring-color: #FFD63A; /* Tailwind variable for focus ring */
+            box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--tw-ring-color);
+        }
+
+        /* Subcategory Accordion */
+        details > summary { list-style: none; cursor: pointer; transition: margin 0.2s ease; }
+        details > summary::-webkit-details-marker { display: none; }
+        details > summary::marker { display: none; }
+        details[open] > summary { margin-bottom: 0.5rem; }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+        details[open] .accordion-content { max-height: 500px; }
+        .accordion-arrow { transition: transform 0.3s ease; }
+        details[open] .accordion-arrow { transform: rotate(90deg); }
+        .sub-category-label { transition: background-color 0.2s ease; }
+        .sub-category-label:hover { background-color: #f9fafb; } /* gray-50 */
+
+        /* Ensure product cards are visible initially if animation fails */
+        .product-card {
+            /* Start visible, let animation handle fade-in */
+            /* opacity: 1; */
+        }
+
+        /* Add these modifications inside the <style> tag */
+
+/* ... (Keep existing Tailwind config and other styles) ... */
+
+/* Adjust Main Container */
+.main-container {
+    /* Estimate search header height ~58px (py-3*2 + input ~34px) */
+    /* Adjust this value based on actual rendered height if needed */
+    height: calc(100vh - 106px);
+    overflow: hidden; /* Prevent main container itself from scrolling */
+    transition: margin-top 0.3s ease-in-out, height 0.3s ease-in-out;
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 3.2rem !important;
+}
+
+/* Make Inner Area Scrollable */
+.products-scroll-area {
+    height: 100%; /* Fill the fixed height of main-container */
+    overflow-y: auto; /* Enable vertical scrolling ONLY for this div */
+    /* Add scrollbar styling for modern look (optional, webkit example) */
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(0, 0, 0, 0.3);
+    }
+}
+
+/* Remove specific top padding from grid, handled by parent */
+.products-grid {
+   padding-top: 0; /* Remove pt-10 */
+    /* Add back some padding-top to the scroll area itself */
+    /* padding-top: 4rem; /* Approx space for the sort button area */
+}
+
+/* Adjust Sort Button positioning within the non-scrolling main-container */
+.sort-button-container { /* New wrapper div for positioning */
+     position: absolute;
+     top: 1rem; /* Adjust as needed from top of main-container */
+     left: 50%;
+     transform: translateX(-50%);
+     z-index: 20; /* Ensure above products */
+}
+
+
+/* Ensure HTML/Body allow full height */
+/* Make HTML/Body support proper layout */
+/* Add these modifications or replace existing styles */
+
+/* Make HTML/Body support proper layout */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevent window scrolling */
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+/* TopHeader Configuration */
+.top-header {
+    position: fixed; /* Make it fixed to scroll away */
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 40;
+    transition: transform 0.3s ease-in-out;
+}
+
+.top-header-hidden {
+    transform: translateY(-100%); /* Will slide up when hidden */
+}
+
+/* Search Header Configuration */
+.search-header {
+    position: fixed; /* Make it sticky at the top */
+    top: 0; /* Start at top, will be pushed down by JS if top header is visible */
+    left: 0;
+    right: 0;
+    z-index: 30;
+    transition: top 0.3s ease-in-out;
+}
+
+/* Main Container Layout */
+.main-container {
+    transition: margin-top 0.3s ease-in-out, height 0.3s ease-in-out;
+    margin-top: 106px; /* Combined height of both headers (adjust as needed) */
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 106px); /* Viewport height minus headers */
+    overflow: hidden; /* Prevent main container scrolling */
+    position: relative;
+    z-index: 10;
+    border-radius: 0px 0px 0 0px;
+}
+
+/* Products Area - This is what scrolls */
+.products-scroll-area {
+    flex-grow: 1;
+    overflow-y: auto; /* Enable vertical scrolling */
+    position: relative; /* For positioning the sort button */
+    padding-top: 60px; /* Space for the sort button at top */
+}
+
+/* Sort Button Positioning */
+.sort-button-container {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+}
+
+    </style>
+</head>
+<body class="bg-primary">
+
+    <header id="topHeader" class="top-header bg-primary px-4 py-3 sm:px-6 lg:px-8 flex justify-between items-center">
+        <div class="flex items-center">
+            <span class="bg-black text-primary px-2 py-1 rounded-md font-bold text-lg mr-2">UCC</span>
+            <span class="text-black font-bold text-xl tracking-tight">Campus Shop</span>
+        </div>
+        <div class="relative cursor-pointer group">
+             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-7 w-7 text-black">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+            </svg>
+            <div class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs font-semibold">3</div>
+        </div>
+    </header>
+
+    <div id="searchHeader" class="search-header bg-primary px-4 sm:px-6 lg:px-8 py-3 shadow-sm">
+        <div class="relative flex items-center bg-white rounded-lg shadow-subtle overflow-hidden">
+            <div class="pl-4 pr-2 text-gray-400">
+                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+                   <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                 </svg>
+            </div>
+            <input type="text" id="searchInput" class="search-input flex-grow border-none focus:ring-0 py-2.5 px-2 text-sm placeholder-gray-400" placeholder="Search products, brands...">
+            <button id="filterToggle" class="p-3 bg-gray-100 hover:bg-gray-200 transition-colors duration-200" aria-label="Open Filters">
+                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 text-text-dark">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+                 </svg>
+            </button>
+        </div>
+    </div>
+
+    <main class="main-container bg-white rounded-t-3xl -mt-5 relative z-10 shadow-lg flex flex-col">
+        <div class="sort-button-container flex-shrink-0"> <button id="sortToggle" class="sort-button bg-white border border-gray-200 rounded-full px-5 py-2 text-sm font-medium text-text-dark shadow-subtle hover:shadow-md transition-shadow duration-200 flex items-center gap-1.5 whitespace-nowrap">
+                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4 text-gray-500"> <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" /></svg>
+                 Sort by: <span id="currentSortLabel" class="font-semibold">Newest</span>
+             </button>
+             <div id="sortDropdown" class="sort-dropdown absolute top-full mt-2 w-48 bg-white rounded-xl shadow-lifted overflow-hidden origin-top">
+                 <a href="#" class="sort-option block px-4 py-2.5 text-sm hover:bg-primary-light transition-colors duration-150 selected" data-sort="newest">Newest</a>
+                   <a href="#" class="sort-option block px-4 py-2.5 text-sm hover:bg-primary-light transition-colors duration-150" data-sort="popular">Popularity</a>
+                   <a href="#" class="sort-option block px-4 py-2.5 text-sm hover:bg-primary-light transition-colors duration-150" data-sort="rating">Rating: High to Low</a>
+                   <a href="#" class="sort-option block px-4 py-2.5 text-sm hover:bg-primary-light transition-colors duration-150" data-sort="price-asc">Price: Low to High</a>
+                   <a href="#" class="sort-option block px-4 py-2.5 text-sm hover:bg-primary-light transition-colors duration-150" data-sort="price-desc">Price: High to Low</a>
+             </div>
+        </div>
+  
+        <div class="products-scroll-area px-4 sm:px-6 lg:px-8 pb-20 pt-16 flex-grow" id="scrollableContainer">
+            <div class="products-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6" id="productsGrid">
+                <!-- Products will be rendered here -->
+            </div>>
+        </div>
+   </main>
+
+    <aside id="filterPanel" class="filter-panel fixed top-0 right-0 h-full w-full max-w-sm bg-white z-[60] shadow-lifted flex flex-col"> <div class="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
+            <h2 class="text-lg font-semibold text-text-dark">Filters</h2>
+            <button id="closeFilter" class="text-gray-500 hover:text-gray-800 transition-colors" aria-label="Close Filters">
+                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
+                   <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                 </svg>
+            </button>
+        </div>
+
+        <div class="flex-grow overflow-y-auto p-5 space-y-6">
+            <div class="filter-section">
+                <h3 class="text-sm font-medium text-gray-600 mb-3">University</h3>
+                <div class="space-y-2">
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" value="UCC" name="university" class="custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                        <span class="text-sm">University of Cape Coast (UCC)</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" value="KNUST" name="university" class="custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                        <span class="text-sm">Kwame Nkrumah University (KNUST)</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" value="UG" name="university" class="custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                        <span class="text-sm">University of Ghana (UG)</span>
+                    </label>
+                     <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" value="UEW" name="university" class="custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                        <span class="text-sm">University of Education, Winneba (UEW)</span>
+                    </label>
+                     <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" value="UDS" name="university" class="custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                        <span class="text-sm">University for Development Studies (UDS)</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <h3 class="text-sm font-medium text-gray-600 mb-3">Category</h3>
+                <div class="space-y-1">
+                    <details class="category-details group">
+                        <summary class="flex justify-between items-center py-1 rounded hover:bg-gray-50 px-1 -mx-1">
+                            <label class="flex items-center space-x-2 cursor-pointer flex-grow">
+                                <input type="checkbox" value="Electronics" name="category" class="category-checkbox custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                                <span class="text-sm font-medium">Electronics</span>
+                            </label>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="accordion-arrow h-4 w-4 text-gray-400 group-open:rotate-90 transition-transform">
+                               <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                             </svg>
+                        </summary>
+                        <div class="accordion-content pl-6 mt-1 space-y-1">
+                             <label class="sub-category-label flex items-center space-x-2 cursor-pointer p-1 rounded">
+                                <input type="checkbox" value="Laptops" name="subcategory_electronics" class="custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                                <span class="text-xs">Laptops</span>
+                            </label>
+                            <label class="sub-category-label flex items-center space-x-2 cursor-pointer p-1 rounded">
+                                <input type="checkbox" value="Accessories" name="subcategory_electronics" class="custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                                <span class="text-xs">Accessories (Mouse, Keyboard)</span>
+                            </label>
+                             <label class="sub-category-label flex items-center space-x-2 cursor-pointer p-1 rounded">
+                                <input type="checkbox" value="Audio" name="subcategory_electronics" class="custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                                <span class="text-xs">Audio (Speakers, Earbuds)</span>
+                            </label>
+                        </div>
+                    </details>
+                     <details class="category-details group">
+                        <summary class="flex justify-between items-center py-1 rounded hover:bg-gray-50 px-1 -mx-1">
+                            <label class="flex items-center space-x-2 cursor-pointer flex-grow">
+                                <input type="checkbox" value="Books" name="category" class="category-checkbox custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                                <span class="text-sm font-medium">Books & Stationery</span>
+                            </label>
+                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="accordion-arrow h-4 w-4 text-gray-400 group-open:rotate-90 transition-transform">
+                               <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                             </svg>
+                        </summary>
+                        <div class="accordion-content pl-6 mt-1 space-y-1">
+                             <label class="sub-category-label flex items-center space-x-2 cursor-pointer p-1 rounded">
+                                <input type="checkbox" value="Textbooks" name="subcategory_books" class="custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                                <span class="text-xs">Textbooks</span>
+                            </label>
+                            <label class="sub-category-label flex items-center space-x-2 cursor-pointer p-1 rounded">
+                                <input type="checkbox" value="Stationery" name="subcategory_books" class="custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                                <span class="text-xs">Stationery</span>
+                            </label>
+                        </div>
+                    </details>
+                    <details class="category-details group">
+                        <summary class="flex justify-between items-center py-1 rounded hover:bg-gray-50 px-1 -mx-1">
+                             <label class="flex items-center space-x-2 cursor-pointer flex-grow">
+                                <input type="checkbox" value="Fashion" name="category" class="category-checkbox custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                                <span class="text-sm font-medium">Fashion</span>
+                            </label>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="accordion-arrow h-4 w-4 text-gray-400 group-open:rotate-90 transition-transform">
+                               <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                             </svg>
+                        </summary>
+                         <div class="accordion-content pl-6 mt-1 space-y-1">
+                             <label class="sub-category-label flex items-center space-x-2 cursor-pointer p-1 rounded">
+                                <input type="checkbox" value="Apparel" name="subcategory_fashion" class="custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                                <span class="text-xs">Apparel (Hoodies, Shirts)</span>
+                            </label>
+                             <label class="sub-category-label flex items-center space-x-2 cursor-pointer p-1 rounded">
+                                <input type="checkbox" value="Bags" name="subcategory_fashion" class="custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                                <span class="text-xs">Bags</span>
+                            </label>
+                        </div>
+                    </details>
+                    <details class="category-details group">
+                         <summary class="flex justify-between items-center py-1 rounded hover:bg-gray-50 px-1 -mx-1">
+                             <label class="flex items-center space-x-2 cursor-pointer flex-grow">
+                                <input type="checkbox" value="Home" name="category" class="category-checkbox custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                                <span class="text-sm font-medium">Hostel Essentials</span>
+                            </label>
+                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="accordion-arrow h-4 w-4 text-gray-400 group-open:rotate-90 transition-transform">
+                               <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                             </svg>
+                        </summary>
+                         <div class="accordion-content pl-6 mt-1 space-y-1">
+                             <label class="sub-category-label flex items-center space-x-2 cursor-pointer p-1 rounded">
+                                <input type="checkbox" value="Lighting" name="subcategory_home" class="custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                                <span class="text-xs">Lighting</span>
+                            </label>
+                             <label class="sub-category-label flex items-center space-x-2 cursor-pointer p-1 rounded">
+                                <input type="checkbox" value="Storage" name="subcategory_home" class="custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                                <span class="text-xs">Storage</span>
+                            </label>
+                        </div>
+                    </details>
+                </div>
+            </div>
+
+             <div class="filter-section">
+                <h3 class="text-sm font-medium text-gray-600 mb-3">Price Range (GH₵)</h3>
+                <div class="flex items-center space-x-3">
+                    <input type="number" id="minPrice" class="price-input w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring-primary-light" placeholder="Min" min="0">
+                    <span class="text-gray-400">-</span>
+                    <input type="number" id="maxPrice" class="price-input w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring-primary-light" placeholder="Max" min="0">
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <h3 class="text-sm font-medium text-gray-600 mb-3">Minimum Rating</h3>
+                <div class="space-y-2">
+                    <label class="flex items-center space-x-2 cursor-pointer p-1 rounded hover:bg-gray-50">
+                         <input type="radio" name="rating" value="4" class="custom-checkbox h-4 w-4 text-primary border-gray-300 focus:ring-primary-light">
+                        <span class="flex items-center text-sm">
+                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4 text-primary mr-0.5"> <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" /></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4 text-primary mr-0.5"> <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" /></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4 text-primary mr-0.5"> <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" /></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4 text-primary mr-0.5"> <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" /></svg>
+                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4 text-gray-300 mr-1"> <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.613.049.841.836.404 1.218l-4.128 3.545a.563.563 0 0 0-.162.527l1.257 5.273c.117.491-.525.885-.948.638L12 18.354l-4.68 2.494c-.423.247-1.065-.147-.948-.638l1.257-5.273a.563.563 0 0 0-.162-.527L2.61 10.615c-.437-.382-.209-1.17.404-1.218l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" /></svg>
+                             & Up
+                        </span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer p-1 rounded hover:bg-gray-50">
+                         <input type="radio" name="rating" value="3" class="custom-checkbox h-4 w-4 text-primary border-gray-300 focus:ring-primary-light">
+                        <span class="flex items-center text-sm">
+                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4 text-primary mr-0.5"> <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" /></svg>
+                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4 text-primary mr-0.5"> <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" /></svg>
+                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4 text-primary mr-0.5"> <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" /></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4 text-gray-300 mr-0.5"> <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.613.049.841.836.404 1.218l-4.128 3.545a.563.563 0 0 0-.162.527l1.257 5.273c.117.491-.525.885-.948.638L12 18.354l-4.68 2.494c-.423.247-1.065-.147-.948-.638l1.257-5.273a.563.563 0 0 0-.162-.527L2.61 10.615c-.437-.382-.209-1.17.404-1.218l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" /></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4 text-gray-300 mr-1"> <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.613.049.841.836.404 1.218l-4.128 3.545a.563.563 0 0 0-.162.527l1.257 5.273c.117.491-.525.885-.948.638L12 18.354l-4.68 2.494c-.423.247-1.065-.147-.948-.638l1.257-5.273a.563.563 0 0 0-.162-.527L2.61 10.615c-.437-.382-.209-1.17.404-1.218l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" /></svg>
+                             & Up
+                        </span>
+                    </label>
+                     <label class="flex items-center space-x-2 cursor-pointer p-1 rounded hover:bg-gray-50">
+                         <input type="radio" name="rating" value="0" class="custom-checkbox h-4 w-4 text-primary border-gray-300 focus:ring-primary-light" checked> <span class="text-sm text-gray-500">All Ratings</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4 border-t border-gray-200 bg-gray-50 flex gap-3 flex-shrink-0">
+            <button id="resetFilterBtn" class="filter-button flex-1 py-2.5 px-4 rounded-lg text-sm font-semibold bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors duration-200">Reset</button>
+            <button id="applyFilterBtn" class="filter-button flex-1 py-2.5 px-4 rounded-lg text-sm font-semibold bg-primary text-black hover:bg-primary-dark transition-colors duration-200 shadow-sm">Apply Filters</button>
+        </div>
+    </aside>
+
+    <button id="scrollTopBtn" class="scroll-top fixed bottom-6 right-6 h-12 w-12 bg-primary rounded-full flex items-center justify-center shadow-lifted hover:bg-primary-dark transition-all duration-300 ease-modern z-50" aria-label="Scroll to top">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-6 w-6 text-black">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" />
+        </svg>
+    </button>
+
+    <div id="overlay" class="overlay fixed inset-0 bg-black bg-opacity-60 z-50"></div> <div id="toast" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 translate-y-20 opacity-0 bg-gray-800 text-white px-5 py-2.5 rounded-full text-sm shadow-lg transition-all duration-300 ease-modern z-[70]"> Toast Message Here
+    </div>
+
+
+<script>
+    // --- SAMPLE DATA (Enhanced) ---
+    const products = [
+        { id: 1, name: "HP Laptop 15.6\" Core i5 8GB RAM 512GB SSD", price: 4500, rating: 4.8, image: "https://via.placeholder.com/400/FFDD88/000000?text=Laptop", category: "Electronics", subCategory: "Laptops", university: "UCC", dateAdded: "2025-04-20" },
+        { id: 2, name: "Introduction to Economics Textbook 5th Edition", price: 180, rating: 4.5, image: "https://via.placeholder.com/400/DDDDDD/000000?text=Book", category: "Books", subCategory: "Textbooks", university: "UCC", dateAdded: "2025-04-15" },
+        { id: 3, name: "UCC Branded Hoodie - Navy Blue", price: 150, rating: 4.9, image: "https://via.placeholder.com/400/003366/FFFFFF?text=Hoodie", category: "Fashion", subCategory: "Apparel", university: "UCC", dateAdded: "2025-04-22" },
+        { id: 4, name: "JBL Bluetooth Speaker Portable Wireless", price: 350, rating: 4.7, image: "https://via.placeholder.com/400/FF6B6B/FFFFFF?text=Speaker", category: "Electronics", subCategory: "Audio", university: "KNUST", dateAdded: "2025-04-18" },
+        { id: 5, name: "Scientific Calculator Casio FX-991ES", price: 120, rating: 4.8, image: "https://via.placeholder.com/400/CCCCCC/000000?text=Calc", category: "Books", subCategory: "Stationery", university: "UG", dateAdded: "2025-03-10" },
+        { id: 6, name: "Campus Room Desk Lamp with USB Charging Port", price: 85, rating: 4.3, image: "https://via.placeholder.com/400/EEEEEE/000000?text=Lamp", category: "Home", subCategory: "Lighting", university: "UEW", dateAdded: "2025-04-01" },
+        { id: 7, name: "Wireless Mouse and Keyboard Combo", price: 200, rating: 4.6, image: "https://via.placeholder.com/400/AAAAAA/FFFFFF?text=Combo", category: "Electronics", subCategory: "Accessories", university: "UCC", dateAdded: "2025-04-24" },
+        { id: 8, name: "Principles of Computer Science - Dr. Kwame Ansah", price: 130, rating: 4.4, image: "https://via.placeholder.com/400/BBBBBB/FFFFFF?text=CS+Book", category: "Books", subCategory: "Textbooks", university: "KNUST", dateAdded: "2025-04-05" },
+        { id: 9, name: "Adjustable Laptop Stand for Desk", price: 95, rating: 4.2, image: "https://via.placeholder.com/400/DDDDDD/000000?text=Stand", category: "Electronics", subCategory: "Accessories", university: "UDS", dateAdded: "2025-04-12" },
+        { id: 10, name: "UCC Branded Water Bottle - 750ml", price: 40, rating: 4.7, image: "https://via.placeholder.com/400/3498DB/FFFFFF?text=Bottle", category: "Home", subCategory: "Storage", university: "UCC", dateAdded: "2025-04-25" },
+        { id: 11, name: "Wireless Earbuds with Noise Cancellation", price: 280, rating: 4.5, image: "https://via.placeholder.com/400/FFFFFF/000000?text=Earbuds", category: "Electronics", subCategory: "Audio", university: "UG", dateAdded: "2025-04-19" },
+        { id: 12, name: "Modern African Literature Anthology", price: 110, rating: 4.8, image: "https://via.placeholder.com/400/EEEEEE/000000?text=Lit+Book", category: "Books", subCategory: "Textbooks", university: "UEW", dateAdded: "2025-04-08" },
+    ];
+
+    // --- DOM ELEMENTS ---
+    const productsGrid = document.getElementById('productsGrid');
+    const filterToggle = document.getElementById('filterToggle');
+    const filterPanel = document.getElementById('filterPanel');
+    const closeFilter = document.getElementById('closeFilter');
+    const overlay = document.getElementById('overlay');
+    const scrollTopBtn = document.getElementById('scrollTopBtn'); // Changed ID
+    const sortToggle = document.getElementById('sortToggle');
+    const sortDropdown = document.getElementById('sortDropdown');
+    const searchInput = document.getElementById('searchInput'); // Changed to ID
+    const resetFilterBtn = document.getElementById('resetFilterBtn'); // Changed ID
+    const applyFilterBtn = document.getElementById('applyFilterBtn'); // Changed ID
+    const toast = document.getElementById('toast');
+    const currentSortLabel = document.getElementById('currentSortLabel');
+    const topHeader = document.getElementById('topHeader');
+    const searchHeader = document.getElementById('searchHeader');
+    const scrollableContainer = document.getElementById('scrollableContainer');
+
+    // --- STATE ---
+    let allProducts = [...products]; // Original list, never modified after load
+    let currentProducts = [...products]; // Holds the currently displayed/filtered/sorted products
+    let currentSort = 'newest';
+    let isFilterResetPending = false;
+    let lastScrollY = window.scrollY;
+    let topHeaderHeight = 0; // To store header height for sticky calc
+
+    // --- FUNCTIONS ---
+
+    // Skeleton Loader
+    function showSkeletons(count = 10) { // Increased count slightly
+        productsGrid.innerHTML = ''; // Clear existing grid content
+        for (let i = 0; i < count; i++) {
+            // Added rounded-xl to match product cards
+            productsGrid.innerHTML += `
+                <div class="product-card-skeleton border border-gray-100 rounded-xl overflow-hidden bg-white h-full">
+                    <div class="skeleton h-40 sm:h-48 w-full"></div>
+                    <div class="p-3 space-y-2">
+                        <div class="skeleton h-4 rounded w-3/4"></div>
+                        <div class="skeleton h-4 rounded w-1/2"></div>
+                        <div class="skeleton h-3 rounded w-1/4 mt-1"></div>
+                    </div>
+                </div>
+            `;
+        }
+        console.log("Skeletons shown");
+    }
+
+    // Render Products
+    function renderProducts(productsToRender) {
+        console.log(`Rendering ${productsToRender.length} products...`);
+        productsGrid.innerHTML = ''; // Clear previous content or skeletons
+
+        if (!productsToRender || productsToRender.length === 0) {
+            productsGrid.innerHTML = `
+                <div class="col-span-full text-center py-16 px-4">
+                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-16 w-16 mx-auto text-gray-300">
+                       <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607ZM13.5 10.5h-3" />
+                     </svg>
+                    <h3 class="mt-4 text-lg font-semibold text-text-dark">No Products Found</h3>
+                    <p class="mt-1 text-sm text-text-light">Try adjusting your search or filters.</p>
+                </div>
+            `;
+             console.log("Rendered 'No Products Found' message.");
+            return;
+        }
+
+        productsToRender.forEach((product, index) => {
+            const productCard = document.createElement('div');
+            // Removed initial opacity-0, use simpler fadeIn animation
+            productCard.className = 'product-card bg-white rounded-xl overflow-hidden shadow-subtle hover:shadow-lifted transition-shadow duration-300 ease-modern flex flex-col animate-fadeIn';
+            // Delay animation start for cascade effect
+            productCard.style.animationDelay = `${index * 60}ms`;
+
+            // Determine heart icon style (simple example, replace with actual favorite status)
+            const isFavorite = Math.random() < 0.1; // Dummy favorite status
+            const heartIconSVG = isFavorite
+                ? `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5 text-red-500"><path d="M11.645 20.91a.75.75 0 0 1-1.29 0C8.635 18.87 2.25 13.165 2.25 8.25a5.585 5.585 0 0 1 10.062-3.72.75.75 0 0 1 1.29 0c.001.002.002.004.003.006a5.585 5.585 0 0 1 10.062 3.72c0 4.915-6.385 10.62-8.103 12.66Z" /></svg>`
+                : `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" /></svg>`;
+
+            productCard.innerHTML = `
+                <div class="relative group">
+                    <img src="${product.image}" alt="${product.name}" class="aspect-square w-full object-cover bg-gray-100">
+                    <button class="favorite-button absolute top-3 right-3 h-9 w-9 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-500 hover:text-red-500 hover:scale-110 transition-all duration-200 ${isFavorite ? 'favorited' : ''}" data-product-id="${product.id}">
+                         ${heartIconSVG}
+                    </button>
+                </div>
+                <div class="p-3 sm:p-4 flex flex-col flex-grow">
+                     <h3 class="product-name text-sm font-semibold text-text-dark leading-snug mb-1.5 h-[2.6em] line-clamp-2">
+                        ${product.name}
+                    </h3>
+                    <div class="flex justify-between items-center mt-auto pt-2">
+                        <div class="product-price text-base font-bold text-text-dark">GH₵ ${product.price.toLocaleString()}</div>
+                        <div class="product-rating flex items-center text-xs font-medium text-text-light">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4 text-primary mr-0.5"> <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" /></svg>
+                            ${product.rating.toFixed(1)}
+                        </div>
+                    </div>
+                     <button class="view-product-button mt-3 w-full text-center py-2 px-3 border border-gray-200 rounded-lg text-xs font-semibold text-text-dark hover:bg-gray-100 hover:border-gray-300 transition-colors duration-200">
+                        View Product
+                    </button>
+                </div>
+            `;
+            productsGrid.appendChild(productCard);
+
+            // Add event listener for favorite button after adding to DOM
+            const favButton = productCard.querySelector('.favorite-button');
+            favButton.addEventListener('click', handleFavoriteClick);
+        });
+        console.log("Product rendering complete.");
+    }
+
+    // Handle Favorite Button Click
+    function handleFavoriteClick(event) {
+        const button = event.currentTarget;
+        const productId = button.dataset.productId;
+        const isFavorited = button.classList.toggle('favorited');
+
+        if (isFavorited) {
+            button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5 text-red-500"><path d="M11.645 20.91a.75.75 0 0 1-1.29 0C8.635 18.87 2.25 13.165 2.25 8.25a5.585 5.585 0 0 1 10.062-3.72.75.75 0 0 1 1.29 0c.001.002.002.004.003.006a5.585 5.585 0 0 1 10.062 3.72c0 4.915-6.385 10.62-8.103 12.66Z" /></svg>`;
+            showToast(`Product ${productId} added to favorites!`);
+        } else {
+            button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" /></svg>`;
+            showToast(`Product ${productId} removed from favorites.`);
+        }
+        event.stopPropagation();
+    }
+
+    // Apply Sorting
+    function sortProducts(productsArray, sortType) {
+        const sorted = [...productsArray];
+        switch (sortType) {
+            case 'popular':
+            case 'rating':
+                sorted.sort((a, b) => b.rating - a.rating);
+                break;
+            case 'price-asc':
+                sorted.sort((a, b) => a.price - b.price);
+                break;
+            case 'price-desc':
+                sorted.sort((a, b) => b.price - a.price);
+                break;
+            case 'newest':
+            default:
+                sorted.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
+                break;
+        }
+        return sorted;
+    }
+
+    // Apply All Filters & Search
+    function applyFiltersAndSearch(searchQuery = '') {
+        showSkeletons(currentProducts.length > 0 ? currentProducts.length : 8); // Show skeletons during filtering
+
+        // Delay filtering slightly to allow UI to show skeletons
+        setTimeout(() => {
+            const form = filterPanel; // Get panel itself
+            const selectedUniversities = Array.from(form.querySelectorAll('input[name="university"]:checked')).map(cb => cb.value);
+            const selectedCategories = Array.from(form.querySelectorAll('input[name="category"]:checked')).map(cb => cb.value);
+
+            const selectedSubCategories = {};
+            selectedCategories.forEach(catValue => {
+                const catKey = catValue.toLowerCase().replace(/[^a-z0-9]/g, '');
+                const subCheckboxes = form.querySelectorAll(`input[name="subcategory_${catKey}"]:checked`);
+                if (subCheckboxes.length > 0) {
+                    selectedSubCategories[catValue] = Array.from(subCheckboxes).map(cb => cb.value);
+                }
+            });
+
+            const minPriceInput = document.getElementById('minPrice');
+            const maxPriceInput = document.getElementById('maxPrice');
+            const minPrice = parseFloat(minPriceInput.value) || 0;
+            const maxPrice = parseFloat(maxPriceInput.value) || Infinity;
+
+            // Basic validation for price range
+             if (maxPrice < minPrice && maxPriceInput.value !== '') {
+                 // Optionally swap or show error, here we just ignore max if invalid
+                 console.warn("Max price is less than min price.");
+                 // maxPrice = Infinity; // Or handle differently
+             }
+
+            const minRating = parseFloat(form.querySelector('input[name="rating"]:checked')?.value || 0);
+            const query = searchQuery.toLowerCase().trim();
+
+            console.log("Filtering with:", { selectedUniversities, selectedCategories, selectedSubCategories, minPrice, maxPrice, minRating, query });
+
+            let filtered = allProducts.filter(product => { // Filter from the original full list
+                if (selectedUniversities.length > 0 && !selectedUniversities.includes(product.university)) return false;
+
+                if (selectedCategories.length > 0) {
+                    if (!selectedCategories.includes(product.category)) return false;
+                    if (selectedSubCategories[product.category] && selectedSubCategories[product.category].length > 0) {
+                        if (!selectedSubCategories[product.category].includes(product.subCategory)) return false;
+                    }
+                }
+
+                if (product.price < minPrice || product.price > maxPrice) return false;
+                if (product.rating < minRating) return false;
+
+                if (query) {
+                    const productName = product.name.toLowerCase();
+                    const category = product.category.toLowerCase();
+                    const subCategory = product.subCategory.toLowerCase();
+                    if (!productName.includes(query) && !category.includes(query) && !subCategory.includes(query)) {
+                         // Basic fuzzy check (can be improved)
+                         const words = query.split(' ').filter(w => w.length > 1);
+                         if (words.length > 0 && !words.every(word => productName.includes(word))) {
+                             return false; // If any word (longer than 1 char) isn't found, exclude
+                         } else if (words.length === 0 && !productName.includes(query)) {
+                              return false; // Handle single short word or direct mismatch
+                         }
+                    }
+                }
+                return true;
+            });
+
+            currentProducts = sortProducts(filtered, currentSort); // Sort the newly filtered list
+            renderProducts(currentProducts); // Render the final list
+
+            const filterCount = selectedUniversities.length + selectedCategories.length + Object.keys(selectedSubCategories).length + (minPrice > 0 ? 1 : 0) + (maxPrice < Infinity ? 1 : 0) + (minRating > 0 ? 1: 0);
+            if (filterCount > 0 || query) {
+                 showToast(`${currentProducts.length} product${currentProducts.length !== 1 ? 's' : ''} found`);
+            }
+        }, 50); // Short delay for skeleton UI update
+    }
+
+    // Show Toast Notification
+    function showToast(message) {
+        toast.textContent = message;
+        toast.classList.remove('translate-y-20', 'opacity-0');
+        toast.classList.add('translate-y-0', 'opacity-100');
+
+        // Clear any existing timer
+        if (toast.timer) clearTimeout(toast.timer);
+
+        toast.timer = setTimeout(() => {
+            toast.classList.remove('translate-y-0', 'opacity-100');
+            toast.classList.add('translate-y-20', 'opacity-0');
+            toast.timer = null;
+        }, 2500);
+    }
+
+    // Toggle Filter Panel
+    function toggleFilterPanel(show = true) {
+        if (show) {
+            filterPanel.classList.add('show');
+            overlay.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        } else {
+            filterPanel.classList.remove('show');
+            overlay.classList.remove('show');
+             document.body.style.overflow = '';
+        }
+    }
+
+    // Visually Reset Filter Form
+    function resetFilterForm() {
+        const form = filterPanel;
+        form.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+        form.querySelectorAll('input[type="radio"]').forEach(rb => rb.checked = false);
+        const defaultRating = form.querySelector('input[name="rating"][value="0"]');
+        if (defaultRating) defaultRating.checked = true;
+        form.querySelectorAll('input[type="number"]').forEach(input => input.value = '');
+        form.querySelectorAll('details.category-details').forEach(detail => detail.removeAttribute('open'));
+        isFilterResetPending = true;
+        console.log("Filter form visually reset.");
+         // Give visual feedback on reset button
+         resetFilterBtn.classList.add('bg-gray-300');
+         setTimeout(()=> resetFilterBtn.classList.remove('bg-gray-300'), 200);
+    }
+
+    // --- EVENT LISTENERS ---
+
+    filterToggle.addEventListener('click', () => toggleFilterPanel(true));
+    closeFilter.addEventListener('click', () => toggleFilterPanel(false));
+    overlay.addEventListener('click', () => {
+        toggleFilterPanel(false);
+        sortDropdown.classList.remove('show');
+    });
+
+    sortToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        sortDropdown.classList.toggle('show');
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!sortToggle.contains(e.target) && !sortDropdown.contains(e.target)) {
+            sortDropdown.classList.remove('show');
+        }
+        // Close filter panel if click is outside it while open
+        if (filterPanel.classList.contains('show') && !filterPanel.contains(e.target) && !filterToggle.contains(e.target)) {
+             // toggleFilterPanel(false); // Keep overlay click for this
+        }
+    });
+
+    sortDropdown.querySelectorAll('.sort-option').forEach(option => {
+        option.addEventListener('click', (e) => {
+            e.preventDefault();
+            const sortType = option.dataset.sort;
+            if(currentSort === sortType) { // Avoid re-sorting if same option clicked
+                sortDropdown.classList.remove('show');
+                return;
+            }
+            currentSort = sortType;
+            currentSortLabel.textContent = option.textContent;
+            sortDropdown.querySelectorAll('.sort-option').forEach(opt => opt.classList.remove('bg-primary-light', 'font-semibold'));
+            option.classList.add('bg-primary-light', 'font-semibold');
+            sortDropdown.classList.remove('show');
+
+            // Re-sort and re-render currently filtered products
+            currentProducts = sortProducts(currentProducts, currentSort); // Sort the existing filtered list
+            renderProducts(currentProducts);
+            showToast(`Sorted by ${option.textContent}`);
+        });
+    });
+
+    function adjustStickyHeader() {
+    const scrollY = scrollableContainer.scrollTop;
+    const scrollThreshold = 50;
+    const mainContainer = document.querySelector('.main-container');
+    const topHeaderHeight = topHeader.offsetHeight;
+
+    if (scrollY > scrollThreshold && scrollY > lastScrollY) {
+        // Hide top header
+        topHeader.classList.add('top-header-hidden');
+        searchHeader.style.top = '0';
+        
+        // Adjust main container to move up as well
+        // We need to transition from [topHeaderHeight + searchHeaderHeight - 20] to [searchHeaderHeight - 20]
+        const searchHeaderHeight = searchHeader.offsetHeight;
+        mainContainer.style.marginTop = `${searchHeaderHeight - 0}px`;
+        mainContainer.style.height = `calc(100vh - ${searchHeaderHeight - 20}px)`;
+    } else {
+        // Show top header
+        topHeader.classList.remove('top-header-hidden');
+        searchHeader.style.top = `${topHeaderHeight}px`;
+        
+        // Reset main container position
+        const searchHeaderHeight = searchHeader.offsetHeight;
+        const totalHeaderHeight = topHeaderHeight + searchHeaderHeight;
+        mainContainer.style.marginTop = `${totalHeaderHeight - 0}px`;
+        mainContainer.style.height = `calc(100vh - ${totalHeaderHeight - 0}px)`;
+    }
+
+    lastScrollY = scrollY;
+}
+
+    // Scroll Events
+
+    // Get the scrollable container element (Make sure this line is present somewhere before the listener)
+    const scrollContainer = document.getElementById('scrollableContainer');
+
+    // Scroll Event Listener for the SCROLLABLE CONTAINER
+// Replace your existing scroll event listener with this
+if (scrollContainer) {
+    scrollContainer.addEventListener('scroll', () => {
+        const scrollY = scrollContainer.scrollTop;
+
+        // Scroll-to-top button visibility
+        if (scrollY > 300) {
+            scrollTopBtn.classList.add('visible');
+        } else {
+            scrollTopBtn.classList.remove('visible');
+        }
+
+        // Adjust header visibility
+        adjustStickyHeader();
+
+    }, { passive: true });
+} else {
+        // Add error handling in case the container isn't found
+        console.error("Element with ID 'scrollableContainer' not found!");
+    }
+
+
+    // Scroll-to-top Button Click Handler
+    scrollTopBtn.addEventListener('click', () => {
+        // 3. Update the button action to scroll the container
+        if (scrollContainer) {
+            scrollContainer.scrollTo({
+                top: 0,
+                behavior: 'smooth' // Use smooth scroll on the container
+            });
+        }
+    });
+
+    // Make sure to comment out or delete the adjustStickyHeader function definition if it exists elsewhere
+    // function adjustStickyHeader() { ... }
+
+    // Search Input
+    let searchTimeout;
+    searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            const query = e.target.value;
+            // Apply search immediately, potentially filtering the current set
+            applyFiltersAndSearch(query);
+        }, 350);
+    });
+
+    // Filter Buttons
+    resetFilterBtn.addEventListener('click', resetFilterForm);
+
+    applyFilterBtn.addEventListener('click', () => {
+        if (isFilterResetPending) {
+            // Apply the full reset
+            currentSort = 'newest';
+            currentSortLabel.textContent = 'Newest';
+            sortDropdown.querySelectorAll('.sort-option').forEach(opt => opt.classList.remove('bg-primary-light', 'font-semibold'));
+            sortDropdown.querySelector('.sort-option[data-sort="newest"]').classList.add('bg-primary-light', 'font-semibold');
+            searchInput.value = '';
+
+            // Start fresh: filter all products with no filters applied, then sort
+            applyFiltersAndSearch(); // Call with no query and rely on reset form state
+            isFilterResetPending = false;
+            showToast('Filters reset');
+        } else {
+             // Apply currently selected filters from the form
+            applyFiltersAndSearch(searchInput.value.trim());
+            // showToast('Filters applied'); // Feedback given inside applyFiltersAndSearch
+        }
+        toggleFilterPanel(false);
+    });
+
+     // Category Checkbox Interactions
+    filterPanel.querySelectorAll('input.category-checkbox').forEach(catCheckbox => {
+        catCheckbox.addEventListener('change', (e) => {
+            const detailsElement = e.target.closest('details.category-details');
+            if (!detailsElement) return;
+            const subCheckboxes = detailsElement.querySelectorAll('.accordion-content input[type="checkbox"]');
+            if (!e.target.checked) {
+                subCheckboxes.forEach(sub => sub.checked = false);
+            }
+        });
+    });
+
+    // Subcategory Checkbox Interactions
+    filterPanel.querySelectorAll('.accordion-content input[type="checkbox"]').forEach(subCheckbox => {
+         subCheckbox.addEventListener('change', (e) => {
+             if (e.target.checked) {
+                 const parentCheckbox = e.target.closest('details.category-details')?.querySelector('input.category-checkbox');
+                 if (parentCheckbox && !parentCheckbox.checked) {
+                      parentCheckbox.checked = true;
+                 }
+             }
+             // Check if any sub is checked, if not, potentially uncheck parent? (Optional complexity)
+             // const detailsElement = e.target.closest('details.category-details');
+             // const anySubChecked = Array.from(detailsElement.querySelectorAll('.accordion-content input[type="checkbox"]')).some(cb => cb.checked);
+             // const parentCheckbox = detailsElement.querySelector('input.category-checkbox');
+             // if (!anySubChecked && parentCheckbox.checked) {
+             //      parentCheckbox.checked = false; // Example: Uncheck parent if no subs are checked
+             // }
+         });
+    });
+
+    function calculateHeaderHeights() {
+    const topHeaderHeight = topHeader.offsetHeight;
+    const searchHeaderHeight = searchHeader.offsetHeight;
+    const totalHeight = topHeaderHeight + searchHeaderHeight;
+    console.log("Top header height:", topHeaderHeight);
+    console.log("Search header height:", searchHeaderHeight);
+    console.log("Total height:", totalHeight);
+    return totalHeight;
+}
+
+function positionElements() {
+    // Get header heights
+    const topHeaderHeight = topHeader.offsetHeight;
+    const searchHeaderHeight = searchHeader.offsetHeight;
+    const totalHeaderHeight = topHeaderHeight + searchHeaderHeight;
+    const mainContainer = document.querySelector('.main-container');
+    
+    // Position search header below top header
+    searchHeader.style.top = `${topHeaderHeight}px`;
+    
+    // Position main container below both headers with the -mt-5 offset
+    const mainContainerTop = totalHeaderHeight - 20; // -mt-5 = -20px
+    
+    mainContainer.style.marginTop = `${mainContainerTop}px`;
+    mainContainer.style.height = `calc(100vh - ${mainContainerTop}px)`;
+    
+    console.log("Headers positioned: Main container top at", mainContainerTop);
+}
+
+
+    // --- INITIALIZATION ---
+    function init() {
+        console.log("Initializing...");
+        showSkeletons(); // Show skeletons immediately
+
+    // Set initial header positions
+    const topHeaderHeight = topHeader.offsetHeight;
+    searchHeader.style.top = `${topHeaderHeight}px`;
+
+        // Calculate and set correct header spacing
+    const headerHeight = calculateHeaderHeights();
+    document.querySelector('.main-container').style.marginTop = `${headerHeight}px`;
+    document.querySelector('.main-container').style.height = `calc(100vh - ${headerHeight}px)`;
+    
+    // Add initialization calls
+document.addEventListener('DOMContentLoaded', () => {
+    init();
+    positionElements();
+});
+
+// Handle window resize
+window.addEventListener('resize', () => {
+    positionElements();
+    // If top header is hidden, adjust for that state
+    if (topHeader.classList.contains('top-header-hidden')) {
+        const searchHeaderHeight = searchHeader.offsetHeight;
+        const mainContainer = document.querySelector('.main-container');
+        mainContainer.style.marginTop = `${searchHeaderHeight - 20}px`;
+        mainContainer.style.height = `calc(100vh - ${searchHeaderHeight - 20}px)`;
+    }
+});
+
+        // Initial adjustment for sticky header based on calculated height
+        // Needs slight delay for accurate offsetHeight reading
+        setTimeout(() => {
+            // Simulate network delay for loading actual products
+            setTimeout(() => {
+                console.log("Loading initial products...");
+                allProducts = [...products]; // Store original data
+                currentSort = 'newest'; // Ensure default sort
+                currentProducts = sortProducts([...allProducts], currentSort); // Sort initial full list
+                renderProducts(currentProducts); // Render the initial sorted list
+
+                // Set default selected sort option visual state
+                sortDropdown.querySelectorAll('.sort-option').forEach(opt => opt.classList.remove('bg-primary-light', 'font-semibold'));
+                sortDropdown.querySelector('.sort-option[data-sort="newest"]')?.classList.add('bg-primary-light', 'font-semibold');
+                console.log("Initial products rendered.");
+            }, 800); // Shorter delay now, just for simulation
+        }, 50); // Short delay for layout calculation
+    }
+
+
+    // Run initialization when the DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', init);
+
+</script>
+
+</body>
+</html>

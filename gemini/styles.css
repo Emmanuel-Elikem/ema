@@ -1,0 +1,781 @@
+/* --- General Styles & Variables --- */
+:root {
+    --primary-yellow: #FFD700; /* Main yellow */
+    --secondary-yellow: #ffec80; /* Lighter yellow for accents if needed */
+    --black: #000000;
+    --white: #FFFFFF;
+    --light-gray: #f5f5f5; /* Lighter gray */
+    --medium-gray: #cccccc;
+    --dark-gray: #333333;
+    --red-accent: #e74c3c; /* For love icon active state */
+    --radius-large: 30px;
+    --radius-medium: 15px;
+    --radius-small: 8px;
+    --base-font: 'Poppins', 'Arial', 'Helvetica', sans-serif; /* Example: More modern font */
+    --header-height-top: 60px;
+    --header-height-search: 70px;
+    --sticky-header-height: 70px;
+    --transition-speed: 0.3s; /* Standard transition speed */
+}
+
+/* Import Poppins font (example) - Place this at the top */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--base-font);
+    background-color: var(--light-gray);
+    color: var(--dark-gray);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: var(--white);
+    border-top-right-radius: var(--radius-medium);
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    overflow: hidden;
+    min-height: 100vh;
+    position: relative;
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+button {
+    cursor: pointer;
+    font-family: inherit;
+    transition: all var(--transition-speed) ease; /* General transition */
+    border: none; /* Remove default borders */
+}
+button:active {
+    transform: scale(0.97); /* Click effect */
+}
+
+input {
+    font-family: inherit;
+}
+
+/* --- Header Styles --- */
+.header {
+    background-color: var(--primary-yellow);
+    color: var(--black);
+    position: relative;
+    z-index: 100;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    height: var(--header-height-top);
+}
+
+.logo {
+    font-size: 1.8em;
+    font-weight: bold;
+    margin: 0;
+}
+
+.header-icons i {
+    font-size: 1.5em;
+    margin-left: 20px;
+    cursor: pointer;
+    transition: color var(--transition-speed) ease;
+}
+.header-icons i:hover {
+    color: var(--white); /* Example hover */
+}
+
+.header-search-sticky {
+    padding: 15px 20px;
+    height: var(--header-height-search);
+    transition: all var(--transition-speed) ease-in-out; /* Smoother transition */
+    background-color: var(--primary-yellow);
+}
+
+.search-wrapper {
+    display: flex;
+    align-items: center;
+    background-color: var(--white);
+    border-radius: var(--radius-large);
+    border: 1px solid var(--black);
+    padding: 5px;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    transition: all var(--transition-speed) ease; /* Transition */
+}
+
+.search-input {
+    flex-grow: 1;
+    border: none;
+    outline: none;
+    padding: 8px 15px;
+    font-size: 1em;
+    background-color: transparent;
+    border-radius: var(--radius-large);
+}
+
+.search-input::placeholder {
+    color: var(--medium-gray);
+}
+
+.filter-btn {
+    background: none;
+    border: none;
+    font-size: 1.4em; /* Adjust if needed for new icon */
+    padding: 5px 10px;
+    color: var(--black);
+    margin-left: 5px;
+    transition: transform var(--transition-speed) ease;
+}
+.filter-btn:hover {
+    transform: scale(1.1);
+}
+
+/* --- Sticky Header --- */
+.header-search-sticky.sticky {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Enhanced shadow */
+    padding-top: 10px;
+    padding-bottom: 10px;
+    height: var(--sticky-header-height);
+    display: flex;
+    justify-content: center;
+    background-color: rgba(255, 215, 0, 0.95); /* Slightly transparent yellow */
+    backdrop-filter: blur(5px); /* Optional: blur background */
+}
+.header-search-sticky.sticky .search-wrapper {
+    max-width: calc(100% - 40px);
+    margin: 0 20px;
+    background-color: var(--white); /* Ensure background is solid when sticky */
+}
+
+/* --- Main Content Padding Adjustment --- */
+.main-content {
+    padding: 0 20px 80px 20px;
+    transition: padding-top var(--transition-speed) ease-in-out; /* Smooth padding transition */
+}
+/* This class is no longer strictly needed as padding is applied directly via JS */
+/* .main-content.sticky-padding { */
+/* padding-top: var(--sticky-header-height); */
+/* } */
+
+
+/* --- Sort Control --- */
+.sort-control-wrapper {
+    display: flex;
+    justify-content: center; /* Center the control */
+    padding: 20px;
+}
+
+.sort-control {
+    position: relative;
+    background-color: var(--black);
+    color: var(--white);
+    border-radius: var(--radius-large);
+    padding: 10px 25px;
+    font-size: 0.9em;
+    font-weight: 500; /* Slightly bolder */
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.sort-control span {
+    margin-right: 10px;
+}
+
+.sort-arrow {
+    transition: transform var(--transition-speed) ease;
+}
+
+.sort-control.open .sort-arrow {
+    transform: rotate(180deg);
+}
+
+.sort-options {
+    display: none;
+    position: absolute;
+    top: calc(100% + 5px); /* Position below with small gap */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--white);
+    border-radius: var(--radius-small);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15); /* Softer shadow */
+    padding: 10px 0;
+    z-index: 1001;
+    min-width: 200px; /* Wider options */
+    border: 1px solid var(--light-gray);
+    opacity: 0; /* For transition */
+    visibility: hidden; /* For transition */
+    transition: opacity var(--transition-speed) ease, visibility 0s linear var(--transition-speed);
+}
+
+.sort-control.open .sort-options {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity var(--transition-speed) ease, visibility 0s linear 0s;
+}
+
+.sort-options button {
+    display: block;
+    width: 100%;
+    padding: 12px 20px; /* More padding */
+    background: none;
+    border: none;
+    text-align: left;
+    color: var(--dark-gray);
+    font-size: 0.9em;
+}
+
+.sort-options button:hover {
+    background-color: var(--light-gray);
+    color: var(--black); /* Darken text on hover */
+}
+
+/* --- Product Grid --- */
+.product-grid {
+    display: grid;
+    /* Default to 2 columns for larger screens */
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); /* Slightly larger min size */
+    gap: 30px; /* Increased gap */
+    padding-top: 10px;
+}
+
+.no-results-message {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--medium-gray);
+    font-size: 1.2em;
+}
+
+/* --- Product Item --- */
+.product-item {
+    background-color: var(--white); /* Yellow background */
+    border-radius: var(--radius-medium); /* Overall rounding */
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+
+.product-item:hover {
+    transform: translateY(-8px) scale(1.02); /* Lift and slightly enlarge */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Stronger shadow on hover */
+}
+
+/* Wrapper for the image container */
+.product-image-wrapper {
+    padding: 12px; /* Padding around the white container */
+}
+
+/* White container for the image */
+.product-image-container {
+    background-color: var(--white);
+    /* Specific rounding: top-left, top-right, bottom-right */
+    border-top-left-radius: var(--radius-small);
+    border-top-right-radius: var(--radius-small);
+    border-bottom-right-radius: var(--radius-small);
+    border-bottom-left-radius: 0; /* Sharp bottom-left */
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative; /* For positioning icons */
+    overflow: hidden; /* Ensure icons stay within bounds */
+}
+
+.product-image {
+    /* Image itself - no background needed */
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    display: block;
+    border-radius: 4px; /* Slight rounding for the image itself */
+    transition: transform var(--transition-speed) ease;
+}
+.product-item:hover .product-image {
+     transform: scale(1.05); /* Zoom image slightly on card hover */
+}
+
+/* Love Icon */
+.love-icon {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 1.4em;
+    color: var(--medium-gray); /* Default color */
+    cursor: pointer;
+    transition: color var(--transition-speed) ease, transform var(--transition-speed) ease;
+    z-index: 5; /* Above image */
+    background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent background */
+    padding: 5px;
+    border-radius: 50%;
+    line-height: 1; /* Ensure icon is centered */
+    display: flex; /* Ensure icon is centered */
+    align-items: center; /* Ensure icon is centered */
+    justify-content: center; /* Ensure icon is centered */
+}
+
+.love-icon:hover {
+    transform: scale(1.2);
+}
+
+.love-icon.active {
+    color: var(--red-accent); /* Active color (e.g., red) */
+}
+.love-icon.active .fa-regular {
+    display: none; /* Hide regular heart */
+}
+.love-icon .fa-solid {
+    display: none; /* Hide solid heart by default */
+}
+.love-icon.active .fa-solid {
+    display: inline-block; /* Show solid heart when active */
+}
+
+
+/* Rating Display */
+.rating-display {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background-color: rgba(0, 0, 0, 0.6); /* Dark semi-transparent bg */
+    color: var(--white);
+    padding: 4px 8px;
+    border-radius: var(--radius-small);
+    font-size: 0.85em;
+    font-weight: 500;
+    display: inline-flex; /* Align items horizontally */
+    align-items: center;
+    gap: 4px; /* Space between star and number */
+    z-index: 5;
+}
+
+.rating-display .fa-star {
+    color: var(--primary-yellow); /* Yellow star */
+    font-size: 0.9em;
+}
+
+.product-info {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.product-title {
+    font-size: 1.05em; /* Adjusted size */
+    font-weight: 600;
+    color: var(--black);
+    margin-bottom: 8px; /* Increased margin */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 2.6em; /* Approx 1.3em line-height * 2 */
+    line-height: 1.3em; /* Adjust line height */
+}
+
+.product-price {
+    font-size: 1.25em; /* Slightly larger price */
+    font-weight: 700; /* Bolder price */
+    color: var(--dark-gray);
+    margin-bottom: 15px;
+    margin-top: auto; /* Push price and button down */
+}
+
+.product-details-btn {
+    display: inline-block;
+    background-color: transparent; /* Transparent background */
+    color: var(--black); /* Black text */
+    text-decoration: none;
+    padding: 8px 18px; /* Adjusted padding */
+    border-radius: var(--radius-large);
+    text-align: center;
+    font-size: 0.9em;
+    font-weight: 600; /* Bolder text */
+    border: 1.5px solid var(--black); /* Black border */
+    align-self: flex-start;
+    transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+}
+
+.product-details-btn:hover {
+    background-color: var(--black); /* Black background on hover */
+    color: var(--primary-yellow); /* Yellow text on hover */
+    border-color: var(--black);
+}
+
+/* --- Filter Modal --- */
+.filter-modal {
+    /* ... (existing styles for position, background, display) ... */
+    transition: opacity var(--transition-speed) ease, visibility 0s linear var(--transition-speed); /* Smoother fade */
+}
+.filter-modal.active {
+    /* ... (existing active styles) ... */
+    transition: opacity var(--transition-speed) ease, visibility 0s linear 0s;
+}
+
+.filter-modal-content {
+    /* ... (existing styles for background, width, padding-top) ... */
+    padding: 25px; /* Standard padding */
+    padding-top: 60px; /* More space for close button */
+    transform: translateX(100%);
+    transition: transform var(--transition-speed) ease-in-out; /* Smoother slide */
+    display: flex;
+    flex-direction: column;
+}
+.filter-modal.active .filter-modal-content {
+    transform: translateX(0);
+}
+
+.close-modal-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 2.8em; /* Larger close icon */
+    font-weight: 300; /* Lighter weight */
+    color: var(--medium-gray);
+    line-height: 1;
+    padding: 0; /* Remove padding if any */
+    transition: color var(--transition-speed) ease, transform var(--transition-speed) ease;
+}
+.close-modal-btn:hover {
+    color: var(--dark-gray);
+    transform: rotate(90deg); /* Rotate on hover */
+}
+
+.filter-modal h2 {
+    margin-bottom: 30px; /* More space below title */
+    font-size: 1.8em; /* Larger title */
+    font-weight: 600;
+    color: var(--black);
+    text-align: left; /* Align left */
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary-yellow); /* Yellow underline */
+}
+
+.filter-section {
+    margin-bottom: 30px; /* Increased spacing */
+}
+
+.filter-section h3 {
+    font-size: 1.2em; /* Larger section titles */
+    font-weight: 500;
+    margin-bottom: 15px; /* More space below title */
+    color: var(--dark-gray);
+    border-bottom: 1px solid var(--light-gray);
+    padding-bottom: 8px;
+}
+
+/* Improved Checkbox/Radio Styles */
+.filter-options div {
+    margin-bottom: 12px; /* Spacing between options */
+    display: flex; /* Align input and label */
+    align-items: center;
+}
+
+.filter-options label {
+    margin-left: 10px; /* Space after checkbox/radio */
+    cursor: pointer;
+    color: var(--dark-gray);
+    font-size: 0.95em;
+}
+.filter-options input[type="checkbox"],
+.filter-options input[type="radio"] {
+    cursor: pointer;
+    accent-color: var(--primary-yellow); /* Style the check/radio itself */
+    width: 18px; /* Custom size */
+    height: 18px;
+}
+
+/* Style for category groups (if using subcategories) */
+.category-group .category-title {
+    font-weight: 500;
+    margin-bottom: 8px;
+    display: block;
+}
+.subcategory-options {
+    padding-left: 20px; /* Indent subcategories */
+}
+
+
+.price-range-inputs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.price-range-inputs input[type="number"] {
+    flex: 1; /* Allow inputs to grow */
+    padding: 10px 12px; /* More padding */
+    border: 1px solid var(--medium-gray);
+    border-radius: var(--radius-small);
+    font-size: 0.95em;
+    -moz-appearance: textfield;
+}
+.price-range-inputs input[type="number"]::-webkit-outer-spin-button,
+.price-range-inputs input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.price-range-inputs input[type="number"]:focus {
+     border-color: var(--primary-yellow); /* Highlight on focus */
+     outline: none;
+     box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.3);
+}
+
+
+.filter-controls {
+    margin-top: auto;
+    padding-top: 25px;
+    border-top: 1px solid var(--light-gray);
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.filter-action-btn {
+    flex: 1;
+    padding: 14px 15px; /* Larger buttons */
+    border-radius: var(--radius-large);
+    font-size: 1em;
+    font-weight: 600; /* Bolder text */
+    border: 1.5px solid;
+    text-transform: uppercase; /* Uppercase text */
+    letter-spacing: 0.5px; /* Slight spacing */
+}
+
+.apply-filters-btn {
+    background-color: var(--primary-yellow);
+    color: var(--black);
+    border-color: var(--primary-yellow);
+}
+.apply-filters-btn:hover {
+    background-color: #e6c300;
+    border-color: #e6c300;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.reset-filters-btn {
+    background-color: transparent;
+    color: var(--dark-gray);
+    border-color: var(--medium-gray);
+}
+.reset-filters-btn:hover {
+    background-color: var(--light-gray);
+    border-color: var(--dark-gray);
+}
+
+/* --- Scroll to Top Button --- */
+.scroll-to-top {
+    /* ... (existing styles) ... */
+    background-color: var(--black); /* Black button */
+    color: var(--primary-yellow); /* Yellow icon */
+    width: 50px; /* Slightly larger */
+    height: 50px;
+    font-size: 1.5em;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: opacity var(--transition-speed) ease, transform var(--transition-speed) ease, background-color var(--transition-speed) ease; /* Added background-color */
+}
+
+.scroll-to-top.visible {
+    /* ... (existing visible styles) ... */
+     transition: opacity var(--transition-speed) ease, transform var(--transition-speed) ease, display 0s linear 0s;
+}
+
+.scroll-to-top:hover {
+    background-color: var(--dark-gray); /* Darker gray on hover */
+    transform: scale(1.1);
+}
+
+/* --- Skeleton Loader Styles --- */
+.skeleton-container {
+    /* Uses product-grid styles for layout */
+    display: grid; /* Ensure it's displayed initially */
+}
+
+.product-item-skeleton {
+    background-color: var(--light-gray); /* Base color */
+    border-radius: var(--radius-medium);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.skeleton {
+    background: linear-gradient(90deg, var(--light-gray) 25%, var(--medium-gray) 50%, var(--light-gray) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite linear;
+    border-radius: var(--radius-small); /* Match content rounding */
+}
+
+.skeleton-image {
+    height: 200px; /* Approximate image height */
+    margin: 12px; /* Match wrapper padding */
+    border-bottom-left-radius: 0; /* Match image container style */
+}
+
+.skeleton-text {
+    height: 1.2em; /* Match text line height */
+    margin-bottom: 8px;
+}
+
+.skeleton-text-short {
+    width: 60%;
+}
+
+.skeleton-text-long {
+     width: 90%;
+}
+
+.skeleton-price {
+    height: 1.5em; /* Match price height */
+    width: 40%;
+    margin-top: auto; /* Push down */
+    margin-bottom: 15px;
+}
+
+.skeleton-button {
+    height: 35px; /* Match button height */
+    width: 100px; /* Match button width */
+    border-radius: var(--radius-large);
+    align-self: flex-start;
+}
+
+.skeleton-info {
+     padding: 15px;
+     flex-grow: 1;
+     display: flex;
+     flex-direction: column;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* --- Responsiveness --- */
+@media (max-width: 768px) {
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr); /* TWO columns for mobile */
+        gap: 20px;
+    }
+
+    .main-content {
+        padding: 0 15px 70px 15px;
+    }
+
+     .header-search-sticky {
+        padding: 10px 15px;
+     }
+
+    .search-wrapper {
+        padding: 3px;
+    }
+    .search-input {
+        padding: 6px 12px;
+        font-size: 0.95em;
+    }
+    .filter-btn {
+        font-size: 1.3em;
+        padding: 4px 8px;
+    }
+
+     .filter-modal-content {
+        max-width: 320px; /* Keep max-width for medium screens */
+        width: 85%; /* Adjust width */
+     }
+
+     /* Adjust skeleton image height for smaller items */
+    .skeleton-image {
+        height: 160px;
+    }
+}
+
+@media (max-width: 480px) {
+    .product-grid {
+        /* Still two columns as requested, adjust gap if needed */
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+     /* Adjust skeleton image height again */
+    .skeleton-image {
+        height: 140px;
+    }
+     .product-title {
+        font-size: 0.9em;
+        height: 2.6em; /* Re-check height */
+        line-height: 1.3em;
+    }
+    .product-price {
+        font-size: 1.1em;
+    }
+    .product-details-btn {
+        font-size: 0.8em;
+        padding: 6px 14px;
+    }
+    /* Make filter modal full width on very small screens */
+    .filter-modal-content {
+        width: 100%;
+        max-width: none;
+        border-radius: 0;
+        height: 100%;
+    }
+
+    .filter-controls {
+        flex-direction: column;
+    }
+
+    .scroll-to-top {
+        width: 45px;
+        height: 45px;
+        font-size: 1.3em;
+        bottom: 15px;
+        right: 15px;
+    }
+
+    /* Header adjustments */
+     .header-top {
+        padding: 8px 15px;
+     }
+     .logo {
+        font-size: 1.6em;
+     }
+     .header-icons i {
+        font-size: 1.4em;
+        margin-left: 15px;
+     }
+     .sort-control {
+        padding: 9px 22px;
+        font-size: 0.9em;
+     }
+}

@@ -1,0 +1,2256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Connect | Account & Activity Log</title>
+    <style>
+        /*
+        Campus Connect User Profile Dashboard Stylesheet
+
+        This stylesheet defines the visual appearance and layout for the user profile dashboard.
+        It uses a light theme with #FFCC08 as the primary brand color.
+
+        Table of Contents:
+        1.  Global Styles & Variables
+        2.  Loader
+        3.  Header & User Actions
+        4.  Dashboard Layout (Sidebar & Main Content)
+        5.  Profile Sidebar
+        6.  Main Content Sections
+        7.  Profile Information Section
+        8.  Order History Section
+        9.  Reviews Section
+        10. Recently Viewed Section
+        11. Shopping Cart Section
+        12. Modals
+        13. Utility Classes & Animations
+        14. Responsive Design (Media Queries)
+        */
+
+        /* 1. Global Styles & Variables */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.4s ease; /* Smooth transitions for most properties */
+        }
+
+        :root {
+            --primary: #FFCC08; /* Brand primary color (Yellow) */
+            --primary-light: #ffda4d; /* Lighter shade of primary */
+            --primary-dark: #e5b800; /* Darker shade of primary */
+            --text: #1f1f1f; /* Main dark text color */
+            --text-light: #5a5a5a; /* Lighter grey text color */
+            --bg: #fefefe; /* Pure white background for cards/elements */
+            --bg-light: #f0f2f5; /* Light grey background for the body */
+            --card-bg: rgba(255, 255, 255, 0.95); /* Semi-transparent white for main sections */
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.08); /* Standard box shadow */
+            --border-radius: 16px; /* Consistent border radius for main elements */
+        }
+
+        body {
+            background: var(--bg-light);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            line-height: 1.6;
+        }
+
+        /* 2. Loader */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #fff;
+            z-index: 9999; /* Stay on top */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.6s ease; /* Fade out effect */
+        }
+
+        /* Animation for gradient shimmer effect */
+    @keyframes gradientShimmer {
+        0% { background-position: 100% 100%; }
+        50% { background-position: -100% -100%; }
+        100% { background-position: 100% 100%; }
+    }
+
+    .loader-preview {
+        width: 90%; /* Take up most of the screen */
+        max-width: 1200px; /* Max width similar to container */
+        height: 90vh; /* Take up most of the viewport height */
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding: 20px;
+        background-color: var(--bg-light); /* Light background for the preview area */
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+    }
+
+    .loader-header-placeholder {
+        width: 100%;
+        height: 60px;
+        background: linear-gradient(135deg, var(--bg-light) 25%, #e0e0e0 50%, var(--bg-light) 75%);
+        background-size: 200% 100%;
+        border-radius: 8px;
+        animation: gradientShimmer 1.5s ease infinite; /* Apply shimmer animation */
+    }
+
+    .loader-main-layout {
+        flex-grow: 1; /* Fill remaining space */
+        display: grid;
+        grid-template-columns: 1fr 3fr; /* Mimic dashboard layout */
+        gap: 20px;
+    }
+
+    .loader-sidebar-placeholder {
+        background: linear-gradient(135deg, var(--bg-light) 25%, #e0e0e0 50%, var(--bg-light) 75%);
+        background-size: 200% 100%;
+        border-radius: 8px;
+        animation: gradientShimmer 1.5s ease infinite;
+    }
+
+    .loader-content-placeholder {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .loader-card-placeholder {
+        width: 100%;
+        height: 100px; /* Example height for content cards */
+        background: linear-gradient(135deg, var(--bg-light) 25%, #e0e0e0 50%, var(--bg-light) 75%);
+        background-size: 200% 100%;
+        border-radius: 8px;
+        animation: gradientShimmer 1.5s ease infinite;
+    }
+
+    /* Add responsiveness for the loader preview */
+    @media (max-width: 992px) {
+        .loader-main-layout {
+            grid-template-columns: 1fr; /* Stack sidebar and content */
+        }
+        .loader-sidebar-placeholder {
+            height: 200px; /* Give sidebar a fixed height when stacked */
+        }
+        .loader-card-placeholder {
+            height: 80px; /* Smaller card height on smaller screens */
+        }
+        .loader-preview {
+            padding: 15px;
+            gap: 15px;
+        }
+    }
+
+    @media (max-width: 768px) {
+         .loader-preview {
+            width: 95%; /* Take more width on small screens */
+            gap: 10px;
+            padding: 10px;
+         }
+         .loader-header-placeholder {
+            height: 50px;
+         }
+         .loader-main-layout {
+             gap: 10px;
+         }
+         .loader-sidebar-placeholder {
+            height: 150px;
+         }
+         .loader-content-placeholder {
+             gap: 10px;
+         }
+         .loader-card-placeholder {
+             height: 60px;
+         }
+    }
+
+        /* 3. Header & User Actions */
+        .container {
+            max-width: 1300px; /* Wider container */
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding: 10px 0;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: var(--primary);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(255, 204, 8, 0.4); /* Shadow based on brand color */
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .action-btn {
+            background: var(--card-bg);
+            border: none;
+            padding: 10px 18px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            font-size: 15px;
+            color: var(--text-light);
+            position: relative;
+            overflow: hidden; /* Hide pseudo-element overflow for shimmer */
+        }
+
+        /* Shimmer effect on hover */
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 204, 8, 0.1), transparent);
+            transition: all 0.6s ease;
+        }
+
+        .action-btn:hover::before {
+            left: 100%;
+        }
+
+        .action-btn svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--text); /* Icon color */
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px); /* Subtle lift effect */
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12); /* Enhanced shadow on hover */
+        }
+
+        .badge {
+            background: var(--primary);
+            color: #fff;
+            font-size: 11px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-left: -8px; /* Overlap with button */
+            border: 2px solid var(--card-bg); /* Border matches button background */
+            font-weight: 600;
+        }
+
+        .logout-btn svg {
+            stroke: var(--text-light); /* Logout icon is lighter */
+        }
+
+        /* 4. Dashboard Layout (Sidebar & Main Content) */
+        .dashboard {
+            display: grid;
+            grid-template-columns: minmax(280px, 1fr) 3fr; /* Sidebar takes less space, main content more */
+            gap: 40px;
+        }
+
+        /* 5. Profile Sidebar */
+        .profile-sidebar {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            height: fit-content; /* Only take necessary vertical space */
+            position: sticky; /* Stay fixed while scrolling main content */
+            top: 20px;
+            opacity: 0; /* Start hidden for animation */
+            animation: slideIn 0.6s ease forwards 0.3s; /* Animation on load */
+            z-index: 10; /* Ensure sidebar is above main content if needed */
+        }
+
+        /* Animation for sidebar entry */
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .profile-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .profile-avatar {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--primary-light)); /* Gradient background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 45px;
+            color: #fff;
+            position: relative;
+            margin-bottom: 15px;
+            overflow: hidden; /* Hide overflow for the "Change Photo" text */
+            box-shadow: 0 6px 20px rgba(255, 204, 8, 0.3); /* Shadow based on brand color */
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1; /* Behind the SVG icon */
+        }
+
+        .profile-avatar svg {
+            position: relative;
+            z-index: 2; /* Above the image */
+        }
+
+
+        /* "Change Photo" overlay effect */
+        .profile-avatar::after {
+            content: "Change Photo";
+            position: absolute;
+            bottom: -40px; /* Start hidden below */
+            left: 0;
+            width: 100%;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            font-size: 14px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: bottom 0.3s ease; /* Slide up animation */
+            z-index: 3; /* On top of the image and SVG */
+        }
+
+        .profile-avatar:hover::after {
+            bottom: 0; /* Slide up on hover */
+        }
+
+        .profile-name {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 10px 0 5px;
+            color: var(--text);
+        }
+
+        .profile-email,
+        .profile-whatsapp {
+            color: var(--text-light);
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .edit-profile-btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 30px;
+            margin-top: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(255, 204, 8, 0.4);
+            transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .edit-profile-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px); /* Subtle lift */
+            box-shadow: 0 6px 20px rgba(255, 204, 8, 0.5); /* Enhanced shadow on hover */
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid var(--bg-light); /* Separator line */
+        }
+
+        .menu-item {
+            padding: 14px 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-light);
+            position: relative;
+            overflow: hidden; /* Hide shimmer */
+        }
+
+        /* Shimmer effect on hover */
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 204, 8, 0.05), transparent);
+            transition: all 0.6s ease;
+        }
+
+        .menu-item:hover::before {
+            left: 100%;
+        }
+
+
+        .menu-item:hover {
+            background: rgba(255, 204, 8, 0.08); /* Light yellow background on hover */
+            color: var(--text); /* Darker text on hover */
+        }
+
+        .menu-item.active {
+            background: linear-gradient(90deg, rgba(255, 204, 8, 0.1), rgba(255, 204, 8, 0)); /* Gradient active background */
+            color: var(--primary-dark);
+            font-weight: 600;
+            border-left: 4px solid var(--primary); /* Highlight bar */
+            padding-left: 16px; /* Adjust padding for border */
+        }
+
+        .menu-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .menu-item svg {
+            stroke: var(--text-light); /* Default icon color */
+        }
+
+        .menu-item.active svg {
+            stroke: var(--primary-dark); /* Active icon color */
+        }
+
+        .vendor-action {
+            background: linear-gradient(90deg, var(--primary-dark), var(--primary)); /* Gradient background */
+            color: #fff;
+            padding: 18px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            margin-top: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 17px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 6px 20px rgba(255, 204, 8, 0.5);
+            position: relative;
+            overflow: hidden; /* Hide shimmer */
+        }
+
+        /* Shimmer effect on hover */
+        .vendor-action::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: all 0.6s ease;
+        }
+
+        .vendor-action:hover::before {
+            left: 100%;
+        }
+
+
+        .vendor-action:hover {
+            transform: translateY(-4px); /* More prominent lift */
+            box-shadow: 0 10px 30px rgba(255, 204, 8, 0.7); /* Larger shadow on hover */
+        }
+
+        .vendor-action svg {
+            stroke: #fff; /* Icon color */
+            width: 22px;
+            height: 22px;
+        }
+
+
+        /* 6. Main Content Sections */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            width: 100%; /* Take full width available in grid cell */
+        }
+
+        .dashboard-section {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            opacity: 0; /* Start hidden for animation */
+            transform: translateY(20px); /* Start slightly below for animation */
+            animation: fadeInUp 0.6s ease forwards; /* Animation on section display */
+        }
+
+        /* Animation for section entry */
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--bg-light); /* Separator */
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap; /* Allow filters to wrap on smaller screens */
+            justify-content: flex-end; /* Align filters to the right */
+        }
+
+        .filter-btn {
+            background: var(--bg-light);
+            border: none;
+            padding: 8px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-light);
+            font-weight: 500;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .filter-btn:hover {
+            background: rgba(255, 204, 8, 0.1); /* Light yellow on hover */
+            color: var(--primary-dark); /* Darker yellow text on hover */
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: #fff;
+            font-weight: 600;
+        }
+
+        /* 7. Profile Information Section */
+        .profile-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Responsive grid for info items */
+            gap: 20px;
+        }
+
+        .info-item {
+            background: var(--bg);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--bg-light); /* Subtle border */
+            position: relative;
+        }
+
+        .info-label {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .info-value {
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--text);
+        }
+
+        .info-edit {
+            background: none;
+            border: none;
+            color: var(--primary-dark);
+            cursor: pointer;
+            font-size: 14px;
+            float: right; /* Float edit button */
+            position: absolute; /* Absolute position for better control */
+            top: 15px;
+            right: 15px;
+            font-weight: 600;
+        }
+
+        /* 8. Order History Section */
+        .orders-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .order-card {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid var(--bg-light);
+        }
+
+        .order-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); /* Lift and shadow on hover */
+        }
+
+        .order-info {
+            flex: 1; /* Take available space */
+            margin-right: 20px;
+        }
+
+        .order-id {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--text);
+        }
+
+        .order-vendor,
+        .order-date {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 4px;
+        }
+
+        .order-amount {
+            font-weight: 700;
+            font-size: 19px;
+            color: var(--primary-dark);
+            margin-top: 5px;
+        }
+
+        .order-status {
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 15px;
+            text-transform: capitalize;
+        }
+
+        .status-pending {
+            background: rgba(255, 204, 8, 0.15); /* Yellow background */
+            color: #e5b800; /* Darker yellow text */
+        }
+
+        .status-completed {
+            background: rgba(39, 174, 96, 0.15); /* Green background */
+            color: #27ae60; /* Darker green text */
+        }
+
+        .status-cancelled {
+            background: rgba(235, 87, 87, 0.15); /* Red background */
+            color: #eb5757; /* Darker red text */
+        }
+
+        /* 9. Reviews Section */
+        .review-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Responsive grid for review cards */
+            gap: 20px;
+        }
+
+        .review-card {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 25px;
+            position: relative;
+            border: 1px solid var(--bg-light);
+        }
+
+        .review-product {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed var(--bg-light); /* Dashed separator */
+        }
+
+        .product-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            background: var(--bg-light); /* Placeholder background */
+            object-fit: cover;
+            border: 1px solid #eee;
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .product-vendor {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        .rating-input {
+            margin: 15px 0;
+            display: inline-block; /* Allow stars to be side-by-side */
+        }
+
+        .star {
+            color: #ccc; /* Default star color (grey) */
+            font-size: 28px;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .star.active,
+        .star:hover {
+            color: var(--primary); /* Yellow when active or hovered */
+        }
+
+        .review-input {
+            width: 100%;
+            border: 1px solid var(--bg-light);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 15px;
+            resize: vertical; /* Allow vertical resizing */
+            font-size: 15px;
+            color: var(--text);
+        }
+
+        .submit-review {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        .submit-review:hover {
+            background: var(--primary-dark);
+        }
+
+        /* 10. Recently Viewed Section */
+        .recently-viewed {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Responsive grid for item cards */
+            gap: 20px;
+        }
+
+        .item-card {
+            background: var(--bg);
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 1px solid var(--bg-light);
+        }
+
+        .item-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); /* Lift and shadow on hover */
+        }
+
+        .item-img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            background: var(--bg-light); /* Placeholder background */
+        }
+
+        .item-details {
+            padding: 15px;
+            /* Subtle gradient for a lifted look */
+            background: linear-gradient(to top, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.8));
+        }
+
+        .item-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis; /* Truncate long names */
+            color: var(--text);
+        }
+
+        .item-price {
+            color: var(--primary-dark);
+            font-weight: 700;
+            font-size: 17px;
+        }
+
+        /* 11. Shopping Cart Section */
+        .cart-overview {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .cart-item {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            background: var(--bg);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--bg-light);
+        }
+
+        .cart-item-img {
+            width: 70px;
+            height: 70px;
+            border-radius: 10px;
+            background: var(--bg-light); /* Placeholder background */
+            object-fit: cover;
+            border: 1px solid #eee;
+        }
+
+        .cart-item-details {
+            flex: 1; /* Take available space */
+        }
+
+        .cart-item-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--text);
+        }
+
+        .cart-item-price {
+            color: var(--primary-dark);
+            font-weight: 700;
+            font-size: 17px;
+        }
+
+        .cart-item-quantity {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--bg-light);
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--text-light);
+            transition: background 0.2s ease;
+        }
+
+        .quantity-btn:hover {
+            background: #e0e0e0; /* Darker grey on hover */
+        }
+
+        .quantity-value {
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--text);
+        }
+
+        .cart-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--bg-light); /* Separator */
+        }
+
+        .cart-total {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .checkout-btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(255, 204, 8, 0.4);
+            transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .checkout-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 204, 8, 0.5);
+        }
+
+        /* 12. Modals (Pop-ups) */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6); /* Semi-transparent dark overlay */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; /* High z-index to be on top */
+            opacity: 0; /* Start hidden */
+            visibility: hidden; /* Hide from screen readers when not active */
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--bg);
+            width: calc(100% - 40px); /* Maximum width with padding */
+            max-width: 550px; /* Max width on larger screens */
+            border-radius: var(--border-radius);
+            padding: 30px;
+            position: relative;
+            transform: translateY(30px); /* Start below center for animation */
+            transition: transform 0.4s ease, opacity 0.4s ease;
+            opacity: 0; /* Start hidden */
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0); /* Slide up to center */
+            opacity: 1;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: color 0.2s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--text);
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: var(--text);
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--bg-light); /* Separator */
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--bg-light);
+            border-radius: 10px;
+            font-size: 16px;
+            color: var(--text);
+            background-color: var(--bg-light); /* Light background for inputs */
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 204, 8, 0.2); /* Highlight with shadow on focus */
+        }
+
+        .form-select {
+            appearance: none; /* Remove default select arrow */
+            /* Custom SVG arrow */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%235a5a5a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3Cpolyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+        }
+
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .cancel-btn {
+            background: var(--bg-light);
+            color: var(--text);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        .cancel-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .save-btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .save-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* 13. Utility Classes & Animations */
+        .hidden {
+            display: none; /* Used to hide sections */
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Note: pulse and gradientBg animations are defined with the loader */
+        /* Note: slideIn and fadeInUp animations are defined with sidebar/sections */
+
+
+        /* 14. Responsive Design (Media Queries) */
+
+        /* Medium screens (Tablets and smaller desktops) */
+        @media (max-width: 992px) {
+            .dashboard {
+                grid-template-columns: 1fr; /* Stack sidebar and main content vertically */
+                gap: 30px;
+            }
+
+            .profile-sidebar {
+                position: relative; /* Remove sticky position */
+                top: 0;
+                padding: 25px;
+                animation: fadeInUp 0.6s ease forwards; /* Use fadeInUp instead of slideIn */
+            }
+
+            .main-content {
+                gap: 20px;
+            }
+
+            .dashboard-section {
+                padding: 25px;
+            }
+        }
+
+        /* Small screens (Large Phones and Tablets) */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px; /* Reduce padding */
+            }
+
+            .header {
+                flex-direction: column; /* Stack header items */
+                align-items: flex-start;
+                gap: 15px;
+                margin-bottom: 30px;
+            }
+
+            .user-actions {
+                width: 100%; /* Take full width */
+                justify-content: space-around; /* Distribute space between buttons */
+                gap: 10px;
+            }
+
+            .action-btn {
+                padding: 8px 12px; /* Reduce button padding */
+                font-size: 14px;
+                gap: 5px;
+            }
+
+            .badge {
+                width: 18px;
+                height: 18px;
+                font-size: 10px;
+                margin-left: -5px;
+            }
+
+            .logo {
+                font-size: 22px;
+            }
+
+            .logo-icon {
+                width: 38px;
+                height: 38px;
+                font-size: 20px;
+            }
+
+            .profile-sidebar {
+                padding: 20px;
+            }
+
+            .profile-avatar {
+                width: 90px;
+                height: 90px;
+                font-size: 35px;
+            }
+
+            .profile-name {
+                font-size: 20px;
+            }
+
+            .profile-email,
+            .profile-whatsapp {
+                font-size: 14px;
+            }
+
+            .edit-profile-btn {
+                padding: 8px 20px;
+                font-size: 15px;
+                margin-top: 15px;
+            }
+
+            .sidebar-menu {
+                margin-top: 20px;
+                padding-top: 10px;
+            }
+
+            .menu-item {
+                padding: 12px 15px;
+                gap: 10px;
+                font-size: 15px;
+            }
+
+            .menu-item.active {
+                padding-left: 11px; /* Adjust padding for border */
+            }
+
+            .vendor-action {
+                padding: 15px;
+                font-size: 16px;
+                margin-top: 30px;
+            }
+
+            .vendor-action svg {
+                width: 20px;
+                height: 20px;
+            }
+
+
+            .dashboard-section {
+                padding: 20px;
+            }
+
+            .section-title {
+                font-size: 20px;
+            }
+
+            .section-actions {
+                justify-content: center; /* Center filter buttons if they wrap */
+                margin-bottom: 20px;
+            }
+
+            .filter-btn {
+                padding: 6px 12px;
+                font-size: 13px;
+            }
+
+            .profile-info {
+                grid-template-columns: 1fr; /* Stack info items vertically */
+                gap: 15px;
+            }
+
+            .info-item {
+                padding: 15px;
+            }
+
+            .info-value {
+                font-size: 15px;
+            }
+
+            .order-card {
+                flex-direction: column; /* Stack order details and status */
+                align-items: flex-start;
+                gap: 10px;
+                padding: 15px;
+            }
+
+            .order-info {
+                margin-right: 0; /* Remove right margin */
+                width: 100%;
+            }
+
+            .order-amount {
+                margin-top: 8px;
+                font-size: 17px;
+            }
+
+            .order-status {
+                margin-left: 0; /* Remove left margin */
+                margin-top: 8px;
+                display: inline-block; /* Ensure status doesn't take full width */
+            }
+
+            .review-cards {
+                grid-template-columns: 1fr; /* Stack review cards vertically */
+                gap: 15px;
+            }
+
+            .review-card {
+                padding: 20px;
+            }
+
+            .review-product {
+                gap: 10px;
+            }
+
+            .product-img {
+                width: 50px;
+                height: 50px;
+            }
+
+            .product-name {
+                font-size: 15px;
+            }
+
+            .rating-input {
+                margin: 10px 0;
+            }
+
+            .star {
+                font-size: 24px;
+            }
+
+            .review-input {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            .submit-review {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+
+            .recently-viewed {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); /* Adjust grid for smaller items */
+                gap: 15px;
+            }
+
+            .item-img {
+                height: 100px;
+            }
+
+            .item-details {
+                padding: 12px;
+            }
+
+            .item-name {
+                font-size: 14px;
+            }
+
+            .item-price {
+                font-size: 16px;
+            }
+
+            .cart-item {
+                flex-direction: column; /* Stack cart item details */
+                align-items: flex-start;
+                gap: 15px;
+                padding: 15px;
+            }
+
+            .cart-item-img {
+                width: 60px;
+                height: 60px;
+            }
+
+            .cart-item-details {
+                flex: auto; /* Allow details to take necessary space */
+            }
+
+            .cart-item-quantity {
+                width: 100%; /* Take full width */
+                justify-content: flex-end; /* Align quantity controls to the right */
+            }
+
+            .cart-actions {
+                flex-direction: column; /* Stack total and checkout button */
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .cart-total {
+                font-size: 18px;
+            }
+
+            .checkout-btn {
+                width: 100%; /* Make checkout button full width */
+                text-align: center;
+                padding: 10px;
+                font-size: 15px;
+            }
+
+            .modal-content {
+                padding: 25px;
+            }
+
+            .modal-title {
+                font-size: 20px;
+                margin-bottom: 20px;
+                padding-bottom: 10px;
+            }
+
+            .form-group {
+                margin-bottom: 18px;
+            }
+
+            .form-label {
+                margin-bottom: 6px;
+            }
+
+            .form-input,
+            .form-select {
+                padding: 10px 12px;
+                font-size: 15px;
+            }
+
+            .form-actions {
+                justify-content: center; /* Center modal buttons */
+                gap: 10px;
+                margin-top: 25px;
+            }
+
+            .cancel-btn,
+            .save-btn {
+                padding: 10px 18px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loader">
+        <div class="loader-preview">
+            <div class="loader-header-placeholder"></div>
+            <div class="loader-main-layout">
+                <div class="loader-sidebar-placeholder"></div>
+                <div class="loader-content-placeholder">
+                    <div class="loader-card-placeholder"></div>
+                    <div class="loader-card-placeholder"></div>
+                    <div class="loader-card-placeholder"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <a href="#" class="logo">
+                <div class="logo-icon">CC</div>
+                Campus Connect
+            </a>
+            <div class="user-actions">
+                <button class="action-btn notification-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    <span class="badge notification-badge">3</span>
+                </button>
+                <button class="action-btn cart-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                    <span class="badge cart-badge">2</span>
+                </button>
+                <button class="action-btn logout-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Logout
+                </button>
+            </div>
+        </header>
+
+        <div class="dashboard">
+            <div class="profile-sidebar">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        </div>
+                    <h2 class="profile-name">John Doe</h2>
+                    <p class="profile-email">johndoe@example.com</p>
+                    <p class="profile-whatsapp">+233 50 123 4567</p>
+                    <button class="edit-profile-btn">Edit Profile</button>
+                </div>
+                <ul class="sidebar-menu">
+                    <li class="menu-item active" data-section="profile">
+                        <div class="menu-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </div>
+                        Profile Information
+                    </li>
+                    <li class="menu-item" data-section="orders">
+                        <div class="menu-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                                <line x1="3" y1="6" x2="21" y2="6"></line>
+                                <path d="M16 10a4 4 0 0 1-8 0"></path>
+                            </svg>
+                        </div>
+                        Order History
+                    </li>
+                    <li class="menu-item" data-section="reviews">
+                        <div class="menu-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                            </svg>
+                        </div>
+                        My Reviews
+                    </li>
+                    <li class="menu-item" data-section="cart">
+                        <div class="menu-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="9" cy="21" r="1"></circle>
+                                <circle cx="20" cy="21" r="1"></circle>
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                            </svg>
+                        </div>
+                        Shopping Cart
+                    </li>
+                    <li class="menu-item" data-section="recently">
+                        <div class="menu-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                        </div>
+                        Recently Viewed
+                    </li>
+                </ul>
+                <div class="vendor-action" id="vendor-section">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    Become a Vendor
+                </div>
+            </div>
+
+            <div class="main-content">
+                <section class="dashboard-section profile-section" id="profile-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Profile Information</h2>
+                    </div>
+                    <div class="profile-info">
+                        <div class="info-item">
+                            <div class="info-label">Username</div>
+                            <div class="info-value">JohnDoe</div>
+                            <button class="info-edit" data-field="username">Edit</button>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Email Address</div>
+                            <div class="info-value">johndoe@example.com</div>
+                            <button class="info-edit" data-field="email">Edit</button>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">WhatsApp Number</div>
+                            <div class="info-value">+233 50 123 4567</div>
+                            <button class="info-edit" data-field="whatsapp">Edit</button>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Campus</div>
+                            <div class="info-value">University of Cape Coast</div>
+                            <button class="info-edit" data-field="campus">Edit</button>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Password</div>
+                            <div class="info-value">••••••••</div>
+                            <button class="info-edit" data-field="password">Change</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="dashboard-section orders-section hidden" id="orders-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Order History</h2>
+                        <div class="section-actions">
+                            <button class="filter-btn active" data-filter="all">All Orders</button>
+                            <button class="filter-btn" data-filter="pending">Pending</button>
+                            <button class="filter-btn" data-filter="completed">Completed</button>
+                            <button class="filter-btn" data-filter="cancelled">Cancelled</button>
+                        </div>
+                    </div>
+                    <div class="orders-list">
+                        <div class="order-card" data-status="pending">
+                            <div class="order-info">
+                                <div class="order-id">Order #UCC-2025-0493</div>
+                                <div class="order-vendor">Vendor: Campus Foodie</div>
+                                <div class="order-date">April 20, 2025</div>
+                            </div>
+                            <div class="order-meta">
+                                <div class="order-amount">GH₵ 85.00</div>
+                                <span class="order-status status-pending">Pending</span>
+                            </div>
+                        </div>
+                        <div class="order-card" data-status="completed">
+                            <div class="order-info">
+                                <div class="order-id">Order #UCC-2025-0481</div>
+                                <div class="order-vendor">Vendor: Tech Haven</div>
+                                <div class="order-date">April 15, 2025</div>
+                            </div>
+                            <div class="order-meta">
+                                <div class="order-amount">GH₵ 250.00</div>
+                                <span class="order-status status-completed">Completed</span>
+                            </div>
+                        </div>
+                        <div class="order-card" data-status="cancelled">
+                            <div class="order-info">
+                                <div class="order-id">Order #UCC-2025-0472</div>
+                                <div class="order-vendor">Vendor: Books & Stationery Store</div>
+                                <div class="order-date">April 10, 2025</div>
+                            </div>
+                            <div class="order-meta">
+                                <div class="order-amount">GH₵ 45.00</div>
+                                <span class="order-status status-cancelled">Cancelled</span>
+                            </div>
+                        </div>
+                        <div class="order-card" data-status="completed">
+                            <div class="order-info">
+                                <div class="order-id">Order #UCC-2025-0465</div>
+                                <div class="order-vendor">Vendor: Fashion Hub</div>
+                                <div class="order-date">April 5, 2025</div>
+                            </div>
+                            <div class="order-meta">
+                                <div class="order-amount">GH₵ 120.00</div>
+                                <span class="order-status status-completed">Completed</span>
+                            </div>
+                        </div>
+                        <div class="order-card" data-status="pending">
+                            <div class="order-info">
+                                <div class="order-id">Order #UCC-2025-0455</div>
+                                <div class="order-vendor">Vendor: Campus Essentials</div>
+                                <div class="order-date">April 1, 2025</div>
+                            </div>
+                            <div class="order-meta">
+                                <div class="order-amount">GH₵ 75.00</div>
+                                <span class="order-status status-pending">Pending</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="dashboard-section reviews-section hidden" id="reviews-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Reviews</h2>
+                        <div class="section-actions">
+                            <button class="filter-btn active" data-review-filter="pending">Pending Reviews</button>
+                            <button class="filter-btn" data-review-filter="submitted">My Reviews</button>
+                        </div>
+                    </div>
+                    <div class="review-cards pending-reviews">
+                        <div class="review-card">
+                            <div class="review-product">
+                                <div class="product-img"></div> <div>
+                                    <div class="product-name">Wireless Earbuds</div>
+                                    <div class="product-vendor">Tech Haven</div>
+                                </div>
+                            </div>
+                            <div class="rating-input">
+                                <span class="star" data-rating="1">★</span>
+                                <span class="star" data-rating="2">★</span>
+                                <span class="star" data-rating="3">★</span>
+                                <span class="star" data-rating="4">★</span>
+                                <span class="star" data-rating="5">★</span>
+                            </div>
+                            <textarea class="review-input" placeholder="Write your review here..."></textarea>
+                            <button class="submit-review">Submit Review</button>
+                        </div>
+                        <div class="review-card">
+                            <div class="review-product">
+                                <div class="product-img"></div>
+                                <div>
+                                    <div class="product-name">Campus T-shirt</div>
+                                    <div class="product-vendor">Fashion Hub</div>
+                                </div>
+                            </div>
+                            <div class="rating-input">
+                                <span class="star" data-rating="1">★</span>
+                                <span class="star" data-rating="2">★</span>
+                                <span class="star" data-rating="3">★</span>
+                                <span class="star" data-rating="4">★</span>
+                                <span class="star" data-rating="5">★</span>
+                            </div>
+                            <textarea class="review-input" placeholder="Write your review here..."></textarea>
+                            <button class="submit-review">Submit Review</button>
+                        </div>
+                    </div>
+                    <div class="review-cards submitted-reviews hidden">
+                        <div class="review-card">
+                            <div class="review-product">
+                                <div class="product-img"></div>
+                                <div>
+                                    <div class="product-name">Study Lamp</div>
+                                    <div class="product-vendor">Campus Essentials</div>
+                                </div>
+                            </div>
+                            <div class="rating-input">
+                                <span class="star active" data-rating="1">★</span>
+                                <span class="star active" data-rating="2">★</span>
+                                <span class="star active" data-rating="3">★</span>
+                                <span class="star active" data-rating="4">★</span>
+                                <span class="star" data-rating="5">★</span>
+                            </div>
+                            <div>Great lamp! Perfect for late night studying. Battery life is impressive.</div>
+                        </div>
+                        <div class="review-card">
+                            <div class="review-product">
+                                <div class="product-img"></div>
+                                <div>
+                                    <div class="product-name">Textbook - Economics 101</div>
+                                    <div class="product-vendor">Books & Stationery Store</div>
+                                </div>
+                            </div>
+                            <div class="rating-input">
+                                <span class="star active" data-rating="1">★</span>
+                                <span class="star active" data-rating="2">★</span>
+                                <span class="star active" data-rating="3">★</span>
+                                <span class="star" data-rating="4">★</span>
+                                <span class="star" data-rating="5">★</span>
+                            </div>
+                            <div>Good condition, delivered on time. A bit expensive though.</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="dashboard-section cart-section hidden" id="cart-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Shopping Cart</h2>
+                    </div>
+                    <div class="cart-overview">
+                        <div class="cart-item">
+                            <div class="cart-item-img"></div> <div class="cart-item-details">
+                                <div class="cart-item-name">Premium Notebook</div>
+                                <div class="cart-item-price">GH₵ 25.00</div>
+                            </div>
+                            <div class="cart-item-quantity">
+                                <button class="quantity-btn">-</button>
+                                <span class="quantity-value">2</span>
+                                <button class="quantity-btn">+</button>
+                            </div>
+                        </div>
+                        <div class="cart-item">
+                            <div class="cart-item-img"></div>
+                            <div class="cart-item-details">
+                                <div class="cart-item-name">USB Flash Drive 32GB</div>
+                                <div class="cart-item-price">GH₵ 45.00</div>
+                            </div>
+                            <div class="cart-item-quantity">
+                                <button class="quantity-btn">-</button>
+                                <span class="quantity-value">1</span>
+                                <button class="quantity-btn">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cart-actions">
+                        <div class="cart-total">Total: GH₵ 95.00</div>
+                        <button class="checkout-btn">Proceed to Checkout</button>
+                    </div>
+                </section>
+
+                <section class="dashboard-section recently-section hidden" id="recently-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Recently Viewed Items</h2>
+                    </div>
+                    <div class="recently-viewed">
+                        <div class="item-card">
+                            <div class="item-img"></div> <div class="item-details">
+                                <div class="item-name">Wireless Mouse</div>
+                                <div class="item-price">GH₵ 60.00</div>
+                            </div>
+                        </div>
+                        <div class="item-card">
+                            <div class="item-img"></div>
+                            <div class="item-details">
+                                <div class="item-name">Campus Hoodie</div>
+                                <div class="item-price">GH₵ 120.00</div>
+                            </div>
+                        </div>
+                        <div class="item-card">
+                            <div class="item-img"></div>
+                            <div class="item-details">
+                                <div class="item-name">Water Bottle</div>
+                                <div class="item-price">GH₵ 35.00</div>
+                            </div>
+                        </div>
+                        <div class="item-card">
+                            <div class="item-img"></div>
+                            <div class="item-details">
+                                <div class="item-name">Desk Organizer</div>
+                                <div class="item-price">GH₵ 45.00</div>
+                            </div>
+                        </div>
+                        <div class="item-card">
+                            <div class="item-img"></div>
+                            <div class="item-details">
+                                <div class="item-name">Bluetooth Speaker</div>
+                                <div class="item-price">GH₵ 85.00</div>
+                            </div>
+                        </div>
+                        <div class="item-card">
+                            <div class="item-img"></div>
+                            <div class="item-details">
+                                <div class="item-name">Notebook Set</div>
+                                <div class="item-price">GH₵ 30.00</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal edit-profile-modal" id="edit-profile-modal">
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <h3 class="modal-title">Edit Profile</h3>
+            <form id="profile-form">
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-input" name="username" value="JohnDoe">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" class="form-input" name="email" value="johndoe@example.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">WhatsApp Number</label>
+                    <input type="tel" class="form-input" name="whatsapp" value="+233 50 123 4567">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Campus</label>
+                    <select class="form-select" name="campus">
+                        <option value="ucc" selected>University of Cape Coast</option>
+                        <option value="legon">University of Ghana, Legon</option>
+                        <option value="knust">Kwame Nkrumah University of Science and Technology</option>
+                        <option value="atu">Accra Technical University</option>
+                        <option value="uew">University of Education, Winneba</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" id="cancel-edit">Cancel</button>
+                    <button type="submit" class="save-btn">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal password-modal" id="password-modal">
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <h3 class="modal-title">Change Password</h3>
+            <form id="password-form">
+                <div class="form-group">
+                    <label class="form-label">Current Password</label>
+                    <input type="password" class="form-input" name="current-password">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">New Password</label>
+                    <input type="password" class="form-input" name="new-password">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Confirm New Password</label>
+                    <input type="password" class="form-input" name="confirm-password">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" id="cancel-password">Cancel</button>
+                    <button type="submit" class="save-btn">Change Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal vendor-modal" id="become-vendor-modal">
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <h3 class="modal-title">Become a Vendor</h3>
+            <form id="vendor-form">
+                <div class="form-group">
+                    <label class="form-label">Business Name</label>
+                    <input type="text" class="form-input" name="business-name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Business Description</label>
+                    <textarea class="form-input" name="business-description" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select class="form-select" name="category">
+                        <option value="" disabled selected>Select a category</option>
+                        <option value="food">Food & Beverages</option>
+                        <option value="tech">Technology & Gadgets</option>
+                        <option value="books">Books & Stationery</option>
+                        <option value="fashion">Fashion & Clothing</option>
+                        <option value="services">Services</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" id="cancel-vendor">Cancel</button>
+                    <button type="submit" class="save-btn">Submit Application</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        /*
+        Campus Connect User Profile Dashboard JavaScript
+
+        This script handles the interactivity of the user profile dashboard,
+        including section navigation, filtering, modal management, and mock form submissions.
+        */
+
+        // Wait for the entire page to load
+        window.addEventListener('load', function() {
+            // Add a slight delay before fading out the loader
+            setTimeout(() => {
+                const loader = document.querySelector('.loader');
+                if (loader) {
+                    loader.style.opacity = '0';
+                    // After fading, hide it completely
+                    setTimeout(() => {
+                        loader.style.display = 'none';
+                    }, 1000); // Match CSS transition duration
+                }
+            }, 1000); // Wait 1 second before starting fade out
+        });
+
+        // --- Section Navigation ---
+        // Get all menu items and dashboard sections
+        const menuItems = document.querySelectorAll('.menu-item');
+        const sections = document.querySelectorAll('.dashboard-section');
+
+        // Add click event listener to each menu item
+        menuItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // Get the ID of the target section from the data-section attribute
+                const sectionId = this.getAttribute('data-section');
+
+                // Remove 'active' class from all menu items
+                menuItems.forEach(menuItem => menuItem.classList.remove('active'));
+                // Add 'active' class to the clicked menu item
+                this.classList.add('active');
+
+                // Hide all main content sections
+                sections.forEach(section => section.classList.add('hidden'));
+
+                // Find the target section and show it with an animation
+                const targetSection = document.getElementById(`${sectionId}-section`);
+                if (targetSection) {
+                    targetSection.classList.remove('hidden');
+                    // Re-add animation class to trigger animation on display
+                    targetSection.classList.remove('fade-in'); // Remove first to allow re-adding
+                    void targetSection.offsetWidth; // Trigger reflow
+                    targetSection.classList.add('fade-in');
+                    targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+
+        // --- Order Filtering ---
+        const orderFilters = document.querySelectorAll('[data-filter]');
+        const orderCards = document.querySelectorAll('.order-card');
+
+        orderFilters.forEach(filter => {
+            filter.addEventListener('click', function() {
+                // Get the filter value (all, pending, completed, cancelled)
+                const filterValue = this.getAttribute('data-filter');
+
+                // Update active filter button style
+                orderFilters.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+
+                // Loop through all order cards and show/hide based on the filter
+                orderCards.forEach(card => {
+                    const orderStatus = card.getAttribute('data-status');
+                    if (filterValue === 'all' || orderStatus === filterValue) {
+                        card.style.display = 'flex'; // Show the card
+                    } else {
+                        card.style.display = 'none'; // Hide the card
+                    }
+                });
+            });
+        });
+
+        // --- Review Filtering ---
+        const reviewFilters = document.querySelectorAll('[data-review-filter]');
+        const pendingReviews = document.querySelector('.pending-reviews');
+        const submittedReviews = document.querySelector('.submitted-reviews');
+
+        reviewFilters.forEach(filter => {
+            filter.addEventListener('click', function() {
+                // Get the filter value (pending, submitted)
+                const filterValue = this.getAttribute('data-review-filter');
+
+                // Update active filter button style
+                reviewFilters.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+
+                // Show/hide the appropriate review sections
+                if (filterValue === 'pending') {
+                    pendingReviews.classList.remove('hidden');
+                    submittedReviews.classList.add('hidden');
+                } else {
+                    pendingReviews.classList.add('hidden');
+                    submittedReviews.classList.remove('hidden');
+                }
+            });
+        });
+
+        // --- Star Rating Functionality ---
+        const reviewCards = document.querySelectorAll('.review-card');
+
+        reviewCards.forEach(card => {
+            // Find stars within this specific review card
+            const stars = card.querySelectorAll('.star');
+
+            stars.forEach(star => {
+                star.addEventListener('click', function() {
+                    // Get the rating value from the clicked star
+                    const rating = parseInt(this.getAttribute('data-rating'));
+                    const starsContainer = this.parentElement; // Get the parent div (rating-input)
+                    const allStars = starsContainer.querySelectorAll('.star'); // Get all stars in this group
+
+                    // Update 'active' class based on the selected rating
+                    allStars.forEach(s => {
+                        if (parseInt(s.getAttribute('data-rating')) <= rating) {
+                            s.classList.add('active'); // Add 'active' class for stars up to the selected rating
+                        } else {
+                            s.classList.remove('active'); // Remove 'active' for stars above the selected rating
+                        }
+                    });
+                    // In a real application, you would store this rating value (e.g., in a hidden input or data attribute)
+                    // to send with the review submission.
+                });
+            });
+        });
+
+
+        // --- Modal Handling ---
+        // Get all modal elements and trigger/close buttons
+        const modals = document.querySelectorAll('.modal');
+        const editProfileBtn = document.querySelector('.edit-profile-btn');
+        const editProfileModal = document.getElementById('edit-profile-modal');
+        const passwordModal = document.getElementById('password-modal');
+        const vendorModal = document.getElementById('become-vendor-modal');
+        const modalCloseButtons = document.querySelectorAll('.modal-close');
+        const cancelButtons = document.querySelectorAll('.cancel-btn');
+        const infoEditButtons = document.querySelectorAll('.info-edit');
+        const vendorSection = document.getElementById('vendor-section');
+
+        // Open the main profile edit modal when the 'Edit Profile' button is clicked
+        editProfileBtn.addEventListener('click', function() {
+            editProfileModal.classList.add('active');
+        });
+
+        // Open specific modals or focus fields when 'Edit' buttons in profile info are clicked
+        infoEditButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const field = this.getAttribute('data-field');
+
+                if (field === 'password') {
+                    // Open the password change modal
+                    passwordModal.classList.add('active');
+                } else {
+                    // Open the main edit profile modal
+                    editProfileModal.classList.add('active');
+                    // Add a small delay before focusing to allow modal transition
+                    setTimeout(() => {
+                        // Find the corresponding input field by name and focus it
+                        const input = editProfileModal.querySelector(`[name="${field}"]`);
+                        if (input) {
+                            input.focus();
+                        }
+                    }, 300); // Adjust delay as needed
+                }
+            });
+        });
+
+        // Open the become vendor modal/redirect when the sidebar item is clicked
+        vendorSection.addEventListener('click', function() {
+            // This is mock logic - in a real app, you'd check if the user is already a vendor
+            const isVendor = false; // Example: assume user is not yet a vendor
+            if (isVendor) {
+                // Redirect user to their vendor dashboard (implement actual redirect)
+                alert('Redirecting to vendor dashboard...');
+                // window.location.href = '/vendor-dashboard'; // Example redirect
+            } else {
+                // Show the 'Become a Vendor' modal
+                vendorModal.classList.add('active');
+            }
+        });
+
+        // Close modals when the 'X' button is clicked
+        modalCloseButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Find the closest parent modal and remove the 'active' class
+                this.closest('.modal').classList.remove('active');
+            });
+        });
+
+        // Close modals when a 'Cancel' button is clicked
+        cancelButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Find the closest parent modal and remove the 'active' class
+                this.closest('.modal').classList.remove('active');
+            });
+        });
+
+        // Close modal when clicking outside the modal content
+        modals.forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                // Check if the click target is the modal backdrop itself (not the content)
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
+
+        // --- Cart Quantity Buttons ---
+        const quantityBtns = document.querySelectorAll('.quantity-btn');
+
+        quantityBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Find the quantity value span within the same cart item
+                const valueElement = this.parentElement.querySelector('.quantity-value');
+                let value = parseInt(valueElement.textContent); // Get current quantity
+
+                // Increase or decrease quantity
+                if (this.textContent === '+') {
+                    value++;
+                } else if (value > 1) { // Prevent quantity from going below 1
+                    value--;
+                }
+
+                valueElement.textContent = value; // Update displayed quantity
+                updateCartTotal(); // Recalculate and display total
+            });
+        });
+
+        // Function to update the cart total (Mock Functionality)
+        function updateCartTotal() {
+            const cartItems = document.querySelectorAll('.cart-item');
+            let total = 0;
+
+            cartItems.forEach(item => {
+                // Extract price from text and convert to number
+                const priceText = item.querySelector('.cart-item-price').textContent;
+                const price = parseFloat(priceText.replace('GH₵', '').trim());
+
+                // Get quantity
+                const quantity = parseInt(item.querySelector('.quantity-value').textContent);
+
+                // Calculate total for this item and add to overall total
+                total += price * quantity;
+            });
+
+            // Update the displayed total (formatted to 2 decimal places)
+            document.querySelector('.cart-total').textContent = 'Total: GH₵ ' + total.toFixed(2);
+        };
+
+        // Call updateCartTotal initially to show the correct total on page load
+        updateCartTotal();
+
+
+        // --- Form Submissions (Mock Functionality) ---
+        const profileForm = document.getElementById('profile-form');
+        const passwordForm = document.getElementById('password-form');
+        const vendorForm = document.getElementById('vendor-form');
+
+        // Profile form submission handler
+        profileForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent actual form submission
+
+            // --- Mock Processing ---
+            // In a real application:
+            // 1. Gather form data (e.g., using new FormData(this))
+            // 2. Send data to your backend server using fetch() or XMLHttpRequest
+            // 3. Handle the backend response (success/failure)
+            // 4. Update UI based on response (e.g., show success message, update profile info on page)
+            // 5. Close modal on success
+
+            alert('Profile update logic would go here.'); // Placeholder alert
+            this.closest('.modal').classList.remove('active'); // Close modal (mock success)
+
+            // Mock updating displayed profile info (replace with real data binding)
+            // document.querySelector('.profile-name').textContent = this.elements.username.value;
+            // document.querySelector('.profile-email').textContent = this.elements.email.value;
+            // document.querySelector('.profile-whatsapp').textContent = this.elements.whatsapp.value;
+        });
+
+        // Password form submission handler
+        passwordForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent actual form submission
+
+            const newPassword = this.elements['new-password'].value;
+            const confirmPassword = this.elements['confirm-password'].value;
+
+            // Basic mock validation: check if new passwords match
+            if (newPassword !== confirmPassword) {
+                alert('New passwords do not match!');
+                // In a real app, show inline error messages near the fields
+                return; // Stop the submission process
+            }
+
+            // --- Mock Processing ---
+            // In a real application:
+            // 1. Gather current, new, and confirm passwords
+            // 2. Send data to your backend for validation and update
+            // 3. Handle the backend response
+            // 4. Close modal and show success/failure message
+
+            alert('Password change logic would go here.'); // Placeholder alert
+            this.closest('.modal').classList.remove('active'); // Close modal (mock success)
+            this.reset(); // Clear form fields (mock success)
+        });
+
+        // Vendor form submission handler
+        vendorForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent actual form submission
+
+            // --- Mock Processing ---
+            // In a real application:
+            // 1. Gather business details
+            // 2. Send data to your backend for application processing
+            // 3. Handle the backend response
+            // 4. Close modal and show success/failure message (e.g., "Application submitted", "Already a vendor")
+            // 5. If successful, potentially update the sidebar link text to "View Vendor Dashboard"
+
+            alert('Vendor application logic would go here.'); // Placeholder alert
+            this.closest('.modal').classList.remove('active'); // Close modal (mock submission)
+
+            // Mock updating the vendor button text after application (assuming success)
+            vendorSection.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                View Vendor Dashboard
+            `;
+            this.reset(); // Clear form fields
+        });
+
+        /*
+        Note on Real-World Implementation:
+        - Data Fetching: Data for profile info, orders, reviews, cart, etc., would be fetched from a backend API on page load and when sections change.
+        - Data Binding: Displayed data would be dynamically updated using JavaScript or a framework (like React, Vue, Angular) based on fetched data and form submissions.
+        - State Management: For a complex app, consider state management patterns/libraries.
+        - Error Handling: Implement robust error handling for API calls and form validations.
+        - Security: Sanitize user inputs, use HTTPS, secure authentication/authorization.
+        - Accessibility: Ensure keyboard navigation, ARIA attributes, and proper focus management, especially for modals.
+        - Performance: Optimize images, lazy load content, minimize JS/CSS, use browser caching.
+        - Animations: For truly "Guinness World Record" level animations, consider libraries like GreenSock (GSAP) or using the Web Animations API, coordinated with section changes.
+        */
+
+    </script>
+</body>
+</html>

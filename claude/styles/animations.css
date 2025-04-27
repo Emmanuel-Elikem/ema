@@ -1,0 +1,277 @@
+/* animations.css - Transition and animation definitions for Campus Marketplace Profile */
+
+/* Page Transitions */
+.page-transition {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--background);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.5s ease;
+}
+
+.page-transition.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Section Transitions */
+.section-enter {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.section-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.section-exit {
+    opacity: 1;
+}
+
+.section-exit-active {
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Card Transitions */
+.card-transition {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-transition:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Section Expansion */
+.expand-transition {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease;
+}
+
+.expand-transition.expanded {
+    max-height: 2000px; /* Large enough value to accommodate content */
+}
+
+/* Form Field Animations */
+.field-transition {
+    position: relative;
+    overflow: hidden;
+}
+
+.field-label {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: var(--spacing-md);
+    color: var(--light-text);
+    transition: top 0.3s ease, transform 0.3s ease, font-size 0.3s ease, color 0.3s ease;
+    pointer-events: none;
+}
+
+.field-input:focus + .field-label,
+.field-input:not(:placeholder-shown) + .field-label {
+    top: 0;
+    transform: translateY(0);
+    font-size: 0.8rem;
+    color: var(--brand-color-dark);
+}
+
+/* Button Animations */
+.button-hover {
+    position: relative;
+    overflow: hidden;
+}
+
+.button-hover::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+    transition: transform 0.6s, opacity 0.6s;
+}
+
+.button-hover:active::after {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 1;
+    transition: transform 0.4s, opacity 0.4s;
+}
+
+/* Loading Animations */
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(255, 204, 8, 0.3);
+    border-top-color: var(--brand-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes wave {
+    0% {
+        background-position: -200px 0;
+    }
+    100% {
+        background-position: 200px 0;
+    }
+}
+
+.loading-wave {
+    background: linear-gradient(90deg, 
+        var(--background-alt) 0%, 
+        var(--background) 50%, 
+        var(--background-alt) 100%);
+    background-size: 200px 100%;
+    animation: wave 1.5s infinite linear;
+}
+
+/* Success/Error Feedback Animations */
+@keyframes success-checkmark {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.success-animation {
+    animation: success-checkmark 0.5s forwards;
+}
+
+@keyframes error-shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    20%, 60% {
+        transform: translateX(-5px);
+    }
+    40%, 80% {
+        transform: translateX(5px);
+    }
+}
+
+.error-animation {
+    animation: error-shake 0.5s;
+}
+
+/* Notification Badge Animation */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.pulse-animation {
+    animation: pulse 1.5s infinite;
+}
+
+/* Star Rating Animation */
+@keyframes star-fill {
+    0% {
+        color: var(--light-text);
+    }
+    100% {
+        color: var(--brand-color);
+    }
+}
+
+.star-fill-animation {
+    animation: star-fill 0.3s forwards;
+}
+
+/* Panel Slide Animations */
+.panel-slide-in {
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+}
+
+.panel-slide-in.active {
+    transform: translateX(0);
+}
+
+.panel-slide-out {
+    transform: translateX(0);
+    transition: transform 0.3s ease;
+}
+
+.panel-slide-out.active {
+    transform: translateX(100%);
+}
+
+/* Fade Transitions */
+.fade-in {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.fade-in.active {
+    opacity: 1;
+}
+
+.fade-out {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.fade-out.active {
+    opacity: 0;
+}
+
+/* Tab Content Transitions */
+.tab-transition {
+    position: relative;
+    overflow: hidden;
+}
+
+.tab-content-transition {
+    position: absolute;
+    width: 100%;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+}
+
+.tab-content-transition.active {
+    position: relative;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+}

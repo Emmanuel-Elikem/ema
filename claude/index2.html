@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCC Campus Shopping</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --brand-yellow: #FFCC08;
+            --white: #ffffff;
+            --light-gray: #f8f8f8;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #757575;
+            --black: #333333;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--brand-yellow);
+            overflow-x: hidden;
+        }
+
+        /* Top Header */
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: var(--brand-yellow);
+            position: relative;
+            z-index: 50;
+            transition: var(--transition);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--black);
+            text-decoration: none;
+        }
+
+        .notification {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification i {
+            font-size: 22px;
+            color: var(--black);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #ff3860;
+            color: white;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            font-size: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Search Header */
+        .search-header {
+            background-color: var(--brand-yellow);
+            padding: 10px 20px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .search-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            background-color: var(--white);
+            border-radius: 50px;
+            padding: 5px 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            padding: 10px 5px;
+            font-size: 16px;
+            background: transparent;
+            outline: none;
+        }
+
+        .search-icon, .filter-icon {
+            color: var(--dark-gray);
+            font-size: 18px;
+            padding: 0 10px;
+            cursor: pointer;
+        }
+
+        .filter-icon {
+            border-left: 1px solid var(--medium-gray);
+            padding-left: 15px;
+        }
+
+        /* Main Container */
+        .main-container {
+            background-color: var(--white);
+            border-top-right-radius: 25px;
+            min-height: calc(100vh - 125px);
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Sort Button */
+        .sort-button {
+            position: sticky;
+            top: 80px;
+            z-index: 30;
+            margin: 0 auto 20px;
+            background-color: var(--white);
+            border: 1px solid var(--medium-gray);
+            border-radius: 20px;
+            padding: 8px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--black);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: fit-content;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .sort-button i {
+            margin-left: 5px;
+        }
+
+        .sort-button:hover {
+            background-color: var(--light-gray);
+        }
+
+        /* Products Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        @media (min-width: 768px) {
+            .products-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .products-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (min-width: 1280px) {
+            .products-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+
+        /* Product Card */
+        .product-card {
+            background-color: var(--white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-image-container {
+            position: relative;
+            padding-top: 100%;
+            overflow: hidden;
+        }
+
+        .product-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .product-card:hover .product-image {
+            transform: scale(1.05);
+        }
+
+        .favorite-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+            z-index: 2;
+        }
+
+        .favorite-btn i {
+            color: var(--dark-gray);
+            transition: var(--transition);
+        }
+
+        .favorite-btn.active i {
+            color: #ff3860;
+        }
+
+        .favorite-btn:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .product-info {
+            padding: 12px;
+        }
+
+        .product-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--black);
+            margin-bottom: 5px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            height: 40px;
+        }
+
+        .product-price {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--black);
+            margin-bottom: 8px;
+        }
+
+        .product-rating {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .product-rating i {
+            color: var(--brand-yellow);
+            margin-right: 5px;
+        }
+
+        .view-btn {
+            width: 100%;
+            background-color: transparent;
+            border: 1px solid var(--brand-yellow);
+            color: var(--black);
+            padding: 8px 0;
+            border-radius: 20px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .view-btn:hover {
+            background-color: var(--brand-yellow);
+            color: var(--black);
+        }
+
+        /* Scroll to top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background-color: var(--brand-yellow);
+            color: var(--black);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: var(--transition);
+            z-index: 100;
+        }
+
+        .scroll-top.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Filter Panel */
+        .filter-panel {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 80%;
+            max-width: 350px;
+            height: 100vh;
+            background-color: var(--white);
+            z-index: 100;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            overflow-y: auto;
+            transition: var(--transition);
+        }
+
+        .filter-panel.active {
+            right: 0;
+        }
+
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .filter-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .close-filter {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--dark-gray);
+        }
+
+        .filter-section {
+            margin-bottom: 20px;
+        }
+
+        .filter-section h4 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: var(--black);
+        }
+
+        .filter-list {
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .filter-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .filter-item input {
+            margin-right: 10px;
+        }
+
+        .price-range {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .price-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--medium-gray);
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .filter-actions button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .reset-btn {
+            background-color: var(--white);
+            border: 1px solid var(--medium-gray);
+            color: var(--black);
+        }
+
+        .apply-btn {
+            background-color: var(--brand-yellow);
+            border: none;
+            color: var(--black);
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 90;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Sort menu */
+        .sort-menu {
+            position: absolute;
+            top: 125px;
+            left: 50%;
+            transform: translateX(-50%) scale(0.9);
+            background-color: var(--white);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            width: 200px;
+            padding: 10px 0;
+            z-index: 80;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .sort-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) scale(1);
+        }
+
+        .sort-option {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .sort-option:hover {
+            background-color: var(--light-gray);
+        }
+
+        .sort-option.active {
+            background-color: rgba(255, 204, 8, 0.1);
+            position: relative;
+        }
+
+        .sort-option.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background-color: var(--brand-yellow);
+        }
+
+        /* Skeleton Loader */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #f8f8f8 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 10px;
+        }
+
+        .skeleton-product {
+            height: 270px;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .skeleton-image {
+            height: 150px;
+            width: 100%;
+        }
+
+        .skeleton-name {
+            height: 16px;
+            margin: 12px;
+            width: 80%;
+        }
+
+        .skeleton-name-2 {
+            height: 16px;
+            margin: 8px 12px;
+            width: 40%;
+        }
+
+        .skeleton-price {
+            height: 20px;
+            margin: 12px;
+            width: 30%;
+        }
+
+        .skeleton-rating {
+            height: 14px;
+            margin: 12px;
+            width: 50%;
+        }
+
+        .skeleton-button {
+            height: 36px;
+            margin: 12px;
+            border-radius: 20px;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        /* No Results */
+        .no-results {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--dark-gray);
+        }
+
+        .no-results i {
+            font-size: 48px;
+            margin-bottom: 10px;
+            color: var(--medium-gray);
+        }
+
+        .no-results h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .no-results p {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Header -->
+    <header class="top-header">
+        <a href="#" class="logo">UCC</a>
+        <div class="notification">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge">2</span>
+        </div>
+    </header>
+
+    <!-- Search Header -->
+    <div class="search-header">
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input" placeholder="Search products..." id="searchInput">
+            <div class="filter-icon" id="filterBtn">
+                <i class="fas fa-sliders-h"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <main class="main-container">
+        <!-- Sort Button -->
+        <div class="sort-button" id="sortBtn">
+            Sort By <i class="fas fa-chevron-down"></i>
+        </div>
+
+        <!-- Sort Menu -->
+        <div class="sort-menu" id="sortMenu">
+            <div class="sort-option active" data-sort="popular">Popular</div>
+            <div class="sort-option" data-sort="newest">Newest</div>
+            <div class="sort-option" data-sort="price-low">Price: Low to High</div>
+            <div class="sort-option" data-sort="price-high">Price: High to Low</div>
+            <div class="sort-option" data-sort="rating">Top Rated</div>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="products-grid" id="productsGrid">
+            <!-- Skeleton loaders will be replaced by JS -->
+        </div>
+
+        <!-- No Results Section -->
+        <div class="no-results" id="noResults" style="display: none;">
+            <i class="fas fa-search"></i>
+            <h3>No products found</h3>
+            <p>Try adjusting your search or filter criteria</p>
+        </div>
+    </main>
+
+    <!-- Scroll to Top Button -->
+    <div class="scroll-top" id="scrollTop">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <!-- Filter Panel -->
+    <div class="filter-panel" id="filterPanel">
+        <div class="filter-header">
+            <h3>Filter</h3>
+            <button class="close-filter" id="closeFilter">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="filter-section">
+            <h4>University</h4>
+            <div class="filter-list">
+                <div class="filter-item">
+                    <input type="checkbox" id="ucc" checked>
+                    <label for="ucc">University of Cape Coast (UCC)</label>
+                </div>
+                <div class="filter-item">
+                    <input type="checkbox" id="knust">
+                    <label for="knust">Kwame Nkrumah University (KNUST)</label>
+                </div>
+                <div class="filter-item">
+                    <input type="checkbox" id="ug">
+                    <label for="ug">University of Ghana (UG)</label>
+                </div>
+                <div class="filter-item">
+                    <input type="checkbox" id="uew">
+                    <label for="uew">University of Education, Winneba</label>
+                </div>
+                <div class="filter-item">
+                    <input type="checkbox" id="uds">
+                    <label for="uds">University for Development Studies</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-section">
+            <h4>Category</h4>
+            <div class="filter-list">
+                <div class="filter-item">
+                    <input type="checkbox" id="electronics">
+                    <label for="electronics">Electronics</label>
+                </div>
+                <div class="filter-item">
+                    <input type="checkbox" id="fashion">
+                    <label for="fashion">Fashion</label>
+                </div>
+                <div class="filter-item">
+                    <input type="checkbox" id="books">
+                    <label for="books">Books & Stationery</label>
+                </div>
+                <div class="filter-item">
+                    <input type="checkbox" id="foodsnacks">
+                    <label for="foodsnacks">Food & Snacks</label>
+                </div>
+                <div class="filter-item">
+                    <input type="checkbox" id="beauty">
+                    <label for="beauty">Beauty & Personal Care</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-section">
+            <h4>Sub Category</h4>
+            <div class="filter-list">
+                <div class="filter-item">
+                    <input type="checkbox" id="phones">
+                    <label for="phones">Phones & Tablets</label>
+                </div>
+                <div class="filter-item">
+                    <input type="checkbox" id="laptops">
+                    <label for="laptops">Laptops & Computers</label>
+                </div>
+                <div class="filter-item">
+                    <input type="checkbox" id="accessories">
+                    <label for="accessories">Accessories</label>
+                </div>
+                <div class="filter-item">
+                    <input type="checkbox" id="textbooks">
+                    <label for="textbooks">Textbooks</label>
+                </div>
+                <div class="filter-item">
+                    <input type="checkbox" id="clothing">
+                    <label for="clothing">Clothing</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-section">
+            <h4>Price Range (GH₵)</h4>
+            <div class="price-range">
+                <input type="number" class="price-input" placeholder="Min" id="minPrice">
+                <span>to</span>
+                <input type="number" class="price-input" placeholder="Max" id="maxPrice">
+            </div>
+        </div>
+
+        <div class="filter-section">
+            <h4>Rating</h4>
+            <div class="filter-list">
+                <div class="filter-item">
+                    <input type="checkbox" id="rating5">
+                    <label for="rating5">5 Stars</label>
+                </div>
+                <div class="filter-item">
+                    <input type="checkbox" id="rating4">
+                    <label for="rating4">4 Stars & Up</label>
+                </div>
+                <div class="filter-item">
+                    <input type="checkbox" id="rating3">
+                    <label for="rating3">3 Stars & Up</label>
+                </div>
+                <div class="filter-item">
+                    <input type="checkbox" id="rating2">
+                    <label for="rating2">2 Stars & Up</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-actions">
+            <button class="reset-btn" id="resetFilterBtn">Reset</button>
+            <button class="apply-btn" id="applyFilterBtn">Apply</button>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <script>
+        // DOM Elements
+        const searchInput = document.getElementById('searchInput');
+        const filterBtn = document.getElementById('filterBtn');
+        const filterPanel = document.getElementById('filterPanel');
+        const closeFilter = document.getElementById('closeFilter');
+        const overlay = document.getElementById('overlay');
+        const productsGrid = document.getElementById('productsGrid');
+        const scrollTop = document.getElementById('scrollTop');
+        const sortBtn = document.getElementById('sortBtn');
+        const sortMenu = document.getElementById('sortMenu');
+        const sortOptions = document.querySelectorAll('.sort-option');
+        const topHeader = document.querySelector('.top-header');
+        const noResults = document.getElementById('noResults');
+        const resetFilterBtn = document.getElementById('resetFilterBtn');
+        const applyFilterBtn = document.getElementById('applyFilterBtn');
+
+        // Sample products data
+        const products = [
+            {
+                id: 1,
+                name: "HP Pavilion 15 Laptop - 11th Gen Intel Core i5",
+                price: 3500,
+                rating: 4.5,
+                image: "/api/placeholder/400/400",
+                category: "Electronics",
+                subCategory: "Laptops & Computers",
+                university: "UCC",
+                date: new Date('2025-03-15')
+            },
+            {
+                id: 2,
+                name: "Samsung Galaxy A53 5G Smartphone",
+                price: 1800,
+                rating: 4.2,
+                image: "/api/placeholder/400/400",
+                category: "Electronics",
+                subCategory: "Phones & Tablets",
+                university: "UCC",
+                date: new Date('2025-04-01')
+            },
+            {
+                id: 3,
+                name: "Introduction to Economics Textbook - 5th Edition",
+                price: 120,
+                rating: 4.8,
+                image: "/api/placeholder/400/400",
+                category: "Books & Stationery",
+                subCategory: "Textbooks",
+                university: "UCC",
+                date: new Date('2025-02-10')
+            },
+            {
+                id: 4,
+                name: "Men's Casual UCC Branded Polo Shirt",
+                price: 85,
+                rating: 4.0,
+                image: "/api/placeholder/400/400",
+                category: "Fashion",
+                subCategory: "Clothing",
+                university: "UCC",
+                date: new Date('2025-03-25')
+            },
+            {
+                id: 5,
+                name: "AirPods Pro with Wireless Charging Case",
+                price: 850,
+                rating: 4.7,
+                image: "/api/placeholder/400/400",
+                category: "Electronics",
+                subCategory: "Accessories",
+                university: "KNUST",
+                date: new Date('2025-04-10')
+            },
+            {
+                id: 6,
+                name: "Scientific Calculator - Casio FX-991ES Plus",
+                price: 95,
+                rating: 4.9,
+                image: "/api/placeholder/400/400",
+                category: "Books & Stationery",
+                subCategory: "Accessories",
+                university: "UCC",
+                date: new Date('2025-01-15')
+            },
+            {
+                id: 7,
+                name: "Women's UCC Sports Tracksuit",
+                price: 150,
+                rating: 3.8,
+                image: "/api/placeholder/400/400",
+                category: "Fashion",
+                subCategory: "Clothing",
+                university: "UCC",
+                date: new Date('2025-04-05')
+            },
+            {
+                id: 8,
+                name: "Advanced Organic Chemistry Handbook",
+                price: 200,
+                rating: 4.6,
+                image: "/api/placeholder/400/400",
+                category: "Books & Stationery",
+                subCategory: "Textbooks",
+                university: "UG",
+                date: new Date('2025-02-20')
+            },
+            {
+                id: 9,
+                name: "UCC Branded Insulated Water Bottle - 750ml",
+                price: 45,
+                rating: 4.3,
+                image: "/api/placeholder/400/400",
+                category: "Food & Snacks",
+                subCategory: "Accessories",
+                university: "UCC",
+                date: new Date('2025-03-10')
+            },
+            {
+                id: 10,
+                name: "Wireless Mouse and Keyboard Combo",
+                price: 180,
+                rating: 4.1,
+                image: "/api/placeholder/400/400",
+                category: "Electronics",
+                subCategory: "Accessories",
+                university: "KNUST",
+                date: new Date('2025-01-25')
+            },
+            {
+                id: 11,
+                name: "Professional Engineering Drawing Kit",
+                price: 250,
+                rating: 4.4,
+                image: "/api/placeholder/400/400",
+                category: "Books & Stationery",
+                subCategory: "Accessories",
+                university: "UEW",
+                date: new Date('2025-02-15')
+            },
+            {
+                id: 12,
+                name: "UCC Graduation Ceremony Gown Rental",
+                price: 300,
+                rating: 4.0,
+                image: "/api/placeholder/400/400",
+                category: "Fashion",
+                subCategory: "Clothing",
+                university: "UCC",
+                date: new Date('2025-03-20')
+            },
+            {
+                id: 13,
+                name: "Premium UCC Branded Notebook Set - Pack of 5",
+                price: 65,
+                rating: 4.2,
+                image: "/api/placeholder/400/400",
+                category: "Books & Stationery",
+                subCategory: "Accessories",
+                university: "UCC",
+                date: new Date('2025-04-15')
+            },
+            {
+                id: 14,
+                name: "24-Hour Campus Delivery Jollof Rice with Chicken",
+                price: 35,
+                rating: 4.8,
+                image: "/api/placeholder/400/400",
+                category: "Food & Snacks",
+                subCategory: "Food",
+                university: "UCC",
+                date: new Date('2025-04-20')
+            },
+            {
+                id: 15,
+                name: "Natural Shea Butter Body Lotion - 500ml",
+                price: 40,
+                rating: 4.5,
+                image: "/api/placeholder/400/400",
+                category: "Beauty & Personal Care",
+                subCategory: "Personal Care",
+                university: "UCC",
+                date: new Date('2025-03-05')
+            },
+            {
+                id: 16,
+                name: "External Hard Drive - 1TB Storage",
+                price: 320,
+                rating: 4.6,
+                image: "/api/placeholder/400/400",
+                category: "Electronics",
+                subCategory: "Accessories",
+                university: "UDS",
+                date: new Date('2025-02-05')
+            }
+        ];
+
+        let currentSort = 'popular';
+        let filteredProducts = [...products];
+        let favorites = [];
+
+        // Load skeleton first
+        loadSkeletonLoaders();
+
+        // After a delay, load the actual products
+        setTimeout(() => {
+            renderProducts(products);
+        }, 1500);
+
+        // Load skeleton loaders
+        function loadSkeletonLoaders() {
+            productsGrid.innerHTML = '';
+            
+            for (let i = 0; i < 8; i++) {
+                productsGrid.innerHTML += `
+                    <div class="skeleton-product">
+                        <div class="skeleton skeleton-image"></div>
+                        <div class="skeleton skeleton-name"></div>
+                        <div class="skeleton skeleton-name-2"></div>
+                        <div class="skeleton skeleton-price"></div>
+                        <div class="skeleton skeleton-rating"></div>
+                        <div class="skeleton skeleton-button"></div>
+                    </div>
+                `;
+            }
+        }
+
+        // Render products
+        function renderProducts(products) {
+            productsGrid.innerHTML = '';
+            
+            if (products.length === 0) {
+                noResults.style.display = 'block';
+                return;
+            }
+            
+            noResults.style.display = 'none';
+            
+            products.forEach(product => {
+                const isFavorite = favorites.includes(product.id);
+                
+                productsGrid.innerHTML += `
+                    <div class="product-card" data-id="${product.id}">
+                        <div class="product-image-container">
+                            <img src="${product.image}" alt="${product.name}" class="product-image">
+                            <div class="favorite-btn ${isFavorite ? 'active' : ''}" data-id="${product.id}">
+                                <i class="fas ${isFavorite ? 'fa-heart' : 'fa-heart-o'}"></i>
+                            </div>
+                        </div>
+                        <div class="product-info">
+                            <div class="product-name">${product.name}</div>
+                            <div class="product-price">GH₵ ${product.price.toLocaleString()}</div>
+                            <div class="product-rating">
+                                <i class="fas fa-star"></i>
+                                <span>${product.rating}</span>
+                            </div>
+                            <button class="view-btn">View Product</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Add event listeners to favorite buttons
+            document.querySelectorAll('.favorite-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    toggleFavorite(this);
+                });
+            });
+
+            // Add event listeners to product cards
+            document.querySelectorAll('.product-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const productId = this.getAttribute('data-id');
+                    viewProduct(productId);
+                });
+            });
+        }
+
+        // Toggle favorite status
+        function toggleFavorite(btn) {
+            const productId = parseInt(btn.getAttribute('data-id'));
+            
+            if (favorites.includes(productId)) {
+                favorites = favorites.filter(id => id !== productId);
+                btn.classList.remove('active');
+                btn.querySelector('i').classList.replace('fa-heart', 'fa-heart-o');
+            } else {
+                favorites.push(productId);
+                btn.classList.add('active');
+                btn.querySelector('i').classList.replace('fa-heart-o', 'fa-heart');
+            }
+
+            // Show animation feedback
+            btn.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                btn.style.transform = 'scale(1)';
+            }, 200);
+        }
+
+        // View product details
+        function viewProduct(productId) {
+            // This would navigate to product detail page in a real app
+            alert(`Viewing product with ID: ${productId}`);
+        }
+
+        // Filter and Sort products
+        function filterAndSortProducts() {
+            let results = [...products];
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            
+            // Apply search
+            if (searchTerm) {
+                results = results.filter(product => {
+                    // Fuzzy search - matches even if spelling is not exact
+                    return fuzzySearch(searchTerm, product.name.toLowerCase()) || 
+                           fuzzySearch(searchTerm, product.category.toLowerCase()) ||
+                           fuzzySearch(searchTerm, product.subCategory.toLowerCase());
+                });
+            }
+            
+            // Apply filter criteria (here we would add filter logic based on selected filters)
+            // This is a simplified example
+            const selectedUniversities = getSelectedValues('university');
+            if (selectedUniversities.length > 0) {
+                results = results.filter(product => selectedUniversities.includes(product.university));
+            }
+            
+            // Apply sorting
+            switch(currentSort) {
+                case 'newest':
+                    results.sort((a, b) => b.date - a.date);
+                    break;
+                case 'price-low':
+                    results.sort((a, b) => a.price - b.price);
+                    break;
+                case 'price-high':
+                    results.sort((a, b) => b.price - a.price);
+                    break;
+                case 'rating':
+                    results.sort((a, b) => b.rating - a.rating);
+                    break;
+                case 'popular':
+                default:
+                    // Already sorted by popularity in original array
+                    break;
+            }
+            
+            filteredProducts = results;
+            renderProducts(results);
+        }
+        
+        // Simple fuzzy search implementation
+        function fuzzySearch(needle, haystack) {
+            needle = needle.toLowerCase();
+            haystack = haystack.toLowerCase();
+            
+            // Exact match
+            if (haystack.includes(needle)) return true;
+            
+            // Check for similar matches (allowing for typos)
+            const needleLen = needle.length;
+            const haystackLen = haystack.length;
+            
+            if (needleLen > haystackLen) return false;
+            
+            let needlePos = 0;
+            let haystackPos = 0;
+            let errors = 0;
+            const maxErrors = Math.min(2, Math.floor(needleLen / 3));
+            
+            while (needlePos < needleLen && haystackPos < haystackLen) {
+                if (needle[needlePos] === haystack[haystackPos]) {
+                    needlePos++;
+                } else {
+                    errors++;
+                    if (errors > maxErrors) return false;
+                }
+                haystackPos++;
+            }
+            
+            return needlePos === needleLen;
+        }
+        
+        // Get selected values from filter checkboxes
+        function getSelectedValues(type) {
+            const selected = [];
+            
+            if (type === 'university') {
+                if (document.getElementById('ucc').checked) selected.push('UCC');
+                if (document.getElementById('knust').checked) selected.push('KNUST');
+                if (document.getElementById('ug').checked) selected.push('UG');
+                if (document.getElementById('uew').checked) selected.push('UEW');
+                if (document.getElementById('uds').checked) selected.push('UDS');
+            }
+            
+            return selected;
+        }
+
+        // Event Listeners
+        
+        // Filter button click
+        filterBtn.addEventListener('click', () => {
+            filterPanel.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        // Close filter panel
+        closeFilter.addEventListener('click', () => {
+            filterPanel.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+        
+        // Overlay click
+        overlay.addEventListener('click', () => {
+            filterPanel.classList.remove('active');
+            sortMenu.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+        
+        // Search input
+        searchInput.addEventListener('input', debounce(() => {
+            filterAndSortProducts();
+        }, 300));
+        
+        // Sort button click
+        sortBtn.addEventListener('click', () => {
+            sortMenu.classList.toggle('active');
+            if (sortMenu.classList.contains('active')) {
+                overlay.classList.add('active');
+            } else {
+                overlay.classList.remove('active');
+            }
+        });
+        
+        // Sort options click
+        sortOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                sortOptions.forEach(opt => opt.classList.remove('active'));
+                option.classList.add('active');
+                currentSort = option.getAttribute('data-sort');
+                sortMenu.classList.remove('active');
+                overlay.classList.remove('active');
+                
+                // Visual feedback
+                sortBtn.innerHTML = `Sort By: ${option.textContent} <i class="fas fa-chevron-down"></i>`;
+                
+                // Apply the new sort
+                filterAndSortProducts();
+            });
+        });
+        
+        // Apply filter button
+        applyFilterBtn.addEventListener('click', () => {
+            filterAndSortProducts();
+            filterPanel.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+        
+        // Reset filter button
+        resetFilterBtn.addEventListener('click', () => {
+            // Reset all checkboxes and inputs
+            document.querySelectorAll('.filter-item input[type="checkbox"]').forEach(input => {
+                input.checked = false;
+            });
+            document.getElementById('ucc').checked = true; // Default UCC selected
+            document.getElementById('minPrice').value = '';
+            document.getElementById('maxPrice').value = '';
+        });
+        
+        // Window scroll
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 100) {
+                scrollTop.classList.add('active');
+            } else {
+                scrollTop.classList.remove('active');
+            }
+            
+            // Hide top header on scroll
+            if (window.scrollY > 50) {
+                topHeader.style.transform = 'translateY(-100%)';
+            } else {
+                topHeader.style.transform = 'translateY(0)';
+            }
+        });
+        
+        // Scroll to top button click
+        scrollTop.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+        
+        // Utility function for debouncing
+        function debounce(func, delay) {
+            let timeout;
+            return function() {
+                const context = this;
+                const args = arguments;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(context, args), delay);
+            };
+        }
+    </script>
+</body>
+</html>

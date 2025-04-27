@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ema - Login/Signup</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* ===== Google Font Import - Poppins ===== */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap');
+
+        :root {
+            --primary-color: #FFCC08;
+            --text-color: #333;
+            --background-color: #f5f5f5;
+            --card-bg: #ffffff;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: url('https://images.unsplash.com/photo-1535957998253-26ae1ef29506?auto=format&fit=crop&q=80&w=1776') center center/cover no-repeat fixed;
+            color: var(--text-color);
+            font-size: 15px;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: -1;
+        }
+
+        a {
+            transition: .3s all ease;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        a:hover {
+            color: #e0b400;
+        }
+
+        .auth-container {
+            perspective: 1000px;
+            width: 100%;
+            max-width: 450px;
+            margin: 2rem auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        .card-container {
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            min-height: 550px; /* Adjusted to min-height */
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+            perspective: 2000px; /* Increased perspective for more depth */
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            background: var(--card-bg);
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem;
+            top: 0;
+            left: 0;
+
+            /* Control visibility and opacity for flipping */
+            visibility: hidden;
+            opacity: 0;
+            /* Transition for hiding: opacity fades out, then visibility becomes hidden */
+            transition: opacity 0.4s ease-in-out, visibility 0s linear 0.4s;
+
+            /* Ensure faces participate in 3D space */
+            transform-style: preserve-3d;
+        }
+
+        /* Hide scrollbar but allow scrolling */
+        .card-face::-webkit-scrollbar { display: none; } /* Chrome, Safari and Opera */
+        .card-face { -ms-overflow-style: none; } /* IE and Edge */
+        .card-face { scrollbar-width: none; } /* Firefox */
+
+
+        /* Base transforms for faces relative to container */
+        .card-front {
+             transform: rotateY(0deg) rotateX(0deg);
+        }
+
+        .card-back {
+            transform: rotateY(180deg) rotateX(0deg);
+        }
+
+        .card-side {
+             transform: rotateY(0deg) rotateX(180deg);
+        }
+
+        /* --- Visibility Control based on Container State --- */
+
+        /* When container is in default state (Login) */
+        .auth-container:not(.flip):not(.flip-vertical) .card-front {
+            visibility: visible;
+            opacity: 1;
+            /* Transition for showing: visibility immediately, opacity fades in */
+            transition: opacity 0.4s ease-in-out, visibility 0s linear 0s;
+        }
+
+        /* When container is horizontally flipped (Signup) */
+        .auth-container.flip:not(.flip-vertical) .card-back {
+            visibility: visible;
+            opacity: 1;
+             /* Transition for showing: visibility immediately, opacity fades in */
+            transition: opacity 0.4s ease-in-out, visibility 0s linear 0s;
+        }
+
+         /* When container is vertically flipped (Forgot) */
+        .auth-container.flip-vertical:not(.flip) .card-side {
+            visibility: visible;
+            opacity: 1;
+             /* Transition for showing: visibility immediately, opacity fades in */
+            transition: opacity 0.4s ease-in-out, visibility 0s linear 0s;
+        }
+
+
+        /* Container Transforms */
+        .auth-container.flip .card-container {
+            transform: rotateY(180deg);
+        }
+
+        .auth-container.flip-vertical .card-container {
+            transform: rotateX(180deg);
+        }
+
+
+        .tab-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            border-radius: 50px;
+            background: rgba(255, 204, 8, 0.1);
+            padding: 5px;
+            position: relative; /* Changed from sticky for better z-index control */
+            z-index: 2;
+            /* Adjusted top position if using sticky, but relative is safer with absolute children */
+            /* top: 0; */
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: none;
+            font-weight: 500;
+            font-size: 16px;
+            color: var(--text-color);
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+            width: 50%;
+            cursor: pointer;
+            text-align: center; /* Added to center text */
+        }
+
+        .tab-btn.active {
+            color: #fff;
+            background: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(255, 204, 8, 0.3);
+        }
+
+        .form-title {
+            font-size: 24px;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .highlight {
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .form-floating {
+            margin-bottom: 1.25rem;
+            position: relative;
+        }
+
+        .form-floating .form-control {
+            height: 60px !important;
+            border-radius: 13px !important;
+            background-color: rgba(248, 249, 250, 0.9);
+            border: 2px solid #e9ecef;
+            padding-left: 20px;
+            font-weight: 400;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .form-floating .form-control:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 204, 8, 0.25);
+            border-color: var(--primary-color);
+        }
+
+         /* Adjust label for floating effect */
+         .form-floating > label {
+             padding: 1rem 0.75rem;
+             opacity: 0.65;
+             transition: all 0.3s ease;
+         }
+
+        .password-toggle {
+            cursor: pointer;
+            position: absolute;
+            right: 20px;
+            top: 50%; /* Center vertically */
+            transform: translateY(-50%); /* Adjust for vertical centering */
+            z-index: 9;
+            color: #888;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .password-toggle:hover {
+            color: var(--primary-color);
+        }
+
+        .form-check-input {
+            border-color: #adb5bd !important;
+            width: 18px;
+            height: 18px;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color) !important;
+        }
+
+        .form-check-input:focus {
+            box-shadow: 0 0 0 3px rgba(255, 204, 8, 0.25);
+        }
+
+        .form-check-label {
+            font-size: 14px;
+            padding-left: 5px;
+        }
+
+        .btn-primary {
+            border-radius: 13px;
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: #333;
+            height: 55px;
+            font-weight: 600;
+            box-shadow: 0 10px 20px rgba(255, 204, 8, 0.3);
+            transition: all 0.3s ease;
+            font-size: 17px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary:hover {
+            background-color: #e0b400;
+            border-color: #e0b400;
+            transform: translateY(-2px);
+        }
+
+                 /* Add some padding at the bottom of card faces to prevent content scrollbar overlap */
+                 .card-face { padding-bottom: 3rem; }
+
+
+/* Style for the suggestions container (the dropdown list) */
+.suggestions-container {
+    position: absolute; /* Position relative to its closest positioned ancestor (the .form-floating) */
+    top: calc(100% + 5px); /* Position 5px below the bottom of the .form-floating parent */
+    left: 0;
+    right: 0; /* Make it span the width of the parent */
+    z-index: 100; /* Ensure it's above other form elements */
+    background-color: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-height: 150px; /* Limit height and add scroll if many suggestions */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on mobile */
+    list-style: none; /* Remove list bullets if using ul/li */
+    padding: 0; /* Remove default padding */
+    margin: 0; /* Remove default margin */
+    display: none; /* Hidden by default until there are suggestions */
+}
+
+/* Style for individual suggestion items (using div as in HTML) */
+.suggestions-container div {
+    padding: 10px 15px; /* Padding inside each suggestion */
+    cursor: pointer; /* Indicate it's clickable */
+    transition: background-color 0.2s ease;
+    font-size: 15px; /* Match body font size */
+    color: var(--text-color); /* Match body text color */
+}
+
+/* Style for hovered suggestion item */
+.suggestions-container div:hover {
+    background-color: #f8f9fa; /* Light background on hover */
+}
+
+ /* Adjust z-index for the form-floating that *contains* the suggestions when the suggestions are shown */
+ /* This lifts the input container and the suggestions above other form-floating elements */
+ .form-floating.has-suggestions {
+     z-index: 101; /* Bring this container higher */
+ }
+
+ /* Ensure the parent form-floating is positioned relative */
+ /* (Already done by Bootstrap's .form-floating, but good to be explicit if needed) */
+  .form-floating {
+      position: relative;
+  }
+
+/* You might want to add a specific margin below the suggestions container */
+/* This can be handled by adjusting the margin-bottom on the .university-input-container */
+ .university-input-container {
+     margin-bottom: 1.75rem; /* Slightly more space if suggestions show */
+ }
+
+        /* Pulsating button effect */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.02); /* Reduced pulse scale slightly */
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .btn-pulse {
+            animation: pulse 2s infinite;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: #adb5bd;
+            font-size: 14px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex-grow: 1;
+            height: 1px;
+            background: #e9ecef;
+            margin: 0 15px;
+        }
+
+        .social-login {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 1.5rem;
+        }
+
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid #e9ecef;
+            background: #fff;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .social-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .social-btn.google:hover {
+            color: #DB4437;
+            border-color: #DB4437;
+        }
+
+        .social-btn.apple:hover {
+            color: #000;
+            border-color: #000;
+        }
+
+        .social-btn.facebook:hover {
+            color: #4267B2;
+            border-color: #4267B2;
+        }
+
+        .login-footer, .signup-footer, .forgot-footer {
+            margin-top: 1rem;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+
+
+
+        /* Media queries for responsive design */
+        @media (max-width: 768px) {
+            .auth-container {
+                margin: 1rem;
+                max-height: 90vh; /* Added max-height for smaller screens */
+            }
+
+            .card-container {
+                min-height: 500px;
+            }
+
+            .card-face {
+                padding: 1.5rem;
+            }
+
+            .form-floating {
+                 margin-bottom: 1rem; /* Adjusted margin */
+            }
+
+            .form-floating .form-control {
+                height: 55px !important;
+                 padding-left: 15px; /* Adjusted padding */
+            }
+
+             .form-floating > label {
+                 padding: 0.8rem 0.75rem; /* Adjusted label padding */
+             }
+
+
+            .btn-primary {
+                height: 50px;
+            }
+        }
+
+        @media (max-height: 700px) {
+            .auth-container {
+                margin: 0.5rem;
+            }
+
+            .card-container {
+                min-height: 450px;
+            }
+
+            .form-floating {
+                margin-bottom: 0.75rem;
+            }
+
+            .form-floating .form-control {
+                height: 50px !important;
+            }
+
+            .form-floating > label {
+                 padding: 0.6rem 0.75rem; /* Adjusted label padding */
+             }
+
+            .btn-primary {
+                height: 45px;
+            }
+        }
+
+        /* Popup styles */
+        .popup-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none; /* Hidden by default */
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.5); /* Dimming overlay */
+            animation: fadeIn 0.3s ease-in-out;
+            z-index: 9999;
+        }
+
+        .popup-box {
+            background-color: #fff;
+            color: #333;
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            animation: popIn 0.3s ease-in-out forwards; /* Use forwards to keep final state */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transform: scale(0.8); /* Start slightly smaller */
+            opacity: 0; /* Start hidden */
+            max-width: 350px;
+            width: 90%; /* Adjusted for better mobile fit */
+            /* Removed active class dependency on transform, animation handles it */
+        }
+
+         .popup-container.show .popup-box {
+             /* Trigger animation by adding a class to container */
+             animation: popIn 0.3s ease-in-out forwards;
+         }
+
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0.8); /* Start slightly smaller */
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                background: rgba(0, 0, 0, 0);
+            }
+            to {
+                background: rgba(0, 0, 0, 0.5);
+            }
+        }
+
+         @keyframes fadeOut {
+            from {
+                 background: rgba(0, 0, 0, 0.5);
+            }
+            to {
+                 background: rgba(0, 0, 0, 0);
+            }
+         }
+
+         @keyframes popOut {
+            0% {
+                 transform: scale(1);
+                 opacity: 1;
+            }
+            100% {
+                 transform: scale(0.8);
+                 opacity: 0;
+            }
+         }
+
+
+        .popup-box img {
+            display: block;
+            width: 60px; /* Adjusted size */
+            height: 60px; /* Adjusted size */
+            margin: 0 auto 20px;
+        }
+
+        .popup-box p {
+            margin: 0;
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        .popup-box .continue-btn {
+            padding: 10px 20px;
+            width: 80%;
+            font-size: 1rem;
+            border: none;
+            border-radius: 13px;
+            background-color: var(--primary-color);
+            color: #333;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-weight: 600;
+        }
+
+        .popup-box .continue-btn:hover {
+            background-color: #e0b400;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container" id="authContainer">
+        <div class="card-container" id="cardContainer">
+            <div class="card-face card-front" id="loginForm">
+                <div class="tab-selector">
+                    <button id="loginTab" class="tab-btn active" onclick="switchToLogin()">Log In</button>
+                    <button id="signupTab" class="tab-btn" onclick="switchToSignup()">Sign Up</button>
+                </div>
+
+                <h5 class="form-title">Good to have you, <span class="highlight">but smile!</span></h5>
+
+                <div class="form-floating">
+                    <input type="email" class="form-control" id="loginEmail" name="email" placeholder="info@example.com" required>
+                    <label for="loginEmail">Email Address</label>
+                </div>
+
+                <div class="form-floating">
+                    <input type="password" class="form-control" id="loginPassword" name="password" placeholder="Password" required>
+                    <label for="loginPassword">Password</label>
+                    <span class="password-toggle" onclick="togglePassword('loginPassword', this)">Show</span>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="rememberMe" name="remember">
+                        <label for="rememberMe" class="form-check-label">Remember me</label>
+                    </div>
+                    <div>
+                        <a href="#" onclick="switchToForgot(event)">Forgot password?</a>
+                    </div>
+                </div>
+
+                <div class="d-grid mb-4">
+                    <button type="submit" id="loginBtn" class="btn btn-primary btn-pulse">Log in</button>
+                </div>
+
+                <div class="divider">or continue with</div>
+
+                <div class="social-login">
+                    <button class="social-btn google" title="Google" onclick="socialLogin('google')">
+                        <i class="fab fa-google"></i>
+                    </button>
+                    <button class="social-btn apple" title="Apple" onclick="socialLogin('apple')">
+                        <i class="fab fa-apple"></i>
+                    </button>
+                    <button class="social-btn facebook" title="Facebook" onclick="socialLogin('facebook')">
+                        <i class="fab fa-facebook-f"></i>
+                    </button>
+                </div>
+
+                <div class="login-footer">
+                    Not a user? <a href="#" onclick="switchToSignup()">Sign up</a>
+                </div>
+            </div>
+
+            <div class="card-face card-back" id="signupForm">
+                <div class="tab-selector">
+                    <button id="loginTabBack" class="tab-btn" onclick="switchToLogin()">Log In</button>
+                    <button id="signupTabBack" class="tab-btn active" onclick="switchToSignup()">Sign Up</button>
+                </div>
+
+                <h5 class="form-title">Create an account <span class="highlight">today!</span></h5>
+
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="signupName" placeholder="Full name" required>
+                    <label for="signupName">Full name</label>
+                </div>
+
+                <div class="form-floating">
+                    <input type="email" class="form-control" id="signupEmail" name="email" placeholder="info@example.com" required>
+                    <label for="signupEmail">Email Address</label>
+                </div>
+
+                <div class="form-floating">
+                    <input type="password" class="form-control" id="signupPassword" name="password" placeholder="Password" required>
+                    <label for="signupPassword">Password</label>
+                    <span class="password-toggle" onclick="togglePassword('signupPassword', this)">Show</span>
+                </div>
+
+                <div class="form-floating">
+                    <input type="password" class="form-control" id="confirmPassword" name="confirm_password" placeholder="Confirm password" required>
+                    <label for="confirmPassword">Confirm Password</label>
+                    <span class="password-toggle" onclick="togglePassword('confirmPassword', this)">Show</span>
+                </div>
+
+                <div class="form-floating university-input-container"> <input type="text" class="form-control" id="signupUniversity" placeholder="University (Optional)">
+                    <label for="signupUniversity">University (Optional)</label>
+                     <div id="universitySuggestions" class="suggestions-container"></div>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input type="checkbox" class="form-check-input" id="agreeTerms" name="agree" required>
+                    <label for="agreeTerms" class="form-check-label">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+                </div>
+
+                <div class="d-grid mb-3">
+                    <button type="submit" id="signupBtn" class="btn btn-primary btn-pulse">Sign up</button>
+                </div>
+
+                <div class="divider">or sign up with</div>
+
+                <div class="social-login">
+                    <button class="social-btn google" title="Google" onclick="socialLogin('google')">
+                        <i class="fab fa-google"></i>
+                    </button>
+                    <button class="social-btn apple" title="Apple" onclick="socialLogin('apple')">
+                        <i class="fab fa-apple"></i>
+                    </button>
+                    <button class="social-btn facebook" title="Facebook" onclick="socialLogin('facebook')">
+                        <i class="fab fa-facebook-f"></i>
+                    </button>
+                </div>
+
+                <div class="signup-footer">
+                    Already a user? <a href="#" onclick="switchToLogin()">Log in</a>
+                </div>
+            </div>
+
+            <div class="card-face card-side" id="forgotForm">
+                 <div class="tab-selector">
+                    <button class="tab-btn" onclick="switchToLogin()">Log In</button> <button class="tab-btn active">Forgot Password</button> </div>
+
+                <h5 class="form-title">Forgot your <span class="highlight">password?</span></h5>
+                <p class="text-center text-muted mb-4">Enter your email address and we'll send you a link to reset your password.</p>
+
+                <div class="form-floating">
+                    <input type="email" class="form-control" id="forgotEmail" name="email" placeholder="info@example.com" required>
+                    <label for="forgotEmail">Email Address</label>
+                </div>
+
+                <div class="d-grid mb-4">
+                    <button type="submit" id="resetBtn" class="btn btn-primary btn-pulse">Reset Password</button>
+                </div>
+
+                <div class="forgot-footer">
+                    Remember your password? <a href="#" onclick="switchToLogin()">Log in</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-container" id="popupContainer">
+        <div class="popup-box" id="popupBox">
+            <img src="data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5z:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve"><style type="text/css">.st0{fill:#FFCC08;}</style><circle class="st0" cx="256" cy="256" r="256"/><g><path fill="#FFFFFF" d="M416.3,163.7c-9.3-9.3-24.5-9.3-33.9,0l-192,192l-96-96c-9.3-9.3-24.5-9.3-33.9,0s-9.3,24.5,0,33.9l112,112c9.3,9.3,24.5,9.3,33.9,0l208-208C425.6,188.2,425.6,173,416.3,163.7z"/></g></svg>" alt="Success">
+            <p><b id="popupTitle">Sign Up successful!</b> <span id="popupMessage">Join us today and start exploring amazing features.</span></p>
+            <button class="continue-btn" onclick="closePopup()">Continue</button>
+        </div>
+    </div>
+
+    <script>
+        // Variables to store references to DOM elements
+        const authContainer = document.getElementById('authContainer');
+        const cardContainer = document.getElementById('cardContainer');
+        const loginTab = document.getElementById('loginTab');
+        const signupTab = document.getElementById('signupTab');
+        const loginTabBack = document.getElementById('loginTabBack');
+        const signupTabBack = document.getElementById('signupTabBack');
+        const popupContainer = document.getElementById('popupContainer');
+        const popupBox = document.getElementById('popupBox');
+        const popupTitle = document.getElementById('popupTitle');
+        const popupMessage = document.getElementById('popupMessage');
+        
+        // NEW: University Autocomplete Elements and List
+        const signupUniversityInput = document.getElementById('signupUniversity');
+        const universitySuggestionsContainer = document.getElementById('universitySuggestions');
+
+         const universities = [
+             "University of Ghana",
+             "Kwame Nkrumah University of Science and Technology",
+             "University of Cape Coast",
+             "Ghana Institute of Management and Public Administration",
+             "University of Education, Winneba",
+             "Ashesi University",
+             "Accra Technical University",
+             "Kumasi Technical University",
+             "Ho Technical University",
+             "Koforidua Technical University",
+             "Takoradi Technical University",
+             "Tamale Technical University",
+             "Cape Coast Technical University",
+             "Wa Technical University",
+             "Bolgatanga Technical University",
+             "Ghana Communication Technology University",
+             "University of Professional Studies, Accra",
+             "Ghana Institute of Journalism",
+             "National Film and Television Institute",
+             "Akenten Appiah-Menka University of Skills Training and Entrepreneurial Development",
+              "Central University",
+              "All Nations University",
+              "Ghana Technology University College",
+              "Methodist University College Ghana",
+              "Presbyterian University College, Ghana",
+              "Valley View University",
+              "Wisconsin International University College",
+              "Catholic University College of Ghana",
+              "Islamic University College, Ghana",
+              "Christian Service University College",
+              "Spiritan University College",
+              "Data Link Institute",
+              "African University College of Communications"
+             // Add more universities here to expand the list
+         ];
+
+        // Login, Signup, and Forgot Password buttons
+        const loginBtn = document.getElementById('loginBtn');
+        const signupBtn = document.getElementById('signupBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        // Remember Me checkbox
+        const rememberMe = document.getElementById('rememberMe');
+
+         // NEW: Autocomplete Logic for University Field
+         // Add event listener to the university input field
+         if (signupUniversityInput && universitySuggestionsContainer) { // Check if elements exist
+             signupUniversityInput.addEventListener('input', function() {
+                 const input = this.value.toLowerCase(); // Get input value, lowercase for case-insensitive search
+                 universitySuggestionsContainer.innerHTML = ''; // Clear previous suggestions
+
+                 // Hide suggestions if input is empty
+                 if (input.length === 0) {
+                     universitySuggestionsContainer.style.display = 'none';
+                      // Remove the z-index class
+                     this.closest('.form-floating').classList.remove('has-suggestions');
+                     return;
+                 }
+
+                 // Filter the universities list based on input
+                 const filteredUniversities = universities.filter(uni =>
+                     uni.toLowerCase().includes(input) // Check if university name includes the input string
+                 );
+
+                 // Display suggestions if there are matches
+                 if (filteredUniversities.length > 0) {
+                     filteredUniversities.forEach(uni => {
+                         const suggestionItem = document.createElement('div'); // Create a div for each suggestion
+                         suggestionItem.textContent = uni; // Set the university name as text
+                         universitySuggestionsContainer.appendChild(suggestionItem); // Add to suggestions container
+                     });
+                     universitySuggestionsContainer.style.display = 'block'; // Show the suggestions container
+                      // Add z-index class to parent form-floating
+                     this.closest('.form-floating').classList.add('has-suggestions');
+
+                 } else {
+                     universitySuggestionsContainer.style.display = 'none'; // Hide if no matches
+                      // Remove the z-index class
+                     this.closest('.form-floating').classList.remove('has-suggestions');
+                 }
+             });
+
+             // Add event listener to handle clicking on a suggestion (using event delegation)
+             universitySuggestionsContainer.addEventListener('click', function(event) {
+                 // Check if the clicked element is a suggestion div
+                 if (event.target.tagName === 'DIV') {
+                     signupUniversityInput.value = event.target.textContent; // Fill the input with selected text
+                     universitySuggestionsContainer.style.display = 'none'; // Hide suggestions
+                      // Remove the z-index class
+                      signupUniversityInput.closest('.form-floating').classList.remove('has-suggestions');
+                 }
+             });
+         }
+
+
+         // Add event listener to hide suggestions when clicking outside the input or suggestions box
+         document.addEventListener('click', function(event) {
+             // Check if the click target is NOT the input AND NOT inside the suggestions container
+             const isClickInsideInput = signupUniversityInput && signupUniversityInput.contains(event.target);
+             const isClickInsideSuggestions = universitySuggestionsContainer && universitySuggestionsContainer.contains(event.target);
+
+             if (universitySuggestionsContainer && universitySuggestionsContainer.style.display !== 'none' && !isClickInsideInput && !isClickInsideSuggestions) {
+                 universitySuggestionsContainer.style.display = 'none'; // Hide suggestions
+                  // Remove the z-index class
+                  if(signupUniversityInput) signupUniversityInput.closest('.form-floating').classList.remove('has-suggestions');
+             }
+         });
+
+
+        // Function to toggle between login and signup
+        function switchToLogin() {
+            authContainer.classList.remove('flip');
+            authContainer.classList.remove('flip-vertical');
+            loginTab.classList.add('active');
+            signupTab.classList.remove('active');
+             // Update tabs on the back/side faces if they exist
+            if(loginTabBack) loginTabBack.classList.add('active');
+            if(signupTabBack) signupTabBack.classList.remove('active');
+             // You might need to update tabs on the forgot form too if applicable
+             const forgotTabBtn = document.querySelector('#forgotForm .tab-btn.active');
+             if (forgotTabBtn) forgotTabBtn.classList.remove('active');
+        }
+
+        function switchToSignup() {
+            authContainer.classList.add('flip');
+            authContainer.classList.remove('flip-vertical');
+            loginTab.classList.remove('active');
+            signupTab.classList.add('active');
+             // Update tabs on the back/side faces if they exist
+            if(loginTabBack) loginTabBack.classList.remove('active');
+            if(signupTabBack) signupTabBack.classList.add('active');
+             const forgotTabBtn = document.querySelector('#forgotForm .tab-btn.active');
+             if (forgotTabBtn) forgotTabBtn.classList.remove('active');
+        }
+
+        function switchToForgot(event) {
+            if (event) event.preventDefault();
+            authContainer.classList.remove('flip'); // Ensure horizontal flip is off
+            authContainer.classList.add('flip-vertical'); // Trigger vertical flip
+
+            // Update tab states - assumes login/signup tabs are not relevant here
+            loginTab.classList.remove('active');
+            signupTab.classList.remove('active');
+            if(loginTabBack) loginTabBack.classList.remove('active');
+            if(signupTabBack) signupTabBack.classList.remove('active');
+             // Activate the 'Forgot Password' button if it exists in the tab-selector
+            const forgotTabBtn = document.querySelector('#forgotForm .tab-btn:not(#loginTabBack)');
+             if (forgotTabBtn) forgotTabBtn.classList.add('active');
+
+        }
+
+        // Function to toggle password visibility
+        function togglePassword(inputId, element) {
+            const passwordField = document.getElementById(inputId);
+
+            if (passwordField.type === "password") {
+                passwordField.type = "text";
+                element.textContent = "Hide";
+            } else {
+                passwordField.type = "password";
+                element.textContent = "Show";
+            }
+        }
+
+        // Function to show popup
+        function showPopup(title, message) {
+            popupTitle.textContent = title;
+            popupMessage.textContent = message;
+            popupContainer.style.display = 'flex';
+             // Add a class to trigger the popIn animation (animation-fill-mode: forwards keeps the state)
+            popupContainer.classList.add('show');
+        }
+
+        // Function to close popup
+        function closePopup() {
+            // Use animations to fade out the popup
+             popupBox.style.animation = 'popOut 0.3s ease-in-out forwards';
+             popupContainer.style.animation = 'fadeOut 0.3s ease-in-out forwards';
+
+            // Hide the container after animations
+            setTimeout(() => {
+                popupContainer.style.display = 'none';
+                 // Reset animations for the next time
+                 popupBox.style.animation = '';
+                 popupContainer.style.animation = '';
+                 popupContainer.classList.remove('show');
+            }, 300); // Match the animation duration
+        }
+
+        // Social login handler
+        function socialLogin(provider) {
+            let providerName = provider.charAt(0).toUpperCase() + provider.slice(1);
+            showPopup(`${providerName} Login`, `You are being redirected to ${providerName} for authentication...`);
+
+            // In a real implementation, you would redirect to the OAuth provider here
+            setTimeout(() => {
+                closePopup(); // Close the initial popup first
+                 // Show a success message popup after a brief delay if login was simulated as successful
+                 setTimeout(() => {
+                      showPopup('Login Successful', `You've successfully logged in with ${providerName}!`);
+                 }, 100); // Short delay before showing success popup
+            }, 2000); // Simulate authentication delay
+        }
+
+        // Login form submission handler
+        if (loginBtn) {
+            loginBtn.addEventListener('click', function(event) {
+                event.preventDefault();
+
+                const email = document.getElementById('loginEmail').value.trim();
+                const password = document.getElementById('loginPassword').value.trim();
+
+                if (!email || !password) {
+                    showPopup('Login Error', 'Please fill in all fields.');
+                    return;
+                }
+
+                if (!validateEmail(email)) {
+                    showPopup('Login Error', 'Please enter a valid email address.');
+                    return;
+                }
+
+                // If "Remember me" is checked, store in localStorage
+                if (rememberMe && rememberMe.checked) {
+                    localStorage.setItem('rememberedEmail', email);
+                } else {
+                    localStorage.removeItem('rememberedEmail');
+                }
+
+                // Simulate success - normally would send to server
+                showPopup('Login Successful', 'Welcome back! You are now logged in.');
+
+                // Reset form after successful simulation (optional)
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginPassword').value = '';
+                if(rememberMe) rememberMe.checked = false;
+            });
+        }
+
+
+        // Signup form submission handler
+         if (signupBtn) {
+            signupBtn.addEventListener('click', function(event) {
+                event.preventDefault();
+
+                const name = document.getElementById('signupName').value.trim();
+                const email = document.getElementById('signupEmail').value.trim();
+                const password = document.getElementById('signupPassword').value.trim();
+                const confirmPassword = document.getElementById('confirmPassword').value.trim();
+                const agree = document.getElementById('agreeTerms').checked;
+
+                if (!name || !email || !password || !confirmPassword) {
+                    showPopup('Sign Up Error', 'Please fill out all fields.');
+                    return;
+                }
+
+                if (!validateEmail(email)) {
+                    showPopup('Sign Up Error', 'Please enter a valid email address.');
+                    return;
+                }
+
+                if (password !== confirmPassword) {
+                    showPopup('Sign Up Error', 'Passwords do not match.');
+                    return;
+                }
+
+                if (!agree) {
+                    showPopup('Sign Up Error', 'You must agree to the Terms of Service and Privacy Policy.');
+                    return;
+                }
+
+                // Simulate success - normally would send to server
+                showPopup('Sign Up Successful', 'Your account has been created successfully!');
+
+                 // Reset form after successful simulation (optional)
+                 document.getElementById('signupName').value = '';
+                 document.getElementById('signupEmail').value = '';
+                 document.getElementById('signupPassword').value = '';
+                 document.getElementById('confirmPassword').value = '';
+                 document.getElementById('agreeTerms').checked = false;
+
+            });
+         }
+
+
+        // Forgot password form submission handler
+         if (resetBtn) {
+            resetBtn.addEventListener('click', function(event) {
+                event.preventDefault();
+
+                const email = document.getElementById('forgotEmail').value.trim();
+
+                if (!email) {
+                    showPopup('Reset Error', 'Please enter your email address.');
+                    return;
+                }
+
+                if (!validateEmail(email)) {
+                    showPopup('Reset Error', 'Please enter a valid email address.');
+                    return;
+                }
+
+                // Simulate success - normally would send to server
+                showPopup('Password Reset', 'A password reset link has been sent to your email address.');
+
+                // Reset form and go back to login after a delay (optional)
+                document.getElementById('forgotEmail').value = '';
+                setTimeout(() => {
+                    // Close the current popup first if it's still open
+                     closePopup();
+                     // Switch back to login after a brief moment
+                     setTimeout(() => {
+                         switchToLogin();
+                     }, 100); // Short delay
+                }, 2000); // Simulate email sending delay
+            });
+         }
+
+
+        // Hide the popup when clicking outside the box
+        if (popupContainer) {
+            popupContainer.addEventListener('click', function(event) {
+                if (event.target === popupContainer) {
+                    closePopup();
+                }
+            });
+        }
+
+
+        // Email validation function
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Check if there's a remembered email on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            const rememberedEmail = localStorage.getItem('rememberedEmail');
+            if (rememberedEmail && document.getElementById('loginEmail') && document.getElementById('rememberMe')) {
+                document.getElementById('loginEmail').value = rememberedEmail;
+                document.getElementById('rememberMe').checked = true;
+            }
+
+            // Adjust card container height based on content and viewport
+            adjustCardHeight();
+
+            // Add event listener for window resize
+            window.addEventListener('resize', adjustCardHeight);
+
+            // Set initial tab active state based on which form is shown (default is login)
+            switchToLogin(); // Ensure login is active on load
+        });
+
+        // Function to adjust card height based on content and viewport
+        function adjustCardHeight() {
+             const viewportHeight = window.innerHeight;
+             // Calculate available vertical space, leaving some margin/padding
+             const availableHeight = viewportHeight - (2 * parseFloat(getComputedStyle(document.body).margin) || 0) - (2 * parseFloat(getComputedStyle(authContainer).margin) || 0);
+
+             // Get the height of the currently active card face
+             let activeFace = document.querySelector('.card-face[style*="visibility: visible"]');
+             if (!activeFace) {
+                // Fallback to login form if no active face is found initially
+                activeFace = document.getElementById('loginForm');
+             }
+             const contentHeight = activeFace ? activeFace.scrollHeight + 60 : 550; // Add some padding/margin
+
+
+             // Set the min-height of the card container, ensuring it fits within the viewport
+             // but is not smaller than the content or a base minimum.
+             const newMinHeight = Math.max(Math.min(contentHeight, availableHeight * 0.9), 450); // Max 90% of viewport height, min 450px
+             cardContainer.style.minHeight = `${newMinHeight}px`;
+
+        }
+
+
+    </script>
+</body>
+</html>

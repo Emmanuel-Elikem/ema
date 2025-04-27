@@ -1,0 +1,1665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Detail | ema-Campus Shopping</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #FFCC08;
+            --primary-dark: #e6b800;
+            --secondary: #333;
+            --text-dark: #222;
+            --text-light: #777;
+            --background: #fff;
+            --background-alt: #f8f8f8;
+            --border: #e0e0e0;
+            --shadow: 0 4px 12px rgba(0,0,0,0.05);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --border-radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            padding-bottom: 120px; /* Space for bottom bar and navigation */
+        }
+
+        /* Top Navigation */
+        .top-nav {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .back-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--background);
+            box-shadow: var(--shadow);
+            border: none;
+            font-size: 18px;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .back-button:hover, .back-button:active {
+            background-color: var(--primary);
+            color: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .top-nav-title {
+            flex-grow: 1;
+            text-align: center;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        /* Image Gallery */
+        .product-gallery {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .gallery-container {
+            display: flex;
+            transition: transform 0.5s ease;
+            height: 100%;
+        }
+
+        .gallery-slide {
+            min-width: 100%;
+            position: relative;
+            background-color: var(--background-alt);
+        }
+
+        .gallery-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            cursor: pointer;
+        }
+
+        .gallery-dots {
+            position: absolute;
+            bottom: 16px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .gallery-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .gallery-dot.active {
+            background-color: var(--primary);
+            transform: scale(1.2);
+        }
+
+        .wishlist-button {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            z-index: 2;
+            font-size: 18px;
+            color: var(--text-light);
+        }
+
+        .wishlist-button.active {
+            color: #ff5252;
+            background-color: rgba(255, 255, 255, 0.95);
+            transform: scale(1.1);
+        }
+
+        /* Fullscreen Mode */
+        .fullscreen-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 100;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .fullscreen-container.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .fullscreen-image {
+            max-width: 100%;
+            max-height: 100%;
+            margin: auto;
+            object-fit: contain;
+        }
+
+        .fullscreen-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            background: rgba(0, 0, 0, 0.5);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        /* Product Info Section */
+        .container {
+            padding: 0 16px;
+        }
+
+        .product-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .product-price {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 16px;
+        }
+
+        .product-price .currency {
+            font-size: 16px;
+            color: var(--text-light);
+        }
+
+        /* Card Styling */
+        .card {
+            background-color: var(--background);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 16px;
+            margin-bottom: 16px;
+            transition: var(--transition);
+            overflow: hidden;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-title i {
+            margin-right: 8px;
+            color: var(--primary);
+        }
+
+        /* Specifications Card */
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .spec-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .spec-label {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-bottom: 4px;
+        }
+
+        .spec-value {
+            font-weight: 500;
+        }
+
+        /* Description Card */
+        .description-content {
+            position: relative;
+            max-height: 100px;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+
+        .description-content.expanded {
+            max-height: 1000px;
+        }
+
+        .description-content p {
+            margin-bottom: 12px;
+            line-height: 1.8;
+        }
+
+        .description-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-top: 8px;
+            color: var(--primary-dark);
+            font-weight: 500;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .description-toggle i {
+            margin-left: 4px;
+            transition: transform 0.3s ease;
+        }
+
+        .description-content.expanded + .description-toggle i {
+            transform: rotate(180deg);
+        }
+
+        /* Vendor & Reviews */
+        .vendor-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .vendor-name {
+            font-weight: 600;
+            margin-right: 12px;
+            color: var(--secondary);
+            text-decoration: none;
+        }
+
+        .vendor-rating {
+            color: var(--primary);
+        }
+
+        .reviews-list {
+            border-top: 1px solid var(--border);
+            padding-top: 16px;
+        }
+
+        .review-item {
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .review-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .reviewer-name {
+            font-weight: 500;
+        }
+
+        .review-rating {
+            color: var(--primary);
+        }
+
+        .review-text {
+            color: var(--text-light);
+            font-size: 14px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .view-all-reviews {
+            display: inline-block;
+            margin-top: 12px;
+            color: var(--primary-dark);
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .report-link {
+            display: block;
+            text-align: center;
+            margin-top: 16px;
+            color: var(--text-light);
+            font-size: 13px;
+            text-decoration: none;
+        }
+
+        /* Similar Products */
+        .similar-products {
+            margin: 24px 0;
+        }
+
+        .similar-products h3 {
+            margin-bottom: 16px;
+            padding: 0 16px;
+        }
+
+        .products-scroll {
+            display: flex;
+            overflow-x: auto;
+            padding: 8px 16px;
+            scroll-snap-type: x mandatory;
+            gap: 12px;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        .products-scroll::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        .product-card {
+            scroll-snap-align: start;
+            min-width: 160px;
+            max-width: 160px;
+            border-radius: 12px;
+            background-color: var(--background);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+
+        .product-card-info {
+            padding: 12px;
+        }
+
+        .product-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            height: 40px;
+        }
+
+        .product-card-price {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        /* Bottom Action Bar */
+        .bottom-action-bar {
+            position: fixed;
+            bottom: 60px; /* Position above app navbar */
+            left: 0;
+            width: 100%;
+            display: flex;
+            padding: 12px 16px;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 30;
+            height: 64px;
+        }
+
+        .action-button {
+            height: 100%;
+            border-radius: 12px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .call-button {
+            background-color: var(--background);
+            color: var(--text-dark);
+            border: 1px solid var(--border);
+            width: 48px;
+            padding: 0;
+        }
+
+        .order-button {
+            background-color: var(--primary);
+            color: var(--secondary);
+            flex-grow: 1;
+            margin: 0 12px;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        .cart-button {
+            background-color: var(--background);
+            color: var(--text-dark);
+            border: 1px solid var(--border);
+            width: 48px;
+            padding: 0;
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .order-button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        /* WhatsApp Order Overlay */
+        .whatsapp-overlay {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 0;
+            background-color: white;
+            z-index: 50;
+            border-radius: 24px 24px 0 0;
+            box-shadow: 0 -4px 24px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .whatsapp-overlay.active {
+            height: 70vh;
+        }
+
+        .overlay-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .overlay-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .close-overlay {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--text-light);
+            cursor: pointer;
+        }
+
+        .whatsapp-content {
+            padding: 16px;
+            height: calc(100% - 120px);
+            overflow-y: auto;
+        }
+
+        .whatsapp-message {
+            background-color: var(--background-alt);
+            border-left: 4px solid var(--primary);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            white-space: pre-line;
+        }
+
+        .additional-message {
+            margin-top: 24px;
+        }
+
+        .additional-message label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .message-input {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 16px;
+            min-height: 100px;
+            resize: none;
+        }
+
+        .message-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .send-whatsapp {
+            width: 100%;
+            padding: 16px;
+            text-align: center;
+            background-color: #25D366; /* WhatsApp green */
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .overlay-footer {
+            padding: 16px;
+            border-top: 1px solid var(--border);
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background-color: white;
+        }
+
+        /* Product Variations */
+        .variations-card {
+            margin-bottom: 24px;
+        }
+
+        .variation-options {
+            margin-bottom: 16px;
+        }
+
+        .variation-name {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .options-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .option-button {
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background-color: var(--background);
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .option-button.selected {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: var(--secondary);
+            font-weight: 500;
+        }
+
+        /* Skeleton Loading */
+        @keyframes shimmer {
+            0% {
+                background-position: -1000px 0;
+            }
+            100% {
+                background-position: 1000px 0;
+            }
+        }
+
+        .skeleton {
+            background: linear-gradient(to right, #f0f0f0 8%, #e0e0e0 18%, #f0f0f0 33%);
+            background-size: 2000px 100%;
+            animation: shimmer 2s infinite linear;
+        }
+
+        .skeleton-gallery {
+            height: 300px;
+            margin-bottom: 20px;
+        }
+
+        .skeleton-title {
+            height: 28px;
+            margin-bottom: 8px;
+            width: 80%;
+            border-radius: 4px;
+        }
+
+        .skeleton-price {
+            height: 24px;
+            width: 40%;
+            border-radius: 4px;
+            margin-bottom: 16px;
+        }
+
+        .skeleton-card {
+            height: 150px;
+            border-radius: var(--border-radius);
+            margin-bottom: 16px;
+        }
+
+        /* Success Animation */
+        @keyframes checkmark {
+            0% {
+                stroke-dashoffset: 100;
+            }
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        .checkmark-circle {
+            stroke-dasharray: 166;
+            stroke-dashoffset: 166;
+            stroke-width: 2;
+            stroke-miterlimit: 10;
+            stroke: #4caf50;
+            fill: none;
+            animation: checkmark 0.6s ease-in-out forwards;
+        }
+
+        .checkmark {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: block;
+            stroke-width: 2;
+            stroke: #fff;
+            stroke-miterlimit: 10;
+            margin: 10% auto;
+            box-shadow: 0 0 0 #4caf50;
+        }
+
+        .checkmark-check {
+            transform-origin: 50% 50%;
+            stroke-dasharray: 48;
+            stroke-dashoffset: 48;
+            animation: checkmark 0.6s 0.3s ease-in-out forwards;
+        }
+
+        /* Feedback toast */
+        .toast {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background-color: var(--secondary);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 24px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 100;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            pointer-events: none;
+        }
+
+        .toast.active {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* All reviews modal */
+        .reviews-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .reviews-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .reviews-modal-content {
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            background-color: white;
+            border-radius: 16px;
+            overflow: hidden;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .reviews-modal.active .reviews-modal-content {
+            transform: translateY(0);
+        }
+
+        .reviews-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .reviews-modal-header h3 {
+            font-weight: 600;
+        }
+
+        .close-reviews {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        .reviews-modal-body {
+            padding: 16px;
+            overflow-y: auto;
+            max-height: calc(80vh - 60px);
+        }
+
+        .modal-review-item {
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-review-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        /* Animation for button clicks */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.95); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 0.3s ease-in-out;
+        }
+
+        /* Ripple effect */
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ripple span {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.7);
+            width: 100px;
+            height: 100px;
+            margin-top: -50px;
+            margin-left: -50px;
+            animation: ripple 1s;
+            opacity: 0;
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(3);
+                opacity: 0;
+            }
+        }
+
+        /* For desktop */
+        @media (min-width: 768px) {
+            body {
+                max-width: 600px;
+                margin: 0 auto;
+                border-left: 1px solid var(--border);
+                border-right: 1px solid var(--border);
+            }
+
+            .product-gallery {
+                height: 400px;
+            }
+
+            .card {
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+
+            .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Skeleton -->
+    <div id="skeleton-loader">
+        <div class="top-nav">
+            <button class="back-button">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="top-nav-title">Product Details</div>
+        </div>
+        <div class="skeleton skeleton-gallery"></div>
+        <div class="container">
+            <div class="skeleton skeleton-title"></div>
+            <div class="skeleton skeleton-price"></div>
+            <div class="skeleton skeleton-card"></div>
+            <div class="skeleton skeleton-card"></div>
+            <div class="skeleton skeleton-card"></div>
+        </div>
+    </div>
+
+    <!-- Main Content (Hidden until loaded) -->
+    <div id="main-content" style="display: none;">
+        <!-- Top Navigation -->
+        <div class="top-nav">
+            <button class="back-button ripple" id="backButton">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="top-nav-title">Product Details</div>
+        </div>
+
+        <!-- Product Gallery -->
+        <div class="product-gallery">
+            <div class="gallery-container" id="galleryContainer">
+                <div class="gallery-slide">
+                    <img src="Picture1.png" alt="Product Image 1" class="gallery-image">
+                </div>
+                <div class="gallery-slide">
+                    <img src="me.png" alt="Product Image 2" class="gallery-image">
+                </div>
+                <div class="gallery-slide">
+                    <img src="me copy.png" alt="Product Image 3" class="gallery-image">
+                </div>
+            </div>
+            <div class="gallery-dots" id="galleryDots">
+                <div class="gallery-dot active"></div>
+                <div class="gallery-dot"></div>
+                <div class="gallery-dot"></div>
+            </div>
+            <button class="wishlist-button" id="wishlistButton">
+                <i class="far fa-heart"></i>
+            </button>
+        </div>
+
+        <!-- Product Info -->
+        <div class="container">
+            <h1 class="product-title">Apple MacBook Pro 13" M1 Chip (2020)</h1>
+            <div class="product-price"><span class="currency">GH₵</span> 5,500</div>
+
+            <!-- Variations Card -->
+            <div class="card variations-card">
+                <div class="card-title">
+                    <i class="fas fa-tags"></i> Product Options
+                </div>
+                <div class="variation-options">
+                    <div class="variation-name">Storage</div>
+                    <div class="options-list">
+                        <button class="option-button selected" data-value="256GB">256GB</button>
+                        <button class="option-button" data-value="512GB">512GB</button>
+                        <button class="option-button" data-value="1TB">1TB</button>
+                    </div>
+                </div>
+                <div class="variation-options">
+                    <div class="variation-name">Color</div>
+                    <div class="options-list">
+                        <button class="option-button selected" data-value="Space Gray">Space Gray</button>
+                        <button class="option-button" data-value="Silver">Silver</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Specifications Card -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-list"></i> Specifications
+                </div>
+                <div class="specs-grid">
+                    <div class="spec-item">
+                        <span class="spec-label">Processor</span>
+                        <span class="spec-value">Apple M1</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">RAM</span>
+                        <span class="spec-value">8GB</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Display</span>
+                        <span class="spec-value">13.3-inch</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Condition</span>
+                        <span class="spec-value">Like New</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Description Card -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-align-left"></i> Description
+                </div>
+                <div class="description-content" id="descriptionContent">
+                    <p>The MacBook Pro with Apple M1 chip offers incredible performance with up to 20 hours of battery life. This model comes with a 13-inch Retina display, 8GB unified memory, and Touch Bar.</p>
+                    <p>Features include:</p>
+                    <p>• Apple M1 chip with 8-core CPU and 8-core GPU<br>
+                    • 8GB unified memory<br>
+                    • 256GB SSD storage<br>
+                    • 13.3-inch Retina display with True Tone<br>
+                    • Magic Keyboard with Touch Bar and Touch ID<br>
+                    • Force Touch trackpad<br>
+                    • Two Thunderbolt / USB 4 ports</p>
+                    <p>Minor signs of use on the bottom case, but the screen and keyboard are in perfect condition. Original charger included. Purchase date: March 2021.</p>
+                </div>
+                <div class="description-toggle" id="descriptionToggle">
+                    Show More <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+
+            <!-- Vendor & Reviews Card -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-store"></i> Vendor & Reviews
+                </div>
+                <div class="vendor-info">
+                    <a href="#" class="vendor-name">TechTrove UCC</a>
+                    <div class="vendor-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                        <span>4.5</span>
+                    </div>
+                </div>
+                <div class="reviews-list">
+                    <div class="review-item">
+                        <div class="review-header">
+                            <span class="reviewer-name">Sarah K.</span>
+                            <span class="review-rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </span>
+                        </div>
+                        <p class="review-text">The laptop works perfectly! Battery life is amazing as described, and the seller was very professional. Fast delivery too.</p>
+                    </div>
+                    <div class="review-item">
+                        <div class="review-header">
+                            <span class="reviewer-name">Michael O.</span>
+                            <span class="review-rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </span>
+                        </div>
+                        <p class="review-text">Great condition for a used laptop. There were a few more scratches than mentioned but overall I'm happy with my purchase.</p>
+                    </div>
+                    <div class="review-item">
+                        <div class="review-header">
+                            <span class="reviewer-name">Priscilla A.</span>
+                            <span class="review-rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </span>
+                        </div>
+                        <p class="review-text">Amazing performance! I'm a Computer Science student and this handles all my programming needs effortlessly. The M1 chip is really game-changing.</p>
+                    </div>
+                    <a class="view-all-reviews" id="viewAllReviews">View All Reviews (12)</a>
+                </div>
+                <a href="#" class="report-link">Report incorrect product details</a>
+            </div>
+        </div>
+
+        <!-- Similar Products -->
+        <div class="similar-products">
+            <h3>Similar Products</h3>
+            <div class="products-scroll">
+                <div class="product-card">
+                    <img src="me.png" alt="Similar Product 1">
+                    <div class="product-card-info">
+                        <div class="product-card-title">Dell XPS 13 (2021) i7 16GB</div>
+                        <div class="product-card-price">GH₵ 4,800</div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="me copy.png" alt="Similar Product 2">
+                    <div class="product-card-info">
+                        <div class="product-card-title">MacBook Air M1 8GB 256GB</div>
+                        <div class="product-card-price">GH₵ 4,200</div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="Picture1.png" alt="Similar Product 3">
+                    <div class="product-card-info">
+                        <div class="product-card-title">HP Spectre x360 14"</div>
+                        <div class="product-card-price">GH₵ 5,100</div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="/api/placeholder/160/120" alt="Similar Product 4">
+                    <div class="product-card-info">
+                        <div class="product-card-title">Asus ZenBook Pro Duo</div>
+                        <div class="product-card-price">GH₵ 6,300</div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="/api/placeholder/160/120" alt="Similar Product 5">
+                    <div class="product-card-info">
+                        <div class="product-card-title">Lenovo ThinkPad X1 Carbon</div>
+                        <div class="product-card-price">GH₵ 5,000</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Action Bar -->
+        <div class="bottom-action-bar">
+            <button class="action-button call-button ripple" id="callButton">
+                <i class="fas fa-phone-alt"></i>
+            </button>
+            <button class="action-button order-button ripple" id="orderButton">
+                Order Now
+            </button>
+            <button class="action-button cart-button ripple" id="cartButton">
+                <i class="fas fa-shopping-cart"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Fullscreen Image Viewer -->
+    <div class="fullscreen-container" id="fullscreenContainer">
+        <img src="/api/placeholder/800/600" alt="Product Image Fullscreen" class="fullscreen-image" id="fullscreenImage">
+        <button class="fullscreen-close" id="fullscreenClose">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <!-- WhatsApp Order Overlay -->
+    <div class="whatsapp-overlay" id="whatsappOverlay">
+        <div class="overlay-header">
+            <h3>Order via WhatsApp</h3>
+            <button class="close-overlay" id="closeOverlay">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="whatsapp-content">
+            <div class="whatsapp-message" id="whatsappMessage">
+Hello TechTrove UCC,
+
+I'm interested in ordering the following item from ema-Campus Shopping:
+
+Product: Apple MacBook Pro 13" M1 Chip (2020)
+Price: GH₵ 5,500
+Options: Space Gray, 256GB Storage
+
+Link: https://ema-campus.com/product/12345
+
+My additional message/questions:
+            </div>
+            <div class="additional-message">
+                <label for="messageInput">Add your message or questions (optional):</label>
+                <textarea class="message-input" id="messageInput" placeholder="E.g., Can I inspect the laptop before payment? Is the price negotiable?"></textarea>
+            </div>
+        </div>
+        <div class="overlay-footer">
+            <button class="send-whatsapp ripple" id="sendWhatsapp">
+                <i class="fab fa-whatsapp"></i> Send on WhatsApp
+            </button>
+        </div>
+    </div>
+
+    <!-- Reviews Modal -->
+    <div class="reviews-modal" id="reviewsModal">
+        <div class="reviews-modal-content">
+            <div class="reviews-modal-header">
+                <h3>All Reviews (12)</h3>
+                <button class="close-reviews" id="closeReviews">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="reviews-modal-body">
+                <div class="modal-review-item">
+                    <div class="review-header">
+                        <span class="reviewer-name">Sarah K.</span>
+                        <span class="review-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </span>
+                    </div>
+                    <p class="review-text">The laptop works perfectly! Battery life is amazing as described, and the seller was very professional. Fast delivery too. Would definitely buy from TechTrove again.</p>
+                </div>
+                <div class="modal-review-item">
+                    <div class="review-header">
+                        <span class="reviewer-name">Michael O.</span>
+                        <span class="review-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                        </span>
+                    </div>
+                    <p class="review-text">Great condition for a used laptop. There were a few more scratches than mentioned but overall I'm happy with my purchase. The performance is amazing and battery life is just as advertised.</p>
+                </div>
+                <div class="modal-review-item">
+                    <div class="review-header">
+                        <span class="reviewer-name">Priscilla A.</span>
+                        <span class="review-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </span>
+                    </div>
+                    <p class="review-text">Amazing performance! I'm a Computer Science student and this handles all my programming needs effortlessly. The M1 chip is really game-changing. Vendor was prompt with delivery and provided all accessories as promised.</p>
+                </div>
+                <div class="modal-review-item">
+                    <div class="review-header">
+                        <span class="reviewer-name">Daniel T.</span>
+                        <span class="review-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </span>
+                    </div>
+                    <p class="review-text">Best purchase I've made this semester! The MacBook is in excellent condition, almost like new. The seller was honest about its condition and even included a free sleeve. Highly recommend!</p>
+                </div>
+                <div class="modal-review-item">
+                    <div class="review-header">
+                        <span class="reviewer-name">Jessica M.</span>
+                        <span class="review-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                            <i class="far fa-star"></i>
+                        </span>
+                    </div>
+                    <p class="review-text">The laptop itself is good, but the battery wasn't as healthy as described. It only lasts about 6 hours instead of the "up to 20 hours" mentioned. Seller was helpful though and offered a partial refund.</p>
+                </div>
+                <div class="modal-review-item">
+                    <div class="review-header">
+                        <span class="reviewer-name">Emmanuel K.</span>
+                        <span class="review-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </span>
+                    </div>
+                    <p class="review-text">Perfect condition and exactly as described. The M1 chip is incredibly powerful and handles all my architecture software with ease. TechTrove is definitely the best tech vendor on campus!</p>
+                </div>
+                <div class="modal-review-item">
+                    <div class="review-header">
+                        <span class="reviewer-name">Fatima B.</span>
+                        <span class="review-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </span>
+                    </div>
+                    <p class="review-text">Excellent laptop and great service. The vendor was patient with all my questions and even helped me set it up. As an international student, I appreciated the extra support.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Utilities
+        function showToast(message, duration = 2000) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('active');
+            
+            setTimeout(() => {
+                toast.classList.remove('active');
+            }, duration);
+        }
+
+        function createRipple(event) {
+            const button = event.currentTarget;
+            
+            const circle = document.createElement('span');
+            const diameter = Math.max(button.clientWidth, button.clientHeight);
+            
+            circle.style.width = circle.style.height = `${diameter}px`;
+            circle.style.left = `${event.clientX - button.getBoundingClientRect().left}px`;
+            circle.style.top = `${event.clientY - button.getBoundingClientRect().top}px`;
+            
+            circle.classList.add('ripple-effect');
+            
+            const ripple = button.querySelector('.ripple-effect');
+            if (ripple) {
+                ripple.remove();
+            }
+            
+            button.appendChild(circle);
+            
+            setTimeout(() => {
+                circle.remove();
+            }, 600);
+        }
+
+        // Simulating product data loading
+        window.addEventListener('DOMContentLoaded', () => {
+            // Simulate loading delay
+            setTimeout(() => {
+                document.getElementById('skeleton-loader').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+                initPage();
+            }, 1500);
+        });
+
+        function initPage() {
+            // Image Gallery
+            const galleryContainer = document.getElementById('galleryContainer');
+            const galleryDots = document.querySelectorAll('.gallery-dot');
+            const gallerySlides = document.querySelectorAll('.gallery-slide');
+            let currentSlide = 0;
+            let startX, moveX;
+            let autoSlideInterval;
+
+            function goToSlide(index) {
+                if (index < 0) index = gallerySlides.length - 1;
+                if (index >= gallerySlides.length) index = 0;
+                
+                currentSlide = index;
+                galleryContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
+                
+                // Update dots
+                galleryDots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === currentSlide);
+                });
+            }
+
+            function startAutoSlide() {
+                stopAutoSlide();
+                autoSlideInterval = setInterval(() => {
+                    goToSlide(currentSlide + 1);
+                }, 5000);
+            }
+
+            function stopAutoSlide() {
+                if (autoSlideInterval) clearInterval(autoSlideInterval);
+            }
+
+            // Touch/mouse events for gallery
+            galleryContainer.addEventListener('touchstart', (e) => {
+                stopAutoSlide();
+                startX = e.touches[0].clientX;
+            }, { passive: true });
+
+            galleryContainer.addEventListener('touchmove', (e) => {
+                if (!startX) return;
+                moveX = e.touches[0].clientX;
+                const diff = startX - moveX;
+                const percentMove = (diff / window.innerWidth) * 100;
+                
+                // Only move slightly with finger to provide resistance
+                if (Math.abs(percentMove) < 30) {
+                    galleryContainer.style.transform = `translateX(calc(-${currentSlide * 100}% - ${percentMove}px))`;
+                }
+            }, { passive: true });
+
+            galleryContainer.addEventListener('touchend', (e) => {
+                if (!startX || !moveX) return;
+                const diff = startX - moveX;
+                
+                if (diff > 50) {
+                    goToSlide(currentSlide + 1);
+                } else if (diff < -50) {
+                    goToSlide(currentSlide - 1);
+                } else {
+                    goToSlide(currentSlide);
+                }
+                
+                startX = null;
+                moveX = null;
+                startAutoSlide();
+            }, { passive: true });
+
+            // Dot navigation
+            galleryDots.forEach((dot, index) => {
+                dot.addEventListener('click', () => {
+                    goToSlide(index);
+                    stopAutoSlide();
+                    startAutoSlide();
+                });
+            });
+
+            // Start auto slide
+            startAutoSlide();
+
+            // Fullscreen Gallery
+            const galleryImages = document.querySelectorAll('.gallery-image');
+            const fullscreenContainer = document.getElementById('fullscreenContainer');
+            const fullscreenImage = document.getElementById('fullscreenImage');
+            const fullscreenClose = document.getElementById('fullscreenClose');
+
+            galleryImages.forEach((img, index) => {
+                img.addEventListener('click', () => {
+                    fullscreenImage.src = img.src.replace('600/400', '800/600');
+                    fullscreenImage.alt = img.alt;
+                    fullscreenContainer.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+
+            fullscreenClose.addEventListener('click', () => {
+                fullscreenContainer.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+
+            // Close fullscreen on background click
+            fullscreenContainer.addEventListener('click', (e) => {
+                if (e.target === fullscreenContainer) {
+                    fullscreenContainer.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+
+            // Description toggle
+            const descriptionContent = document.getElementById('descriptionContent');
+            const descriptionToggle = document.getElementById('descriptionToggle');
+
+            descriptionToggle.addEventListener('click', () => {
+                descriptionContent.classList.toggle('expanded');
+                
+                if (descriptionContent.classList.contains('expanded')) {
+                    descriptionToggle.innerHTML = 'Show Less <i class="fas fa-chevron-up"></i>';
+                } else {
+                    descriptionToggle.innerHTML = 'Show More <i class="fas fa-chevron-down"></i>';
+                }
+            });
+
+            // View All Reviews
+            const viewAllReviews = document.getElementById('viewAllReviews');
+            const reviewsModal = document.getElementById('reviewsModal');
+            const closeReviews = document.getElementById('closeReviews');
+
+            viewAllReviews.addEventListener('click', () => {
+                reviewsModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+
+            closeReviews.addEventListener('click', () => {
+                reviewsModal.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+
+            // Close reviews modal on background click
+            reviewsModal.addEventListener('click', (e) => {
+                if (e.target === reviewsModal) {
+                    reviewsModal.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+
+            // Wishlist button
+            const wishlistButton = document.getElementById('wishlistButton');
+            wishlistButton.addEventListener('click', () => {
+                wishlistButton.classList.toggle('active');
+                
+                if (wishlistButton.classList.contains('active')) {
+                    wishlistButton.innerHTML = '<i class="fas fa-heart"></i>';
+                    showToast('Added to your wishlist');
+                } else {
+                    wishlistButton.innerHTML = '<i class="far fa-heart"></i>';
+                    showToast('Removed from your wishlist');
+                }
+                
+                wishlistButton.classList.add('pulse');
+                setTimeout(() => {
+                    wishlistButton.classList.remove('pulse');
+                }, 300);
+            });
+
+            // Product variations selection
+            const optionButtons = document.querySelectorAll('.option-button');
+            
+            optionButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Find parent variation group
+                    const parent = button.closest('.variation-options');
+                    
+                    // Remove selected class from siblings
+                    parent.querySelectorAll('.option-button').forEach(btn => {
+                        btn.classList.remove('selected');
+                    });
+                    
+                    // Add selected class to clicked button
+                    button.classList.add('selected');
+                    
+                    // Update WhatsApp message with selected variations
+                    updateWhatsAppMessage();
+                });
+            });
+
+            // WhatsApp Order
+            const orderButton = document.getElementById('orderButton');
+            const whatsappOverlay = document.getElementById('whatsappOverlay');
+            const closeOverlay = document.getElementById('closeOverlay');
+            const sendWhatsapp = document.getElementById('sendWhatsapp');
+            const messageInput = document.getElementById('messageInput');
+
+            function updateWhatsAppMessage() {
+                const productName = document.querySelector('.product-title').textContent;
+                const productPrice = document.querySelector('.product-price').textContent.trim();
+                
+                // Get selected variations
+                const variations = [];
+                document.querySelectorAll('.variation-options').forEach(variation => {
+                    const variationName = variation.querySelector('.variation-name').textContent;
+                    const selectedValue = variation.querySelector('.option-button.selected').dataset.value;
+                    variations.push(`${selectedValue}`);
+                });
+                
+                // Format the message
+                const message = `Hello TechTrove UCC,
+
+I'm interested in ordering the following item from ema-Campus Shopping:
+
+Product: ${productName}
+Price: ${productPrice}
+Options: ${variations.join(', ')}
+
+Link: https://ema-campus.com/product/12345
+
+My additional message/questions:`;
+                
+                document.getElementById('whatsappMessage').textContent = message;
+            }
+
+            orderButton.addEventListener('click', () => {
+                updateWhatsAppMessage();
+                whatsappOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+
+            closeOverlay.addEventListener('click', () => {
+                whatsappOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+
+            sendWhatsapp.addEventListener('click', () => {
+                // Get the base message
+                const baseMessage = document.getElementById('whatsappMessage').textContent;
+                // Get additional message
+                const additionalMessage = messageInput.value.trim();
+                
+                // Combine them
+                const fullMessage = additionalMessage ? 
+                    baseMessage + '\n' + additionalMessage + '\n\nThanks!' :
+                    baseMessage + '\n\nThanks!';
+                
+                // Encode for WhatsApp URL
+                const encodedMessage = encodeURIComponent(fullMessage);
+                
+                // Simulate WhatsApp redirect
+                // In production, this would use a real phone number
+                const whatsappUrl = `https://wa.me/233XXXXXXXXX?text=${encodedMessage}`;
+                
+                // For demo purposes, show success message
+                showToast('Redirecting to WhatsApp...', 1500);
+                
+                // Close the overlay
+                setTimeout(() => {
+                    whatsappOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                    
+                    // In a real implementation, you would use:
+                    // window.location.href = whatsappUrl;
+                    // For demo, we'll just show a message
+                    console.log('WhatsApp URL:', whatsappUrl);
+                }, 1500);
+            });
+
+            // Add to Cart button
+            const cartButton = document.getElementById('cartButton');
+            
+            cartButton.addEventListener('click', () => {
+                // Get selected variations to add to cart
+                const variations = [];
+                document.querySelectorAll('.variation-options').forEach(variation => {
+                    const variationName = variation.querySelector('.variation-name').textContent;
+                    const selectedValue = variation.querySelector('.option-button.selected').dataset.value;
+                    variations.push(`${variationName}: ${selectedValue}`);
+                });
+                
+                // Animation effect
+                cartButton.classList.add('pulse');
+                setTimeout(() => {
+                    cartButton.classList.remove('pulse');
+                }, 300);
+                
+                showToast('Added to your cart!');
+            });
+
+            // Call Vendor button
+            const callButton = document.getElementById('callButton');
+            
+            callButton.addEventListener('click', () => {
+                // Simulate call action
+                // In production, this would trigger a real call
+                showToast('Calling vendor...');
+                
+                // Animation effect
+                callButton.classList.add('pulse');
+                setTimeout(() => {
+                    callButton.classList.remove('pulse');
+                }, 300);
+                
+                // For demo purposes only
+                console.log('Calling vendor at: 233XXXXXXXXX');
+            });
+
+            // Back button navigation
+            const backButton = document.getElementById('backButton');
+            
+            backButton.addEventListener('click', () => {
+                // In a real app, this would navigate back
+                // For demo purposes, just show a message
+                showToast('Navigating back...');
+                
+                // For demo purposes only
+                console.log('Back navigation triggered');
+            });
+
+            // Add ripple effect to all buttons
+            document.querySelectorAll('.ripple').forEach(button => {
+                button.addEventListener('click', createRipple);
+            });
+        }
+    </script>
+</body>
+</html>

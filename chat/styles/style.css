@@ -1,0 +1,656 @@
+/* --- Base & Variables --- */
+:root {
+    --brand-yellow: #FFCC08;
+    --brand-yellow-light: #FFD740;
+    --brand-yellow-dark: #E6B800;
+    --text-dark: #333;
+    --text-light: #f8f9fa;
+    --gray-light: #f1f3f5;
+    --gray-medium: #dee2e6;
+    --gray-dark: #adb5bd;
+    --border-radius: 8px;
+    --transition-speed: 0.3s;
+    --error-color: #e74c3c;
+    --success-color: #2ecc71;
+    --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    background-color: var(--gray-light);
+    color: var(--text-dark);
+    line-height: 1.6;
+    overscroll-behavior-y: contain; /* Prevents pull-to-refresh */
+}
+
+/* --- Skeleton Loader --- */
+.page-loader {
+    position: fixed;
+    inset: 0;
+    background-color: var(--gray-light);
+    z-index: 100;
+    padding: 20px;
+    transition: opacity var(--transition-speed) ease-out;
+}
+
+.skeleton-header {
+    height: 60px;
+    background-color: var(--gray-medium);
+    margin-bottom: 30px;
+    border-radius: var(--border-radius);
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-form .skeleton-field,
+.skeleton-form .skeleton-button {
+    height: 50px;
+    background-color: var(--gray-medium);
+    margin-bottom: 20px;
+    border-radius: var(--border-radius);
+    animation: pulse 1.5s infinite ease-in-out;
+}
+.skeleton-form .skeleton-field.tall { height: 100px; }
+.skeleton-form .skeleton-field.medium { height: 80px; }
+.skeleton-form .skeleton-field.short { height: 30px; }
+.skeleton-form .skeleton-button { background-color: var(--gray-dark); height: 55px; }
+
+@keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
+
+.page-content.is-loading {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.page-content {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity var(--transition-speed) ease-in;
+}
+
+/* --- Header --- */
+.main-header {
+    background-color: #ffffff;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Pushes elements apart */
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    border-bottom-right-radius: var(--border-radius); /* As requested */
+    border-bottom-left-radius: var(--border-radius); /* Added for symmetry */
+}
+
+.logo {
+    height: 40px; /* Adjust as needed */
+}
+
+.page-title {
+    font-size: 1.3em;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin: 0;
+    /* Center title if logo/back are positioned absolute/differently */
+    /* position: absolute; left: 50%; transform: translateX(-50%); */
+}
+
+.back-link {
+    font-size: 1.5em;
+    color: var(--text-dark);
+    text-decoration: none;
+    transition: color var(--transition-speed);
+}
+
+.back-link:hover {
+    color: var(--brand-yellow);
+}
+
+/* --- Form Container --- */
+.form-container {
+    padding: 20px;
+    max-width: 700px; /* Max width for larger screens */
+    margin: 20px auto;
+    background-color: #ffffff;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+/* --- Form Groups & Inputs --- */
+.form-group {
+    margin-bottom: 25px;
+    transition: all var(--transition-speed) ease-out; /* For smooth dynamic field appearance */
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 1000px; /* Allow space for transitions */
+}
+
+.form-group.hidden {
+    opacity: 0;
+    max-height: 0;
+    margin-bottom: 0;
+    overflow: hidden;
+    pointer-events: none; /* Prevent interaction when hidden */
+}
+
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 0.95em;
+    color: var(--text-dark);
+}
+
+.required {
+    color: var(--brand-yellow-dark);
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="tel"],
+input[type="email"], /* Add if needed */
+textarea,
+select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--gray-medium);
+    border-radius: var(--border-radius);
+    font-size: 1em;
+    transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+    box-sizing: border-box; /* Include padding in width */
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: var(--brand-yellow);
+    box-shadow: 0 0 0 3px rgba(255, 204, 8, 0.3);
+}
+
+textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.char-counter {
+    display: block;
+    text-align: right;
+    font-size: 0.8em;
+    color: var(--gray-dark);
+    margin-top: 5px;
+}
+
+/* Error Styling */
+.error-message {
+    color: var(--error-color);
+    font-size: 0.85em;
+    margin-top: 5px;
+    display: none; /* Hidden by default */
+}
+
+.form-group.error input,
+.form-group.error textarea,
+.form-group.error select {
+    border-color: var(--error-color);
+}
+
+.form-group.error .error-message {
+    display: block;
+}
+
+
+/* --- Specific Field Styling --- */
+
+/* Price Input */
+.price-group .price-options {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.price-input-wrapper {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--gray-medium);
+    border-radius: var(--border-radius);
+    padding-left: 10px;
+    flex-grow: 1; /* Take available space */
+}
+.price-input-wrapper:focus-within { /* Style wrapper when input inside is focused */
+     border-color: var(--brand-yellow);
+     box-shadow: 0 0 0 3px rgba(255, 204, 8, 0.3);
+}
+.price-input-wrapper .currency-symbol {
+    color: var(--gray-dark);
+    font-weight: 600;
+    margin-right: 5px;
+}
+.price-input-wrapper input[type="number"] {
+    border: none;
+    padding: 12px 5px 12px 0; /* Adjust padding */
+    flex-grow: 1;
+    width: auto; /* Override default width */
+}
+.price-input-wrapper input[type="number"]:focus {
+    box-shadow: none; /* Remove inner input shadow */
+}
+
+/* Toggle Switches (Enhanced) */
+.toggle-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+}
+.toggle-switch input[type="checkbox"] {
+    display: none; /* Hide the actual checkbox */
+}
+.toggle-switch .slider {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+    background-color: var(--gray-medium);
+    border-radius: 14px;
+    transition: background-color var(--transition-speed);
+}
+.toggle-switch .slider::before { /* The circle */
+    content: '';
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background-color: white;
+    top: 3px;
+    left: 4px;
+    transition: transform var(--transition-speed);
+}
+.toggle-switch input:checked + .slider {
+    background-color: var(--brand-yellow);
+}
+.toggle-switch input:checked + .slider::before {
+    transform: translateX(21px);
+}
+.toggle-switch span { /* Label next to simple toggles */
+     font-size: 0.95em;
+}
+/* Larger Toggles with Yes/No */
+.toggle-group .toggle-switch.large {
+    width: 100%; /* Make it take full width */
+    justify-content: space-between;
+}
+.toggle-group .toggle-switch.large .slider {
+    width: 80px;
+    height: 34px;
+    border-radius: 17px;
+}
+.toggle-group .toggle-switch.large .slider::before {
+    width: 26px;
+    height: 26px;
+    top: 4px;
+    left: 5px;
+}
+.toggle-group .toggle-switch.large input:checked + .slider::before {
+    transform: translateX(44px);
+}
+.toggle-group .toggle-switch.large .toggle-label {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.8em;
+    font-weight: 600;
+    color: white;
+    transition: all var(--transition-speed);
+}
+.toggle-group .toggle-switch.large .toggle-label::before { /* "No" text */
+    content: attr(data-off);
+    position: absolute;
+    right: 10px;
+    opacity: 1;
+}
+.toggle-group .toggle-switch.large .toggle-label::after { /* "Yes" text */
+    content: attr(data-on);
+    position: absolute;
+    left: 10px;
+    opacity: 0;
+}
+.toggle-group .toggle-switch.large input:checked + .slider .toggle-label::before {
+    opacity: 0;
+}
+.toggle-group .toggle-switch.large input:checked + .slider .toggle-label::after {
+    opacity: 1;
+}
+
+
+/* WhatsApp Edit Button */
+.form-group label[for="whatsapp-number"] {
+    display: inline-block; /* Align label and button */
+    margin-right: 10px;
+}
+.edit-btn {
+    background: none;
+    border: none;
+    color: var(--brand-yellow-dark);
+    cursor: pointer;
+    font-size: 0.9em;
+    padding: 5px;
+}
+.edit-btn:hover {
+    color: var(--brand-yellow);
+}
+#whatsapp-number[readonly] {
+    background-color: var(--gray-light);
+    cursor: not-allowed;
+}
+
+
+/* Image Upload Area */
+.image-upload-area {
+    border: 2px dashed var(--gray-medium);
+    border-radius: var(--border-radius);
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color var(--transition-speed), background-color var(--transition-speed);
+}
+.image-upload-area:hover,
+.image-upload-area.dragover { /* Style for drag hover */
+    border-color: var(--brand-yellow);
+    background-color: #fffbeb;
+}
+.image-upload-area .upload-prompt i {
+    font-size: 3em;
+    color: var(--brand-yellow);
+    margin-bottom: 15px;
+}
+.image-upload-area p {
+    margin: 5px 0;
+    font-weight: 600;
+}
+.image-upload-area small {
+    color: var(--gray-dark);
+}
+
+.image-preview-container {
+    margin-top: 15px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); /* Responsive grid */
+    gap: 10px;
+}
+.img-preview-wrapper {
+    position: relative;
+    border: 1px solid var(--gray-medium);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    height: 80px; /* Fixed height */
+}
+.img-preview-wrapper img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Crop images nicely */
+}
+.remove-img-btn {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 0.8em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+
+/* Tags Input */
+.tags-input-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    border: 1px solid var(--gray-medium);
+    border-radius: var(--border-radius);
+    padding: 5px 10px;
+    min-height: 48px; /* Match input height */
+    cursor: text; /* Make wrapper behave like text input */
+}
+.tags-input-wrapper:focus-within {
+    border-color: var(--brand-yellow);
+    box-shadow: 0 0 0 3px rgba(255, 204, 8, 0.3);
+}
+#tags-selected-area {
+    display: inline-flex; /* Keep tags together */
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-right: 5px;
+}
+.tag-item {
+    background-color: var(--brand-yellow);
+    color: var(--text-dark); /* Dark text on yellow */
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.remove-tag-btn {
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 0.8em;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 2px;
+}
+#tags-input {
+    border: none;
+    outline: none;
+    padding: 8px 0; /* Adjust vertical padding */
+    flex-grow: 1;
+    min-width: 100px; /* Ensure it doesn't get too small */
+    box-shadow: none; /* Remove focus shadow */
+}
+.autocomplete-list {
+    border: 1px solid var(--gray-medium);
+    border-top: none;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    background-color: white;
+    position: absolute; /* Position relative to wrapper needed if not form-group */
+    width: calc(100% - 2px); /* Match wrapper width */
+    z-index: 5;
+    max-height: 150px;
+    overflow-y: auto;
+    display: none; /* Hidden by default */
+}
+.autocomplete-item {
+    padding: 8px 15px;
+    cursor: pointer;
+}
+.autocomplete-item:hover, .autocomplete-item.selected {
+    background-color: var(--brand-yellow-light);
+}
+
+/* Terms Checkbox */
+.terms-group {
+    display: flex;
+    align-items: flex-start; /* Align checkbox with start of text */
+    gap: 10px;
+}
+.terms-group input[type="checkbox"] {
+    margin-top: 4px; /* Align better with text line */
+    flex-shrink: 0; /* Prevent shrinking */
+    width: 18px; /* Custom size */
+    height: 18px;
+    accent-color: var(--brand-yellow); /* Style checkbox color */
+}
+.terms-group label {
+    margin-bottom: 0;
+    font-weight: normal;
+    font-size: 0.9em;
+}
+
+/* --- Submit Button --- */
+.submit-btn {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    background-color: var(--brand-yellow);
+    color: var(--text-dark); /* Dark text on yellow */
+    font-size: 1.1em;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color var(--transition-speed), transform var(--transition-speed);
+    margin-top: 30px;
+}
+.submit-btn:hover:not(:disabled) {
+    background-color: var(--brand-yellow-dark);
+    transform: translateY(-2px);
+}
+.submit-btn:disabled {
+    background-color: var(--gray-medium);
+    color: var(--gray-dark);
+    cursor: not-allowed;
+}
+
+/* --- Success Modal --- */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6); /* Dim background */
+    align-items: center;
+    justify-content: center;
+}
+.modal-content {
+    background-color: #fff;
+    margin: auto;
+    padding: 30px;
+    border-radius: var(--border-radius);
+    text-align: center;
+    max-width: 400px;
+    position: relative;
+    animation: slideIn 0.4s ease-out;
+}
+.close-modal-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    color: var(--gray-dark);
+    font-size: 1.8em;
+    font-weight: bold;
+    cursor: pointer;
+}
+.success-icon {
+    font-size: 4em;
+    color: var(--success-color);
+    margin-bottom: 15px;
+}
+.modal-content h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+.modal-actions {
+    margin-top: 25px;
+    display: flex;
+    justify-content: space-around;
+    gap: 15px;
+}
+.modal-actions button {
+    padding: 10px 20px;
+    border-radius: var(--border-radius);
+    font-size: 1em;
+    cursor: pointer;
+    border: none;
+    transition: background-color var(--transition-speed), transform var(--transition-speed);
+}
+.btn-primary {
+    background-color: var(--brand-yellow);
+    color: var(--text-dark);
+}
+.btn-primary:hover {
+    background-color: var(--brand-yellow-dark);
+    transform: translateY(-2px);
+}
+.btn-secondary {
+    background-color: var(--gray-light);
+    color: var(--text-dark);
+    border: 1px solid var(--gray-medium);
+}
+.btn-secondary:hover {
+    background-color: var(--gray-medium);
+    transform: translateY(-2px);
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* --- Responsiveness --- */
+@media (max-width: 768px) {
+    .main-header {
+        padding: 8px 15px;
+        border-radius: 0; /* Remove radius on mobile */
+    }
+    .logo { height: 35px; }
+    .page-title { font-size: 1.1em; }
+    .back-link { font-size: 1.3em; }
+
+    .form-container {
+        margin: 10px;
+        padding: 15px;
+        box-shadow: none;
+        border-radius: 0;
+    }
+
+    .form-group { margin-bottom: 20px; }
+
+    .price-group .price-options {
+        flex-direction: column; /* Stack price input and negotiable toggle */
+        align-items: stretch;
+        gap: 10px;
+    }
+     .price-input-wrapper { width: 100%; } /* Ensure full width */
+
+    .image-preview-container {
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    }
+    .img-preview-wrapper { height: 70px; }
+
+     .toggle-group .toggle-switch.large {
+         /* Adjust spacing if needed */
+     }
+
+     .modal-content {
+         width: 90%;
+         padding: 20px;
+     }
+     .modal-actions {
+         flex-direction: column; /* Stack modal buttons */
+     }
+     .modal-actions button {
+         width: 100%;
+     }
+}

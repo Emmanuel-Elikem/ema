@@ -1,0 +1,439 @@
+
+
+/* --- Global Styles & Variables --- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --theme-color: #FFCC08; /* Your Yellow */
+    --primary-text: #333333;
+    --secondary-text: #777777;
+    --background-color: #f8f8f8; /* Slightly off-white for better depth */
+    --card-background: #ffffff;
+    --border-color: #eeeeee;
+    --shadow-light: rgba(0, 0, 0, 0.05);
+    --shadow-medium: rgba(0, 0, 0, 0.1);
+    --background-icon-color: #e0e0e0; /* Ash grey for background pattern */
+    --skeleton-bg: #e0e0e0;
+    --skeleton-shine: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%);
+    --nav-height: 70px;
+    --nav-margin-bottom: 15px;
+    --header-height: 50px; /* Approximate height for calculations */
+    --search-bar-height: 60px; /* Approximate height */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: var(--background-color);
+    color: var(--primary-text);
+    position: relative;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* --- Floating Background Icons --- */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"><path d="M20 80 L20 70 L30 70 L30 80 Z M70 30 L70 20 L80 20 L80 30 Z M45 55 L55 45 L60 50 L50 60 Z" fill="none" stroke="%23e0e0e0" stroke-width="2"/></svg>'),
+                      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80"><circle cx="40" cy="40" r="15" fill="none" stroke="%23cccccc" stroke-width="1.5"/><path d="M30 60 L50 60 L45 70 Z" fill="%23e0e0e0" /></svg>');
+    background-repeat: repeat;
+    background-size: 150px 150px, 120px 120px;
+    opacity: 0.15;
+    background-position: 10px 10px, 70px 80px;
+}
+
+
+.app-container {
+    /* Remove top padding, handle spacing within header-search-container */
+    padding: 0 15px;
+    padding-bottom: calc(var(--nav-height) + var(--nav-margin-bottom) + 20px);
+}
+
+/* --- Loading State --- */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--background-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+    font-size: 1.2em;
+    color: var(--primary-text);
+}
+
+.loading-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Skeleton Loader Styles */
+.skeleton {
+    background-color: var(--skeleton-bg);
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.skeleton::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%; width: 100%; height: 100%;
+    background: var(--skeleton-shine);
+    animation: shimmer 1.8s infinite linear;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* --- Top bar for stuff before search bar --- */
+.header-container {
+    background-color: var(--theme-color); /* White background for the bar */
+    padding: -15px -15px 15px -15px; /* Padding for content inside */
+    margin: 0 -15px; /* Extend to screen edges, counteracting app-container padding */
+    position: relative; /* Needed for potential z-index layering */
+    z-index: 10; /* Above background pattern */
+    /* This container scrolls away */
+}
+
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* Remove margin-bottom, handled by search-section */
+    height: var(--header-height); /* Give it a defined height */
+    padding-bottom: 10px; /* Space between header and search */
+}
+
+.location {
+    font-size: 0.9em;
+    font-weight: 500;
+    color: var(--primary-text);
+    display: flex;
+    align-items: center;
+}
+.location i { margin-right: 5px; color: var(--theme-color); }
+.location .small-icon { font-size: 0.7em; margin-left: 5px; color: var(--secondary-text); }
+.notifications i { font-size: 1.3em; color: var(--primary-text); cursor: pointer; }
+.notifications i:hover { color: var(--theme-color); }
+
+/* Search Section - Sticky Behavior */
+.search-section {
+    /* Take search out of the normal flow to make it sticky */
+    position: sticky;
+    top: 0; /* Stick to the top */
+    z-index: 50; /* Above content, below nav */
+    background-color: var(--theme-color); /* Background needed when sticky */
+    padding: 10px 15px 15px 15px; /* Padding when sticky */
+    margin: 0 -15px; /* Extend sticky bar to screen edges */
+    box-shadow: 0 2px 0px rgba(255, 247, 0, 0.08); /* Add shadow when sticky */
+    border-bottom-left-radius: 25px;
+    border-bottom-right-radius: 25px;
+    /* The height is implicit based on content */
+    /* border-bottom: 1px solid var(--border-color); Optional border when sticky */
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    background-color: var(--background-color); /* Slightly different background for input area */
+    border-radius: 25px;
+    padding: 8px 15px;
+    /* Removed shadow from here, added to .search-section */
+    border: 1px solid var(--border-color);
+}
+.search-bar i.fa-search { color: var(--secondary-text); margin-right: 10px; }
+.search-bar input { flex-grow: 1; border: none; outline: none; font-size: 0.95em; background: transparent; }
+.filter-btn { background-color: var(--theme-color); color: var(--primary-text); border: none; border-radius: 50%; width: 35px; height: 35px; display: flex; justify-content: center; align-items: center; cursor: pointer; margin-left: 10px; transition: transform 0.2s ease; }
+.filter-btn:hover { transform: scale(1.1); }
+.filter-btn i { font-size: 0.9em; }
+
+/* Add margin to the content below the sticky header area */
+.banner-section {
+    margin-top: 20px; /* Space below the sticky header area */
+}
+
+
+/* --- Section Headers (Used for Banner, Category now) --- */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 0 0; /* Reset padding if applied before */
+}
+.section-header h2 { font-size: 1.2em; font-weight: 600; }
+.section-header a { font-size: 0.85em; color: var(--theme-color); text-decoration: none; font-weight: 500; }
+
+/* --- Banner Section --- */
+/* --- Banner Section --- */
+.banner-section {
+    margin-bottom: 25px;
+    padding: 0 0;
+}
+.banner-carousel {
+    width: 100%;
+    aspect-ratio: 16 / 7;
+    border-radius: 15px;
+    overflow: hidden;
+    position: relative;
+    background-color: var(--skeleton-bg);
+    box-shadow: 0 3px 10px var(--shadow-light);
+}
+.banner-slides {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+.banner-slide {
+    display: none;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+}
+.banner-slide.active {
+    display: block;
+    opacity: 1;
+}
+.banner-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.carousel-indicators {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+.indicator {
+    height: 8px;
+    background-color: rgba(255, 255, 255, 0.6);
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+.indicator.active {
+    background-color: var(--theme-color);
+    width: 20px; /* Active indicator is a bar */
+}
+.indicator:not(.active) {
+    width: 8px; /* Inactive indicators are dots */
+}
+.carousel-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.2);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s ease, background-color 0.3s ease;
+}
+.carousel-arrow.prev { left: 10px; }
+.carousel-arrow.next { right: 10px; }
+.banner-carousel:hover .carousel-arrow { opacity: 1; }
+.carousel-arrow:hover { background-color: rgba(0, 0, 0, 0.4); }
+
+/* Skeleton loader adjustment */
+.banner-carousel.skeleton .banner-slides,
+.banner-carousel.skeleton .carousel-indicators,
+.banner-carousel.skeleton .carousel-arrow {
+    display: none;
+}
+
+/* --- Category Section (Updated Styling) --- */
+.category-section {
+    margin-bottom: 25px;
+}
+
+.category-list {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    padding: 5px 0 15px 0; /* Padding for scroll and space below */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.category-list::-webkit-scrollbar { display: none; }
+
+.category-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 80px; /* Adjusted width */
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    /* Removed background/padding from item itself */
+}
+.category-item:hover { transform: translateY(-3px); }
+
+.category-square {
+    width: 65px; /* Square dimensions */
+    height: 65px;
+    background-color: var(--card-background); /* White background */
+    border: 2px solid var(--theme-color); /* Yellow border */
+    border-radius: 15px; /* Rounded corners */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 8px; /* Space between square and text */
+    box-shadow: 0 2px 5px var(--shadow-light); /* Subtle shadow */
+}
+
+.category-square i {
+    font-size: 1.8em; /* Icon size */
+    color: var(--primary-text); /* Black icon */
+}
+
+.category-item span {
+    font-size: 0.8em;
+    color: var(--primary-text); /* Make text black */
+    font-weight: 500; /* Slightly bolder text */
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* Category Skeleton styling */
+.category-list.skeleton { display: flex; gap: 15px; background: none; border-radius: 0; }
+.category-list.skeleton .category-item { background-color: var(--skeleton-bg); box-shadow: none; border: none; padding: 0; min-width: 80px; height: 100px; /* Adjust height */ position: relative; overflow: hidden; border-radius: 15px; /* Match rounding */ }
+.category-list.skeleton .category-item::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: var(--skeleton-shine); animation: shimmer 1.8s infinite linear; }
+.category-list.skeleton .category-item span, .category-list.skeleton .category-item .category-square { display: none; }
+
+
+/* --- Product Section (Updated with Filter Tabs) --- */
+.product-section {
+    margin-bottom: 20px;
+}
+
+.filter-tabs-container {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 15px; /* Space below tabs */
+    margin-bottom: 15px;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.filter-tabs-container::-webkit-scrollbar { display: none; }
+
+.filter-tab {
+    padding: 8px 18px;
+    background-color: transparent; /* Yellow background */
+    color: var(--primary-text); /* Black text */
+    border: 5px;
+    border-radius: 20px; /* Rounded edges */
+    font-size: 0.9em;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap; /* Prevent wrapping */
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 4px var(--shadow-light);
+}
+
+.filter-tab:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--shadow-medium);
+}
+
+.filter-tab.active {
+    background-color: var(--theme-color); /* Dark background for active */
+    color: var(--primary-text); /* Yellow text for active */
+    font-weight: 600;
+    box-shadow: 0 3px 6px var(--shadow-medium);
+}
+
+/* Product Grid */
+.product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
+.product-card { background-color: var(--card-background); border-radius: 10px; overflow: hidden; box-shadow: 0 3px 10px var(--shadow-light); border: 1px solid var(--border-color); transition: transform 0.2s ease, box-shadow 0.2s ease; height: 200px; }
+.product-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px var(--shadow-medium); }
+.product-grid.skeleton .product-card { background-color: var(--skeleton-bg); box-shadow: none; border: none; position: relative; overflow: hidden; height: 200px; }
+.product-grid.skeleton .product-card::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: var(--skeleton-shine); animation: shimmer 1.8s infinite linear; }
+
+
+/* --- Floating Navigation Bar --- */
+.nav-spacer { height: calc(var(--nav-height) + var(--nav-margin-bottom) + 10px); }
+.floating-nav { position: fixed; bottom: var(--nav-margin-bottom); left: 15px; right: 15px; height: var(--nav-height); background-color: var(--card-background); border-radius: 35px; box-shadow: 0 5px 20px var(--shadow-medium); display: flex; align-items: center; z-index: 100; border: 1px solid var(--border-color); overflow: hidden; }
+.floating-nav ul { list-style: none; display: flex; justify-content: space-around; align-items: center; width: 100%; height: 100%; position: relative; padding: 0 10px; }
+.floating-nav .nav-item { flex: 1; text-align: center; position: relative; z-index: 1; }
+.floating-nav .nav-item a { display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: var(--secondary-text); padding: 10px 0; transition: color 0.3s ease, transform 0.3s ease; font-size: 0.7em; height: 100%; }
+.floating-nav .nav-item a i { font-size: 1.4em; margin-bottom: 3px; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.floating-nav .nav-item a span { display: block; }
+.floating-nav .nav-item.active a { color: var(--theme-color); }
+.floating-nav .nav-item.active a i { transform: translateY(-2px) scale(1.1); }
+.nav-indicator { position: absolute; top: -8px; left: 0; width: 30px; height: 15px; background-color: var(--theme-color); border-bottom-left-radius: 200px; border-bottom-right-radius: 200px; transition: left 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); z-index: 0; }
+
+
+/* --- Animations --- */
+/* Subtle fade-in for sections - Apply carefully considering sticky header */
+.category-section, .product-section {
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeInSlideUp 0.6s ease forwards;
+    animation-delay: 0.2s; /* Stagger loading */
+}
+
+/* Stagger animation for children items */
+.category-list > *, .product-grid > * {
+     opacity: 0;
+     transform: scale(0.95);
+     animation: popIn 0.4s ease forwards;
+}
+.category-list.skeleton > *, .product-grid.skeleton > * { animation: none; opacity: 1; transform: none; }
+
+/* Stagger delays need adjustment based on final structure */
+.category-item:nth-child(1) { animation-delay: 0.3s; }
+.category-item:nth-child(2) { animation-delay: 0.35s; }
+.category-item:nth-child(3) { animation-delay: 0.4s; }
+.category-item:nth-child(4) { animation-delay: 0.45s; }
+.category-item:nth-child(5) { animation-delay: 0.5s; }
+.category-item:nth-child(6) { animation-delay: 0.55s; }
+
+
+.filter-tab:nth-child(1) { animation-delay: 0.4s; }
+.filter-tab:nth-child(2) { animation-delay: 0.45s; }
+.filter-tab:nth-child(3) { animation-delay: 0.5s; }
+
+
+.product-card:nth-child(1) { animation-delay: 0.6s; }
+.product-card:nth-child(2) { animation-delay: 0.65s; }
+.product-card:nth-child(3) { animation-delay: 0.7s; }
+.product-card:nth-child(4) { animation-delay: 0.75s; }
+
+
+@keyframes fadeInSlideUp { to { opacity: 1; transform: translateY(0); } }
+@keyframes popIn { to { opacity: 1; transform: scale(1); } }
+

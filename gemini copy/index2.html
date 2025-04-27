@@ -1,0 +1,1521 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Ultra Modern Product Listing Form</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root { --primary: #FFCC08; --primary-light: rgba(255, 204, 8, 0.1); --primary-dark: #e6b800; --secondary: #FFCC08; --text: #2b2d42; --text-light: #8d99ae; --bg: #f8f9fa; --white: #ffffff; --error: #ef476f; --warning: #ffd166; --success: #06d6a0; --border-radius: 16px; --shadow: 0 8px 24px rgba(0,0,0,0.12); --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); --holographic-effect: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,204,8,0.2), rgba(255,255,255,0.1)); }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+
+        html { scroll-behavior: smooth; }
+        body { background-color: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+
+        .page-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--white); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease, visibility 0.5s ease; }
+        .page-loader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+        .loader { width: 48px; height: 48px; border: 5px solid var(--primary-light); border-bottom-color: var(--primary); border-radius: 50%; animation: rotation 1s linear infinite; margin-bottom: 16px; }
+        .loader-text { font-weight: 500; color: var(--text-light); }
+
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        header { background: linear-gradient(135deg, var(--white) 90%, var(--primary-light) 100%); padding: 20px; box-shadow: var(--shadow); position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; border-radius: 0 0 40px 0; border-bottom: 4px solid var(--primary); }
+
+        .logo-container { display: flex; align-items: center; gap: 12px; }
+        .logo { height: 40px; width: auto; border-radius: 50%; }
+        .page-title { font-size: 1.5rem; font-weight: 700; color: var(--text); margin: 0; }
+
+        .back-link { color: var(--text); text-decoration: none; display: flex; align-items: center; gap: 8px; font-weight: 500; transition: var(--transition); }
+        .back-link:hover { color: var(--primary); }
+
+        .main-container { max-width: 800px; width: 100%; margin: 0 auto; padding: 32px 20px; flex: 1; }
+
+        .progress-container { margin-bottom: 32px; }
+        .progress-bar { display: flex; justify-content: space-between; position: relative; margin-bottom: 60px; }
+        .progress-bar::before { content: ''; position: absolute; top: 50%; left: 0; transform: translateY(-50%); height: 4px; width: 100%; background-color: var(--text-light); opacity: 0.3; z-index: 1; }
+        .progress-bar-fill { position: absolute; top: 50%; left: 0; transform: translateY(-50%); height: 4px; width: 0%; background-color: var(--primary); z-index: 2; transition: width 0.5s ease; }
+
+        .step { width: 40px; height: 40px; border-radius: 50%; background-color: var(--white); border: 2px solid var(--text-light); display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--text-light); position: relative; z-index: 3; transition: var(--transition); }
+        .step.active { border-color: var(--primary); background-color: var(--primary); color: var(--white); transform: scale(1.1); }
+        .step.completed { border-color: var(--primary); background-color: var(--primary); color: var(--white); }
+
+        .step-label { position: absolute; top: 48px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 14px; font-weight: 500; color: var(--text-light); transition: var(--transition); }
+        .step.active .step-label, .step.completed .step-label { color: var(--text); font-weight: 600; }
+
+        .form-step { display: none; animation: fadeIn 0.5s ease forwards; }
+        .form-step.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-20px); } }
+        .form-step.inactive-fade-out { animation: fadeOut 0.3s ease forwards; }
+
+
+        .step-title { font-size: 1.5rem; margin-bottom: 24px; color: var(--text); display: flex; align-items: center; gap: 12px; }
+        .step-title i { color: var(--primary); }
+
+        .form-group { margin-bottom: 24px; position: relative; }
+
+        label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--text); transition: var(--transition); }
+        .required { color: var(--error); }
+
+        input[type="text"], input[type="number"], input[type="tel"], select, textarea { width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: var(--border-radius); font-size: 16px; transition: var(--transition); background-color: var(--white); color: var(--text); }
+        input::placeholder, textarea::placeholder { color: var(--text-light); opacity: 0.7; }
+
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px var(--primary-light); }
+        input.invalid, select.invalid, textarea.invalid, .tags-input-wrapper.invalid { border-color: var(--error) !important; box-shadow: 0 0 0 3px rgba(239, 71, 111, 0.2) !important; }
+        .image-upload-area.invalid { border-color: var(--error) !important; background-color: rgba(239, 71, 111, 0.05) !important; }
+        .category-chips.invalid .category-chip, .condition-options.invalid .condition-option { border-color: var(--error); }
+
+        .input-with-icon { position: relative; }
+        .input-with-icon input, .input-with-icon select { padding-left: 40px; }
+        .input-icon { position: absolute; top: 50%; left: 16px; transform: translateY(-50%); color: var(--text-light); }
+
+        textarea { min-height: 120px; resize: vertical; }
+        .char-counter { display: block; text-align: right; font-size: 12px; color: var(--text-light); margin-top: 4px; }
+
+        .error-message { color: var(--error); font-size: 14px; margin-top: 4px; min-height: 20px; font-weight: 500; display: none; }
+        .error-message.show { display: block; }
+
+        .price-type-selector { display: flex; gap: 12px; margin-bottom: 16px; }
+        .price-type-btn { flex: 1; padding: 12px; border: 2px solid var(--primary); border-radius: var(--border-radius); background: transparent; cursor: pointer; transition: var(--transition); position: relative; overflow: hidden; font-weight: 500; text-align: center; color: var(--primary); }
+        .price-type-btn.active { background: var(--primary); color: var(--white); border-color: var(--primary); }
+
+        .price-range-group { display: none; gap: 16px; animation: slideDown 0.4s ease; }
+        .price-range-group.active { display: flex; }
+
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); max-height: 0; } to { opacity: 1; transform: translateY(0); max-height: 100px; /* Adjust as needed */ } }
+
+        .price-input-wrapper { position: relative; flex: 1; }
+        .currency-symbol { position: absolute; top: 50%; left: 16px; transform: translateY(-50%); color: var(--text); font-weight: 500; }
+        .price-input-wrapper input { padding-left: 32px; }
+
+        .holographic-card { position: relative; overflow: hidden; background: var(--white); border-radius: var(--border-radius); box-shadow: var(--shadow); transition: transform 0.3s ease, box-shadow 0.3s ease; transform-style: preserve-3d; }
+        .holographic-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--holographic-effect); transform: rotate(45deg) scale(2.5); pointer-events: none; opacity: 0; transition: opacity 0.4s ease; z-index: 1; }
+        .holographic-card:hover::before { opacity: 1; }
+        .holographic-card > * { position: relative; z-index: 2; } /* Ensure content is above overlay */
+
+        .image-upload-area { border: 2px dashed #e0e0e0; border-radius: var(--border-radius); padding: 32px; text-align: center; cursor: pointer; transition: var(--transition); background-color: var(--white); }
+        .image-upload-area:hover, .image-upload-area.dragover { border-color: var(--primary); background-color: var(--primary-light); transform: scale(1.02); }
+        .image-upload-area.dragover { border-style: solid; }
+
+        .upload-prompt { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+        .upload-prompt i { font-size: 32px; color: var(--primary); }
+        .upload-prompt p { font-weight: 500; }
+        .upload-prompt small { color: var(--text-light); }
+
+        .image-preview-container { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+        .image-preview { width: calc(25% - 9px); aspect-ratio: 1; border-radius: 8px; overflow: hidden; position: relative; border: 1px solid #e0e0e0; }
+        .image-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .image-preview .remove-image { position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; background-color: rgba(239, 71, 111, 0.8); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; transition: var(--transition); transform: scale(0.8); }
+        .image-preview:hover .remove-image { opacity: 1; transform: scale(1); }
+        .image-preview .remove-image i { font-size: 12px; }
+
+
+        .tags-input-wrapper { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 12px; border: 2px solid #e0e0e0; border-radius: var(--border-radius); background-color: var(--white); transition: var(--transition); min-height: 50px; align-items: center; }
+        .tags-input-wrapper:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+
+        #tags-input { flex: 1; min-width: 120px; border: none; padding: 4px 0; outline: none; background: transparent; font-size: 16px; }
+        #tags-selected-area { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .tag { display: inline-flex; align-items: center; gap: 4px; padding: 4px 12px; background-color: var(--primary-light); color: var(--primary); border-radius: 16px; font-size: 14px; font-weight: 500; animation: popIn 0.2s ease; }
+        .tag i { cursor: pointer; font-size: 12px; transition: color 0.2s ease; }
+        .tag i:hover { color: var(--error); }
+
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+
+        .btn { padding: 12px 24px; border: none; border-radius: var(--border-radius); font-size: 16px; font-weight: 600; cursor: pointer; transition: var(--transition); display: inline-flex; /* Changed from flex */ align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+
+        .btn-primary { background-color: var(--primary); color: var(--text); } /* Changed text color */
+        .btn-primary:not(:disabled):hover { background-color: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+
+        .btn-secondary { background-color: var(--white); color: var(--text); border: 2px solid #e0e0e0; }
+        .btn-secondary:not(:disabled):hover { border-color: var(--text); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+
+        .btn-success { background-color: var(--success); color: white; }
+        .btn-success:not(:disabled):hover { background-color: #05c090; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+
+        .highlight-field { animation: pulse 0.6s ease; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
+
+        .shake { animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); } 20%, 40%, 60%, 80% { transform: translateX(5px); } }
+
+        .interactive-card { transition: transform 0.3s ease, box-shadow 0.3s ease; transform-style: preserve-3d; cursor: pointer; }
+        .interactive-card:hover { transform: perspective(1000px) translateY(-5px) rotateX(5deg) rotateY(3deg); box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
+
+        .floating-label-group { position: relative; margin-bottom: 24px; }
+        .floating-label { position: absolute; left: 16px; top: 14px; /* Adjusted top */ color: var(--text-light); transition: var(--transition); pointer-events: none; background: var(--white); padding: 0 4px; font-size: 16px; }
+        input:focus + .floating-label, input:not(:placeholder-shown) + .floating-label,
+        select:focus + .floating-label, select:not([value=""]):not(:disabled) + .floating-label,
+        textarea:focus + .floating-label, textarea:not(:placeholder-shown) + .floating-label {
+             transform: translateY(-24px) scale(0.85); color: var(--primary); font-weight: 500;
+        }
+        /* Specific adjustment for select when value is empty but not focused */
+        select:not(:focus):placeholder-shown + .floating-label {
+             transform: translateY(0) scale(1); color: var(--text-light); font-weight: normal;
+        }
+
+
+        .category-chips { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+        .category-chip { flex: 1; min-width: 120px; background: var(--white); border: 2px solid #e0e0e0; border-radius: var(--border-radius); padding: 16px; text-align: center; cursor: pointer; transition: var(--transition); display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .category-chip i { font-size: 24px; color: var(--text-light); transition: var(--transition); }
+        .category-chip span { font-weight: 500; }
+        .category-chip.selected { border-color: var(--primary); background-color: var(--primary-light); }
+        .category-chip.selected i { color: var(--primary); }
+        .category-chip.selected span { color: var(--primary); }
+
+        .subcategory-container { display: none; margin-top: 16px; padding: 16px; background: var(--white); border-radius: var(--border-radius); border-left: 4px solid var(--primary); animation: fadeIn 0.3s ease; }
+        .subcategory-title { font-weight: 600; margin-bottom: 12px; color: var(--text); }
+
+        .condition-options { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+        .condition-option { flex: 1; min-width: 120px; background: var(--white); border: 2px solid #e0e0e0; border-radius: var(--border-radius); padding: 16px; text-align: center; cursor: pointer; transition: var(--transition); display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .condition-option i { font-size: 24px; color: var(--text-light); transition: var(--transition); }
+        .condition-option.selected { border-color: var(--primary); background-color: var(--primary-light); }
+        .condition-option.selected i { color: var(--primary); }
+        .condition-name { font-weight: 600; }
+        .condition-desc { font-size: 12px; color: var(--text-light); }
+
+        .toggle-group { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: var(--white); border-radius: var(--border-radius); border: 2px solid #e0e0e0; margin-top: 12px; }
+        .toggle-switch { position: relative; display: inline-block; width: 48px; height: 24px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #e0e0e0; border-radius: 34px; transition: var(--transition); }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: var(--transition); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(24px); }
+
+        .hints { margin-top: 8px; background: var(--primary-light); border-radius: var(--border-radius); padding: 12px; font-size: 14px; border-left: 4px solid var(--primary); }
+        .hints-title { display: flex; align-items: center; gap: 8px; font-weight: 600; margin-bottom: 4px; }
+        .hints-title i { color: var(--primary); }
+        .hints p { margin: 0; color: var(--text); }
+
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 32px; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; opacity: 0; transition: opacity 0.3s ease; }
+        .modal.show { display: flex; opacity: 1; }
+        .modal-content { background: var(--white); padding: 32px; border-radius: var(--border-radius); text-align: center; max-width: 500px; width: 90%; position: relative; transform: scale(0.9); transition: transform 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .modal.show .modal-content { transform: scale(1); }
+        .close-modal-btn { position: absolute; top: 16px; right: 16px; font-size: 24px; cursor: pointer; color: var(--text-light); transition: color 0.2s ease; }
+        .close-modal-btn:hover { color: var(--text); }
+        .success-icon { font-size: 64px; color: var(--success); margin-bottom: 16px; animation: popIn 0.5s ease; }
+        .modal-title { font-size: 1.5rem; margin-bottom: 8px; color: var(--text); }
+        .modal-message { margin-bottom: 24px; color: var(--text-light); }
+        .modal-actions { display: flex; gap: 16px; margin-top: 24px; justify-content: center; }
+
+        .autocomplete-list { position: absolute; width: 100%; max-height: 200px; overflow-y: auto; background-color: var(--white); border: 1px solid #e0e0e0; border-top: none; border-radius: 0 0 var(--border-radius) var(--border-radius); z-index: 10; display: none; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .autocomplete-item { padding: 10px 16px; cursor: pointer; transition: var(--transition); font-size: 15px; }
+        .autocomplete-item:hover { background-color: var(--primary-light); }
+        .autocomplete-item:last-child { border-radius: 0 0 var(--border-radius) var(--border-radius); }
+
+        .review-section { margin-bottom: 24px; padding: 16px; background: var(--white); border-radius: var(--border-radius); border: 1px solid #eee; }
+        .review-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px; color: var(--primary); }
+        .review-item { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 15px; }
+        .review-item strong { color: var(--text); font-weight: 500; margin-right: 8px; }
+        .review-item span { color: var(--text-light); text-align: right; }
+        .review-images { display: flex; gap: 8px; flex-wrap: wrap; }
+        .review-image { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid #eee; }
+        .review-tags { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+        .review-tag { background: var(--primary-light); color: var(--primary); padding: 2px 8px; border-radius: 12px; font-size: 13px; font-weight: 500; }
+
+
+        @media (max-width: 768px) {
+             header { border-radius: 0 0 30px 0; padding: 16px; flex-direction: column; align-items: flex-start; gap: 10px; }
+             .main-container { padding: 20px 16px; }
+             .progress-bar { margin-bottom: 50px; } /* Reduced margin */
+             .step-label { display: none; } /* Hide labels */
+             .step { width: 35px; height: 35px; } /* Smaller steps */
+             .price-type-selector, .price-range-group { flex-direction: column; }
+             .price-range-group.active { display: flex; } /* Ensure it still shows */
+             .image-preview { width: calc(50% - 6px); }
+             .nav-buttons { flex-direction: column-reverse; gap: 12px; }
+             .btn { width: 100%; } /* Make buttons full width */
+             .modal-content { width: 95%; }
+             .category-chips, .condition-options { gap: 8px; }
+             .category-chip, .condition-option { min-width: calc(50% - 4px); padding: 12px; }
+             .review-item { flex-direction: column; align-items: flex-start; }
+             .review-item span { text-align: left; margin-top: 4px; }
+             .review-tags { justify-content: flex-start; }
+        }
+        @media (max-width: 480px) {
+            .page-title { font-size: 1.3rem; }
+            .step-title { font-size: 1.3rem; }
+            .category-chip, .condition-option { min-width: calc(50% - 4px); padding: 12px; }
+            .image-preview { width: calc(50% - 6px); } /* Keep 2 columns for images */
+        }
+
+    </style>
+
+</head>
+<body>
+    <div class="page-loader"><div class="loader"></div><p class="loader-text">Loading your form...</p></div>
+
+    <header>
+        <div class="logo-container"><img src="https://via.placeholder.com/40/FFCC08/2b2d42?text=L" alt="Your Logo" class="logo"><h1 class="page-title">New Listing</h1></div>
+        <a href="#" class="back-link" onclick="window.history.back(); return false;"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+    </header>
+
+    <div class="main-container">
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                <div class="step active" data-step="1">1<div class="step-label">Basic Info</div></div>
+                <div class="step" data-step="2">2<div class="step-label">Details</div></div>
+                <div class="step" data-step="3">3<div class="step-label">Images</div></div>
+                <div class="step" data-step="4">4<div class="step-label">Contact</div></div>
+                <div class="step" data-step="5">5<div class="step-label">Review</div></div>
+            </div>
+        </div>
+
+        <form id="product-form" novalidate>
+            <div class="form-step active" id="step-1">
+                <h2 class="step-title"><i class="fas fa-info-circle"></i> Basic Product Information</h2>
+
+                <div class="form-group floating-label-group">
+                    <input type="text" id="product-title" name="productTitle" placeholder=" " required minlength="5">
+                    <label for="product-title" class="floating-label">Product Title <span class="required">*</span></label>
+                    <div class="error-message" data-field="product-title">Please enter a descriptive title (min. 5 characters).</div>
+                    <div class="hints">
+                        <div class="hints-title"><i class="fas fa-lightbulb"></i> Tip for Great Titles</div>
+                        <p>Include brand, model, size, and color. E.g., "Samsung Galaxy S21 Ultra 5G - 256GB - Phantom Black"</p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Category <span class="required">*</span></label>
+                    <div class="category-chips" id="category-chips">
+                        <div class="category-chip interactive-card" data-category="electronics" data-icon="fas fa-laptop">
+                            <i class="fas fa-laptop"></i><span>Electronics</span>
+                        </div>
+                        <div class="category-chip interactive-card" data-category="fashion" data-icon="fas fa-tshirt">
+                            <i class="fas fa-tshirt"></i><span>Fashion</span>
+                        </div>
+                        <div class="category-chip interactive-card" data-category="home" data-icon="fas fa-couch">
+                            <i class="fas fa-couch"></i><span>Home & Garden</span>
+                        </div>
+                         <div class="category-chip interactive-card" data-category="vehicles" data-icon="fas fa-car">
+                            <i class="fas fa-car"></i><span>Vehicles</span>
+                        </div>
+                         <div class="category-chip interactive-card" data-category="property" data-icon="fas fa-home">
+                            <i class="fas fa-home"></i><span>Property</span>
+                        </div>
+                        <div class="category-chip interactive-card" data-category="other" data-icon="fas fa-shapes">
+                            <i class="fas fa-shapes"></i><span>Other</span>
+                        </div>
+                    </div>
+                    <input type="hidden" id="category" name="category" required>
+                    <div class="error-message" data-field="category">Please select a category.</div>
+
+                    <div id="subcategory-container" class="subcategory-container">
+                        <div class="subcategory-title">Select a subcategory <span class="required">*</span></div>
+                        <div id="subcategories" class="category-chips">
+                            </div>
+                        <input type="hidden" id="subcategory" name="subcategory" required>
+                         <div class="error-message" data-field="subcategory">Please select a subcategory.</div>
+                    </div>
+                </div>
+
+                <div id="dynamic-fields-container">
+                    </div>
+
+                <div class="nav-buttons">
+                    <button type="button" class="btn btn-secondary" disabled><i class="fas fa-chevron-left"></i> Previous</button>
+                    <button type="button" class="btn btn-primary next-btn">Next <i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+
+            <div class="form-step" id="step-2">
+                <h2 class="step-title"><i class="fas fa-clipboard-list"></i> Product Details</h2>
+
+                <div class="form-group floating-label-group">
+                    <textarea id="description" name="description" placeholder=" " maxlength="500" required minlength="20"></textarea>
+                    <label for="description" class="floating-label">Product Description <span class="required">*</span></label>
+                    <div class="char-counter" id="char-counter">0/500</div>
+                    <div class="error-message" data-field="description">Please provide a detailed description (min. 20 characters).</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Pricing Type <span class="required">*</span></label>
+                    <div class="price-type-selector">
+                        <button type="button" class="price-type-btn active" data-type="fixed">Fixed Price</button>
+                        <button type="button" class="price-type-btn" data-type="range">Price Range</button>
+                    </div>
+                    <input type="hidden" id="price-type" name="priceType" value="fixed" required>
+
+                    <div class="price-input-wrapper" id="fixed-price-group">
+                        <span class="currency-symbol">₵</span>
+                        <input type="number" id="price" name="price" placeholder="0.00" step="0.01" min="0" required>
+                        <div class="error-message" data-field="price">Please enter a valid price.</div>
+                    </div>
+                    <div class="price-range-group" id="price-range-group">
+                        <div class="price-input-wrapper">
+                            <span class="currency-symbol">₵</span>
+                            <input type="number" id="min-price" name="minPrice" placeholder="Min" step="0.01" min="0">
+                             <div class="error-message" data-field="min-price">Min price required.</div>
+                        </div>
+                        <div class="price-input-wrapper">
+                            <span class="currency-symbol">₵</span>
+                            <input type="number" id="max-price" name="maxPrice" placeholder="Max" step="0.01" min="0">
+                             <div class="error-message" data-field="max-price">Max price required and must be >= Min price.</div>
+                        </div>
+                    </div>
+                    <div class="error-message" data-field="price-range">Please enter a valid price range.</div>
+
+
+                    <div class="toggle-group">
+                        <label for="negotiable">Price is negotiable</label>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="negotiable" name="negotiable">
+                            <label for="negotiable" class="slider"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" id="condition-group">
+                     <label>Product Condition <span class="required">*</span></label>
+                     <div class="condition-options">
+                        <div class="condition-option interactive-card" data-condition="new">
+                            <i class="fas fa-box-open"></i>
+                            <div class="condition-name">Brand New</div>
+                            <div class="condition-desc">Unused, in original packaging</div>
+                        </div>
+                        <div class="condition-option interactive-card" data-condition="used-like-new">
+                            <i class="fas fa-star"></i>
+                            <div class="condition-name">Used - Like New</div>
+                            <div class="condition-desc">Minimal signs of use</div>
+                        </div>
+                        <div class="condition-option interactive-card" data-condition="used-good">
+                            <i class="fas fa-thumbs-up"></i>
+                            <div class="condition-name">Used - Good</div>
+                            <div class="condition-desc">Some signs of wear</div>
+                        </div>
+                        <div class="condition-option interactive-card" data-condition="used-fair">
+                             <i class="fas fa-recycle"></i>
+                            <div class="condition-name">Used - Fair</div>
+                            <div class="condition-desc">Visible wear and tear</div>
+                        </div>
+                     </div>
+                     <input type="hidden" id="condition" name="condition" required>
+                     <div class="error-message" data-field="condition">Please select the product condition.</div>
+                </div>
+
+                <div class="form-group">
+                     <label for="tags-input">Tags (Optional, press Enter to add)</label>
+                     <div class="tags-input-wrapper" id="tags-wrapper">
+                         <div id="tags-selected-area"></div>
+                         <input type="text" id="tags-input" placeholder="Add relevant tags...">
+                     </div>
+                     <input type="hidden" id="tags-hidden" name="tags">
+                     <div class="autocomplete-list" id="autocomplete-list"></div>
+                     <div class="hints">
+                        <div class="hints-title"><i class="fas fa-tags"></i> Tagging Tips</div>
+                        <p>Use tags like "smartphone", "android", "used phone", "electronics", etc., to improve searchability.</p>
+                    </div>
+                 </div>
+
+
+                <div class="nav-buttons">
+                    <button type="button" class="btn btn-secondary prev-btn"><i class="fas fa-chevron-left"></i> Previous</button>
+                    <button type="button" class="btn btn-primary next-btn">Next <i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+
+            <div class="form-step" id="step-3">
+                <h2 class="step-title"><i class="fas fa-images"></i> Product Images</h2>
+
+                <div class="form-group">
+                    <label>Upload Images (Min 1, Max 4) <span class="required">*</span></label>
+                    <div class="image-upload-area holographic-card" id="image-upload-area">
+                        <div class="upload-prompt">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Drag & drop images here, or click to browse</p>
+                            <small>JPG, PNG, WebP accepted (max 5MB each)</small>
+                        </div>
+                        <input type="file" id="product-images" name="productImages" accept=".jpg,.jpeg,.png,.webp" multiple style="display: none;">
+                    </div>
+                    <div class="image-preview-container" id="image-preview-container"></div>
+                    <input type="hidden" id="image-count" name="imageCount" value="0" required data-min="1"> <div class="error-message" data-field="image-count">Please upload at least one image (max 4).</div>
+                     <div class="hints">
+                        <div class="hints-title"><i class="fas fa-camera-retro"></i> Image Tips</div>
+                        <p>Use clear, well-lit photos from different angles. The first image will be the main one.</p>
+                    </div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button type="button" class="btn btn-secondary prev-btn"><i class="fas fa-chevron-left"></i> Previous</button>
+                    <button type="button" class="btn btn-primary next-btn">Next <i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+
+             <div class="form-step" id="step-4">
+                 <h2 class="step-title"><i class="fas fa-address-card"></i> Contact Information</h2>
+
+                 <div class="form-group floating-label-group">
+                    <input type="text" id="contact-name" name="contactName" placeholder=" " required>
+                    <label for="contact-name" class="floating-label">Your Name <span class="required">*</span></label>
+                    <div class="error-message" data-field="contact-name">Please enter your name.</div>
+                 </div>
+
+                 <div class="form-group floating-label-group">
+                    <input type="tel" id="phone-number" name="phoneNumber" placeholder=" " required pattern="^[0-9]{10}$"> <label for="phone-number" class="floating-label">Phone Number <span class="required">*</span></label>
+                    <div class="error-message" data-field="phone-number">Please enter a valid 10-digit phone number (e.g., 024xxxxxxx).</div>
+                     <div class="hints">
+                        <div class="hints-title"><i class="fas fa-phone-alt"></i> Phone Number Format</div>
+                        <p>Enter your 10-digit Ghanaian phone number without spaces or hyphens.</p>
+                    </div>
+                 </div>
+
+                 <div class="form-group floating-label-group">
+                    <input type="text" id="location" name="location" placeholder=" " required>
+                    <label for="location" class="floating-label">Your Location (e.g., Accra, East Legon) <span class="required">*</span></label>
+                    <div class="error-message" data-field="location">Please enter your general location.</div>
+                 </div>
+
+                <div class="nav-buttons">
+                    <button type="button" class="btn btn-secondary prev-btn"><i class="fas fa-chevron-left"></i> Previous</button>
+                    <button type="button" class="btn btn-primary next-btn">Next <i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+
+             <div class="form-step" id="step-5">
+                <h2 class="step-title"><i class="fas fa-check-circle"></i> Review Your Listing</h2>
+                <p style="color: var(--text-light); margin-bottom: 24px;">Please review all the details below before submitting your listing.</p>
+
+                <div id="review-container">
+                    <div class="review-section">
+                        <div class="review-title">Basic Information</div>
+                        <div class="review-item"><strong>Title:</strong> <span id="review-title"></span></div>
+                        <div class="review-item"><strong>Category:</strong> <span id="review-category"></span></div>
+                        <div class="review-item"><strong>Subcategory:</strong> <span id="review-subcategory"></span></div>
+                         </div>
+                    <div class="review-section">
+                         <div class="review-title">Product Details</div>
+                         <div class="review-item"><strong>Description:</strong> <span id="review-description" style="white-space: pre-wrap;"></span></div>
+                         <div class="review-item"><strong>Price:</strong> <span id="review-price"></span></div>
+                         <div class="review-item"><strong>Negotiable:</strong> <span id="review-negotiable"></span></div>
+                         <div class="review-item"><strong>Condition:</strong> <span id="review-condition"></span></div>
+                         <div class="review-item"><strong>Tags:</strong> <span id="review-tags" class="review-tags"></span></div>
+                    </div>
+                     <div class="review-section">
+                         <div class="review-title">Images</div>
+                         <div id="review-images" class="review-images"></div>
+                    </div>
+                     <div class="review-section">
+                         <div class="review-title">Contact Info</div>
+                         <div class="review-item"><strong>Name:</strong> <span id="review-contact-name"></span></div>
+                         <div class="review-item"><strong>Phone:</strong> <span id="review-phone"></span></div>
+                         <div class="review-item"><strong>Location:</strong> <span id="review-location"></span></div>
+                    </div>
+
+                </div>
+
+                <div class="nav-buttons">
+                    <button type="button" class="btn btn-secondary prev-btn"><i class="fas fa-chevron-left"></i> Previous</button>
+                    <button type="submit" class="btn btn-success"><i class="fas fa-paper-plane"></i> Submit Listing</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+    <div class="modal" id="success-modal">
+        <div class="modal-content">
+             <span class="close-modal-btn" id="close-modal">&times;</span>
+            <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+            <h2 class="modal-title">Listing Submitted!</h2>
+            <p class="modal-message">Your product listing has been successfully submitted. It will be reviewed shortly.</p>
+            <div class="modal-actions">
+                <a href="#" class="btn btn-primary">View Listing</a> <a href="#" class="btn btn-secondary">Create Another Listing</a> </div>
+        </div>
+    </div>
+    <nav class="floating-nav">
+        <div class="nav-indicator"></div>
+        <ul>
+            <li class="nav-item active" data-index="0"> <a href="#"><i class="fas fa-home"></i><span>Home</span></a> </li>
+            <li class="nav-item" data-index="1"> <a href="#"><i class="fas fa-th-large"></i><span>Categories</span></a> </li>
+            <li class="nav-item" data-index="2"> <a href="#"><i class="fas fa-plus-circle"></i><span>Sell</span></a> </li>
+            <li class="nav-item" data-index="3"> <a href="#"><i class="fas fa-heart"></i><span>Wishlist</span></a> </li>
+            <li class="nav-item" data-index="4"> <a href="#"><i class="fas fa-user"></i><span>Profile</span></a> </li>
+        </ul>
+    </nav>    
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('product-form');
+            const steps = Array.from(form.querySelectorAll('.form-step'));
+            const progressBarFill = document.getElementById('progress-bar-fill');
+            const progressSteps = Array.from(document.querySelectorAll('.progress-bar .step'));
+            const nextBtns = form.querySelectorAll('.next-btn');
+            const prevBtns = form.querySelectorAll('.prev-btn');
+            const pageLoader = document.querySelector('.page-loader');
+
+            let currentStep = 0;
+            const MAX_IMAGES = 4;
+            const uploadedFiles = []; // Store File objects
+
+             // --- Basic Form Data & Categories ---
+            const categoryData = {
+                electronics: { name: "Electronics", icon: "fas fa-laptop", subcategories: ["Mobile Phones", "Laptops", "TVs", "Cameras", "Accessories"] },
+                fashion: { name: "Fashion", icon: "fas fa-tshirt", subcategories: ["Clothing", "Shoes", "Bags", "Jewelry", "Watches"] },
+                home: { name: "Home & Garden", icon: "fas fa-couch", subcategories: ["Furniture", "Appliances", "Decor", "Kitchenware", "Garden"] },
+                vehicles: { name: "Vehicles", icon: "fas fa-car", subcategories: ["Cars", "Motorcycles", "Bicycles", "Parts & Accessories"] },
+                property: { name: "Property", icon: "fas fa-home", subcategories: ["For Sale", "For Rent"] },
+                other: { name: "Other", icon: "fas fa-shapes", subcategories: ["Books", "Sports", "Services", "Musical Instruments"] },
+            };
+             // --- Predefined Tags for Autocomplete ---
+            const predefinedTags = [
+                "New", "Used", "Slightly Used", "Negotiable", "Urgent", "Free Delivery",
+                "Samsung", "iPhone", "Tecno", "Infinix", "Laptop", "HP", "Dell", "Apple", "TV", "LG",
+                "Sofa", "Bed", "Fridge", "Gas Cooker", "Toyota", "Honda", "BMW", "Mercedes", "Rent", "Sale",
+                "Accra", "Kumasi", "Takoradi", "Tema", "East Legon", "Spintex", "Osu", "Cantonments",
+                "Sneakers", "Dress", "Shirt", "Trousers", "Watch", "Bag", "Camera", "Gaming"
+            ];
+
+            // --- Initial Setup ---
+            const hideLoader = () => {
+                pageLoader.classList.add('hidden');
+            };
+            // Hide loader after a short delay or when content is ready
+            window.addEventListener('load', () => {
+                 setTimeout(hideLoader, 300); // Give a small delay for better perceived performance
+            });
+            if (document.readyState === 'complete') {
+                 setTimeout(hideLoader, 0);
+            }
+
+            updateProgress();
+            setupFloatingLabels(); // Initialize floating labels
+
+
+            // --- Navigation Logic ---
+            nextBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (validateStep(currentStep)) {
+                         if (currentStep === steps.length - 2) { // Before Review step
+                            populateReview();
+                        }
+                        changeStep(1);
+                    } else {
+                        showValidationErrors(currentStep);
+                    }
+                });
+            });
+
+            prevBtns.forEach(btn => {
+                btn.addEventListener('click', () => changeStep(-1));
+            });
+
+            function changeStep(direction) {
+                const currentFormStep = steps[currentStep];
+                const nextStepIndex = currentStep + direction;
+
+                 // Add fade-out animation before hiding
+                currentFormStep.classList.add('inactive-fade-out');
+
+                setTimeout(() => {
+                    currentFormStep.classList.remove('active', 'inactive-fade-out');
+                    currentFormStep.style.display = 'none'; // Ensure it's hidden after animation
+
+                    currentStep = nextStepIndex;
+                    const nextFormStep = steps[currentStep];
+                    nextFormStep.style.display = 'block'; // Set display before adding class
+                    nextFormStep.classList.add('active'); // Add active class to trigger fade-in
+
+                    updateProgress();
+                    window.scrollTo(0, 0); // Scroll to top on step change
+                }, 300); // Match animation duration
+            }
+
+
+            function updateProgress() {
+                progressSteps.forEach((step, index) => {
+                    step.classList.remove('active', 'completed');
+                    if (index < currentStep) {
+                        step.classList.add('completed');
+                    } else if (index === currentStep) {
+                        step.classList.add('active');
+                    }
+                });
+                const percentage = (currentStep / (steps.length - 1)) * 100;
+                progressBarFill.style.width = `${percentage}%`;
+
+                 // Disable/Enable Prev/Next buttons
+                 prevBtns.forEach(btn => btn.disabled = currentStep === 0);
+                 // Next buttons are handled individually, but let's ensure the submit button state is correct if needed
+                 // const submitBtn = form.querySelector('button[type="submit"]');
+                 // if (submitBtn) submitBtn.disabled = currentStep !== steps.length - 1;
+            }
+
+
+            // --- Step 1: Basic Info ---
+            const categoryChipsContainer = document.getElementById('category-chips');
+            const categoryInput = document.getElementById('category');
+            const subcategoryContainer = document.getElementById('subcategory-container');
+            const subcategoriesDiv = document.getElementById('subcategories');
+            const subcategoryInput = document.getElementById('subcategory');
+            const dynamicFieldsContainer = document.getElementById('dynamic-fields-container'); // Placeholder for future dynamic fields
+
+            categoryChipsContainer.addEventListener('click', (e) => {
+                const chip = e.target.closest('.category-chip');
+                if (chip) {
+                    const selectedCategory = chip.dataset.category;
+
+                     // Remove selected from all chips
+                     categoryChipsContainer.querySelectorAll('.category-chip').forEach(c => c.classList.remove('selected'));
+                     // Add selected to the clicked chip
+                     chip.classList.add('selected');
+                     categoryInput.value = selectedCategory;
+                     clearValidationError(categoryInput); // Clear validation on selection
+                     categoryChipsContainer.classList.remove('invalid');
+
+                    // Handle Subcategories
+                    subcategoryInput.value = ''; // Reset subcategory
+                    subcategoriesDiv.innerHTML = ''; // Clear previous subcategories
+                    subcategoryContainer.style.display = 'none';
+                    clearValidationError(subcategoryInput);
+
+                     if (categoryData[selectedCategory] && categoryData[selectedCategory].subcategories.length > 0) {
+                        subcategoryContainer.style.display = 'block';
+                        categoryData[selectedCategory].subcategories.forEach(sub => {
+                            const subChip = document.createElement('div');
+                            subChip.classList.add('category-chip', 'interactive-card'); // Reuse styles
+                            subChip.dataset.subcategory = sub;
+                            // You can add icons for subcategories if needed
+                            subChip.innerHTML = `<span>${sub}</span>`;
+                            subcategoriesDiv.appendChild(subChip);
+                        });
+                        subcategoryInput.required = true; // Make subcategory required if options exist
+                     } else {
+                        subcategoryInput.required = false; // Not required if no subcategories
+                     }
+
+                      // Handle Dynamic Fields (Example - could be expanded)
+                      dynamicFieldsContainer.innerHTML = ''; // Clear previous dynamic fields
+                      if (selectedCategory === 'vehicles') {
+                          // Example: Add Brand and Model fields
+                          dynamicFieldsContainer.innerHTML = `
+                            <div class="form-group floating-label-group">
+                                <input type="text" id="vehicle-brand" name="vehicleBrand" placeholder=" ">
+                                <label for="vehicle-brand" class="floating-label">Brand</label>
+                                <div class="error-message" data-field="vehicle-brand"></div>
+                            </div>
+                             <div class="form-group floating-label-group">
+                                <input type="text" id="vehicle-model" name="vehicleModel" placeholder=" ">
+                                <label for="vehicle-model" class="floating-label">Model</label>
+                                <div class="error-message" data-field="vehicle-model"></div>
+                            </div>
+                          `;
+                           setupFloatingLabels(); // Re-initialize for new fields
+                      } else if (selectedCategory === 'property') {
+                           dynamicFieldsContainer.innerHTML = `
+                            <div class="form-group floating-label-group">
+                                <input type="number" id="property-bedrooms" name="propertyBedrooms" placeholder=" " min="0">
+                                <label for="property-bedrooms" class="floating-label">Bedrooms</label>
+                                <div class="error-message" data-field="property-bedrooms"></div>
+                            </div>
+                             <div class="form-group floating-label-group">
+                                <input type="number" id="property-bathrooms" name="propertyBathrooms" placeholder=" " min="0">
+                                <label for="property-bathrooms" class="floating-label">Bathrooms</label>
+                                <div class="error-message" data-field="property-bathrooms"></div>
+                            </div>
+                          `;
+                           setupFloatingLabels();
+                      }
+                      // Add more else if blocks for other categories...
+
+                }
+            });
+
+            subcategoriesDiv.addEventListener('click', (e) => {
+                 const subChip = e.target.closest('.category-chip');
+                 if (subChip) {
+                    const selectedSubCategory = subChip.dataset.subcategory;
+                    subcategoriesDiv.querySelectorAll('.category-chip').forEach(c => c.classList.remove('selected'));
+                    subChip.classList.add('selected');
+                    subcategoryInput.value = selectedSubCategory;
+                    clearValidationError(subcategoryInput);
+                     subcategoryContainer.classList.remove('invalid'); // Remove parent invalid state
+                 }
+            });
+
+
+            // --- Step 2: Details ---
+            const descriptionInput = document.getElementById('description');
+            const charCounter = document.getElementById('char-counter');
+            const priceTypeBtns = form.querySelectorAll('.price-type-btn');
+            const priceTypeInput = document.getElementById('price-type');
+            const fixedPriceGroup = document.getElementById('fixed-price-group');
+            const priceRangeGroup = document.getElementById('price-range-group');
+            const priceInput = document.getElementById('price');
+            const minPriceInput = document.getElementById('min-price');
+            const maxPriceInput = document.getElementById('max-price');
+            const conditionOptionsContainer = form.querySelector('.condition-options');
+            const conditionInput = document.getElementById('condition');
+            const tagsInput = document.getElementById('tags-input');
+            const tagsSelectedArea = document.getElementById('tags-selected-area');
+            const tagsHiddenInput = document.getElementById('tags-hidden');
+            const tagsWrapper = document.getElementById('tags-wrapper');
+            const autocompleteList = document.getElementById('autocomplete-list');
+            let currentTags = [];
+
+
+            descriptionInput.addEventListener('input', () => {
+                const count = descriptionInput.value.length;
+                charCounter.textContent = `${count}/500`;
+                 clearValidationError(descriptionInput);
+            });
+
+             priceTypeBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    priceTypeBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const type = btn.dataset.type;
+                    priceTypeInput.value = type;
+
+                     // Reset and manage requirement attributes
+                     priceInput.required = false;
+                     minPriceInput.required = false;
+                     maxPriceInput.required = false;
+                     fixedPriceGroup.style.display = 'none';
+                     priceRangeGroup.classList.remove('active');
+
+                     if (type === 'fixed') {
+                         fixedPriceGroup.style.display = 'block';
+                         priceInput.required = true;
+                         minPriceInput.value = ''; // Clear range inputs
+                         maxPriceInput.value = '';
+                     } else {
+                         priceRangeGroup.classList.add('active');
+                         minPriceInput.required = true;
+                         maxPriceInput.required = true;
+                         priceInput.value = ''; // Clear fixed input
+                     }
+                      clearValidationError(priceInput);
+                      clearValidationError(minPriceInput);
+                      clearValidationError(maxPriceInput);
+                      // Clear potential parent error message
+                      const priceRangeErrorMsg = form.querySelector('.error-message[data-field="price-range"]');
+                      if(priceRangeErrorMsg) priceRangeErrorMsg.classList.remove('show');
+
+                 });
+             });
+
+              // Trigger click on default active button to set initial state correctly
+             form.querySelector('.price-type-btn.active').click();
+
+            conditionOptionsContainer.addEventListener('click', (e) => {
+                const option = e.target.closest('.condition-option');
+                if (option) {
+                    conditionOptionsContainer.querySelectorAll('.condition-option').forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                    conditionInput.value = option.dataset.condition;
+                    clearValidationError(conditionInput);
+                    conditionOptionsContainer.classList.remove('invalid');
+                }
+            });
+
+             // Tags Input Logic
+            tagsInput.addEventListener('keydown', (e) => {
+                 if (e.key === 'Enter' && tagsInput.value.trim() !== '') {
+                     e.preventDefault(); // Prevent form submission
+                     addTag(tagsInput.value.trim());
+                     tagsInput.value = '';
+                     hideAutocomplete();
+                 } else if (e.key === 'Backspace' && tagsInput.value === '' && currentTags.length > 0) {
+                      // Remove last tag on backspace if input is empty
+                      removeTag(currentTags[currentTags.length - 1]);
+                 }
+             });
+
+             tagsInput.addEventListener('input', () => {
+                showAutocomplete(tagsInput.value);
+             });
+
+             tagsInput.addEventListener('blur', () => {
+                // Delay hiding to allow clicking on autocomplete items
+                setTimeout(hideAutocomplete, 150);
+             });
+             tagsInput.addEventListener('focus', () => {
+                 if (tagsInput.value.trim() !== '') {
+                     showAutocomplete(tagsInput.value);
+                 }
+             });
+
+            tagsSelectedArea.addEventListener('click', (e) => {
+                if (e.target.classList.contains('remove-tag-btn') || e.target.closest('.remove-tag-btn')) {
+                    const tagText = e.target.closest('.tag').firstChild.textContent;
+                    removeTag(tagText);
+                }
+            });
+
+             function addTag(tagText) {
+                const normalizedTag = tagText.toLowerCase();
+                if (!currentTags.includes(normalizedTag) && currentTags.length < 10) { // Limit tags
+                    currentTags.push(normalizedTag);
+                    renderTags();
+                }
+             }
+
+             function removeTag(tagText) {
+                 const normalizedTag = tagText.toLowerCase();
+                 currentTags = currentTags.filter(t => t !== normalizedTag);
+                 renderTags();
+             }
+
+             function renderTags() {
+                 tagsSelectedArea.innerHTML = '';
+                 currentTags.forEach(tag => {
+                     const tagElement = document.createElement('span');
+                     tagElement.classList.add('tag');
+                     tagElement.innerHTML = `${tag} <i class="fas fa-times remove-tag-btn" title="Remove tag"></i>`;
+                     tagsSelectedArea.appendChild(tagElement);
+                 });
+                 tagsHiddenInput.value = currentTags.join(','); // Update hidden input for form submission
+             }
+
+            function showAutocomplete(query) {
+                const filteredTags = predefinedTags.filter(tag =>
+                    tag.toLowerCase().includes(query.toLowerCase()) &&
+                    !currentTags.includes(tag.toLowerCase())
+                );
+
+                 autocompleteList.innerHTML = '';
+                 if (filteredTags.length > 0 && query.length > 0) {
+                     filteredTags.slice(0, 5).forEach(tag => { // Show max 5 suggestions
+                         const item = document.createElement('div');
+                         item.classList.add('autocomplete-item');
+                         item.textContent = tag;
+                         item.addEventListener('click', () => {
+                             addTag(tag);
+                             tagsInput.value = '';
+                             hideAutocomplete();
+                             tagsInput.focus(); // Keep focus on input
+                         });
+                         autocompleteList.appendChild(item);
+                     });
+                     autocompleteList.style.display = 'block';
+                 } else {
+                     hideAutocomplete();
+                 }
+             }
+
+            function hideAutocomplete() {
+                autocompleteList.style.display = 'none';
+            }
+
+            // --- Step 3: Images ---
+            const imageUploadArea = document.getElementById('image-upload-area');
+            const imageInput = document.getElementById('product-images');
+            const imagePreviewContainer = document.getElementById('image-preview-container');
+            const imageCountInput = document.getElementById('image-count');
+
+
+            imageUploadArea.addEventListener('click', () => imageInput.click());
+
+            imageUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                imageUploadArea.classList.add('dragover');
+            });
+
+            imageUploadArea.addEventListener('dragleave', () => {
+                imageUploadArea.classList.remove('dragover');
+            });
+
+            imageUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                imageUploadArea.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                handleFiles(files);
+            });
+
+            imageInput.addEventListener('change', (e) => {
+                handleFiles(e.target.files);
+                 // Reset file input value to allow uploading the same file again after removal
+                 imageInput.value = null;
+            });
+
+            function handleFiles(files) {
+                 clearValidationError(imageCountInput); // Clear validation error on new upload attempt
+                 imageUploadArea.classList.remove('invalid');
+
+                const currentImageCount = uploadedFiles.length;
+                let addedCount = 0;
+
+                for (const file of files) {
+                    if (uploadedFiles.length >= MAX_IMAGES) {
+                        alert(`You can only upload a maximum of ${MAX_IMAGES} images.`);
+                        break;
+                    }
+                    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                        alert(`File "${file.name}" is too large (Max 5MB).`);
+                        continue;
+                    }
+                     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+                        alert(`File "${file.name}" has an unsupported format. Please use JPG, PNG, or WebP.`);
+                        continue;
+                    }
+
+                    uploadedFiles.push(file);
+                    createImagePreview(file, uploadedFiles.length -1); // Pass index for removal
+                    addedCount++;
+                }
+                 updateImageCounter();
+                 if(addedCount > 0) clearValidationError(imageCountInput); // Clear error if images were successfully added
+            }
+
+            function createImagePreview(file, index) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const previewDiv = document.createElement('div');
+                    previewDiv.classList.add('image-preview');
+                    previewDiv.dataset.index = index; // Store index on the element
+
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.alt = file.name;
+
+                    const removeBtn = document.createElement('span');
+                    removeBtn.classList.add('remove-image');
+                    removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                    removeBtn.title = "Remove image";
+
+                    removeBtn.addEventListener('click', (event) => {
+                         event.stopPropagation(); // Prevent triggering other events
+                         const parentPreview = event.target.closest('.image-preview');
+                         const idxToRemove = parseInt(parentPreview.dataset.index, 10);
+
+                          // Remove the file from the array based on its original index
+                          // Find the actual file object matching the index at the time of removal
+                          if(idxToRemove >= 0 && idxToRemove < uploadedFiles.length) {
+                               uploadedFiles.splice(idxToRemove, 1); // Remove the file
+                               parentPreview.remove(); // Remove the preview element
+                               updateImageCounter();
+                               // Re-index remaining previews to keep data-index consistent (optional but good practice)
+                               reindexPreviews();
+                          }
+                    });
+
+                    previewDiv.appendChild(img);
+                    previewDiv.appendChild(removeBtn);
+                    imagePreviewContainer.appendChild(previewDiv);
+                };
+                reader.readAsDataURL(file);
+            }
+
+            function reindexPreviews() {
+                const previews = imagePreviewContainer.querySelectorAll('.image-preview');
+                previews.forEach((preview, i) => {
+                    preview.dataset.index = i;
+                });
+            }
+
+            function updateImageCounter() {
+                imageCountInput.value = uploadedFiles.length;
+                // Trigger validation check if needed after update
+                 if (uploadedFiles.length >= 1) {
+                     clearValidationError(imageCountInput);
+                     imageUploadArea.classList.remove('invalid');
+                 }
+            }
+
+             // --- Step 4: Contact ---
+             // Add input listeners to clear validation on typing
+             ['contact-name', 'phone-number', 'location'].forEach(id => {
+                 const input = document.getElementById(id);
+                 if(input) {
+                     input.addEventListener('input', () => clearValidationError(input));
+                 }
+             });
+             // Phone number specific formatting/validation could be added here if needed
+
+            // --- Step 5: Review ---
+            function populateReview() {
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries()); // Get basic form data
+
+                 // Basic Info
+                 document.getElementById('review-title').textContent = data.productTitle || 'N/A';
+                 document.getElementById('review-category').textContent = categoryData[data.category]?.name || data.category || 'N/A';
+                 document.getElementById('review-subcategory').textContent = data.subcategory || 'N/A';
+                 // Add review population for dynamic fields here based on 'data' object
+
+                // Details
+                 document.getElementById('review-description').textContent = data.description || 'N/A';
+                 let priceText = 'N/A';
+                 if (data.priceType === 'fixed' && data.price) {
+                     priceText = `₵ ${parseFloat(data.price).toFixed(2)}`;
+                 } else if (data.priceType === 'range' && data.minPrice && data.maxPrice) {
+                     priceText = `₵ ${parseFloat(data.minPrice).toFixed(2)} - ₵ ${parseFloat(data.maxPrice).toFixed(2)}`;
+                 }
+                 document.getElementById('review-price').textContent = priceText;
+                 document.getElementById('review-negotiable').textContent = data.negotiable ? 'Yes' : 'No';
+                 const conditionMap = {
+                     'new': 'Brand New',
+                     'used-like-new': 'Used - Like New',
+                     'used-good': 'Used - Good',
+                     'used-fair': 'Used - Fair',
+                 };
+                 document.getElementById('review-condition').textContent = conditionMap[data.condition] || data.condition || 'N/A';
+
+                // Tags
+                const reviewTagsContainer = document.getElementById('review-tags');
+                reviewTagsContainer.innerHTML = ''; // Clear previous
+                if (currentTags.length > 0) {
+                    currentTags.forEach(tag => {
+                        const tagSpan = document.createElement('span');
+                        tagSpan.classList.add('review-tag');
+                        tagSpan.textContent = tag;
+                        reviewTagsContainer.appendChild(tagSpan);
+                    });
+                } else {
+                     reviewTagsContainer.textContent = 'None';
+                }
+
+
+                 // Images
+                 const reviewImagesContainer = document.getElementById('review-images');
+                 reviewImagesContainer.innerHTML = ''; // Clear previous
+                 if (uploadedFiles.length > 0) {
+                     uploadedFiles.forEach(file => {
+                         const img = document.createElement('img');
+                         img.src = URL.createObjectURL(file); // Use Object URL for preview
+                         img.classList.add('review-image');
+                         img.alt = "Product image preview";
+                         img.onload = () => URL.revokeObjectURL(img.src); // Clean up object URL
+                         reviewImagesContainer.appendChild(img);
+                     });
+                 } else {
+                     reviewImagesContainer.textContent = 'No images uploaded.';
+                 }
+
+
+                 // Contact
+                 document.getElementById('review-contact-name').textContent = data.contactName || 'N/A';
+                 document.getElementById('review-phone').textContent = data.phoneNumber || 'N/A';
+                 document.getElementById('review-location').textContent = data.location || 'N/A';
+            }
+
+            // --- Validation ---
+            function validateStep(stepIndex) {
+                let isValid = true;
+                const currentFields = steps[stepIndex].querySelectorAll('[required]');
+
+                currentFields.forEach(field => {
+                    if (!validateField(field)) {
+                        isValid = false;
+                         // Don't show error messages here, handle in showValidationErrors
+                    } else {
+                        clearValidationError(field); // Clear previous errors if now valid
+                    }
+                });
+
+                 // Custom validation checks per step
+                 if (stepIndex === 0) { // Basic Info
+                     // Category validation (check hidden input)
+                     if (!categoryInput.value) {
+                          markFieldInvalid(categoryInput, categoryChipsContainer);
+                          isValid = false;
+                     } else {
+                          clearValidationError(categoryInput, categoryChipsContainer);
+                     }
+                     // Subcategory validation (check hidden input ONLY IF required)
+                      if (subcategoryInput.required && !subcategoryInput.value) {
+                         markFieldInvalid(subcategoryInput, subcategoryContainer);
+                         isValid = false;
+                      } else {
+                          clearValidationError(subcategoryInput, subcategoryContainer);
+                      }
+                 }
+                else if (stepIndex === 1) { // Details
+                    // Price validation based on type
+                    if (priceTypeInput.value === 'fixed') {
+                        if (!validateField(priceInput)) isValid = false;
+                         else clearValidationError(priceInput);
+                    } else { // Range
+                        const minValid = validateField(minPriceInput);
+                        const maxValid = validateField(maxPriceInput);
+                        let rangeValid = true;
+                         if (!minValid) { isValid = false; rangeValid = false; } else clearValidationError(minPriceInput);
+                         if (!maxValid) { isValid = false; rangeValid = false; } else clearValidationError(maxPriceInput);
+
+                         // Check if max >= min only if both are valid numbers
+                         if(minValid && maxValid && parseFloat(maxPriceInput.value) < parseFloat(minPriceInput.value)) {
+                             markFieldInvalid(maxPriceInput);
+                             markFieldInvalid(minPriceInput); // Mark both as involved in the range error
+                             const priceRangeErrorMsg = form.querySelector('.error-message[data-field="price-range"]');
+                             if(priceRangeErrorMsg) priceRangeErrorMsg.textContent = "Max price must be greater than or equal to Min price.";
+                             markFieldInvalid(null, null, priceRangeErrorMsg); // Show the specific range error
+                             isValid = false;
+                             rangeValid = false;
+                         }
+
+                         if (rangeValid) {
+                            const priceRangeErrorMsg = form.querySelector('.error-message[data-field="price-range"]');
+                            if(priceRangeErrorMsg) priceRangeErrorMsg.classList.remove('show');
+                         }
+                    }
+                     // Condition validation
+                     if (!conditionInput.value || conditionInput.value === 'na' && conditionInput.required) { // Assuming 'na' is not a valid selectable state if required
+                          markFieldInvalid(conditionInput, conditionOptionsContainer);
+                          isValid = false;
+                     } else {
+                          clearValidationError(conditionInput, conditionOptionsContainer);
+                     }
+                 }
+                 else if (stepIndex === 2) { // Images
+                     // Image count validation (using hidden input)
+                     const minImages = parseInt(imageCountInput.dataset.min || "1", 10);
+                     if (parseInt(imageCountInput.value, 10) < minImages) {
+                         markFieldInvalid(imageCountInput, imageUploadArea); // Mark uploader area as invalid
+                         isValid = false;
+                     } else {
+                         clearValidationError(imageCountInput, imageUploadArea);
+                     }
+                 }
+                  else if (stepIndex === 3) { // Contact
+                      // Phone number pattern validation
+                      const phoneInput = document.getElementById('phone-number');
+                       if (phoneInput.value && !phoneInput.checkValidity()) { // checkValidity uses the pattern attribute
+                           markFieldInvalid(phoneInput);
+                           isValid = false;
+                       } else if (phoneInput.value) { // Clear only if it has a value and is now valid
+                           clearValidationError(phoneInput);
+                       }
+                  }
+
+                return isValid;
+            }
+
+            function validateField(field) {
+                 let isValid = true;
+                 if (field.type === 'checkbox') {
+                     isValid = field.checked; // Required checkboxes must be checked
+                 } else if (field.type === 'hidden' && field.id === 'image-count') {
+                     isValid = parseInt(field.value, 10) >= parseInt(field.dataset.min || "1", 10);
+                 } else if (field.tagName === 'SELECT') {
+                     isValid = field.value !== '';
+                 } else {
+                    // General input/textarea validation
+                     isValid = field.value.trim() !== '';
+                     if (isValid && field.minLength > 0) {
+                         isValid = field.value.trim().length >= field.minLength;
+                     }
+                      if (isValid && field.pattern) {
+                          const regex = new RegExp(field.pattern);
+                          isValid = regex.test(field.value);
+                      }
+                      if (isValid && field.type === 'number' && field.min !== '') {
+                          isValid = parseFloat(field.value) >= parseFloat(field.min);
+                      }
+
+                 }
+                 return isValid;
+            }
+
+            function showValidationErrors(stepIndex) {
+                let firstErrorField = null;
+                const currentFields = steps[stepIndex].querySelectorAll('[required], [pattern]'); // Include fields needing validation
+
+                currentFields.forEach(field => {
+                     if (!validateField(field)) {
+                         markFieldInvalid(field);
+                         if (!firstErrorField) {
+                             firstErrorField = field;
+                         }
+                     }
+                 });
+
+                 // Custom validation error displays after checking standard fields
+                 if (stepIndex === 0) {
+                     if (!categoryInput.value) {
+                          markFieldInvalid(categoryInput, categoryChipsContainer);
+                          if (!firstErrorField) firstErrorField = categoryChipsContainer;
+                     }
+                     if (subcategoryInput.required && !subcategoryInput.value) {
+                          markFieldInvalid(subcategoryInput, subcategoryContainer);
+                          if (!firstErrorField) firstErrorField = subcategoryContainer;
+                     }
+                 } else if (stepIndex === 1) {
+                    if (priceTypeInput.value === 'range') {
+                        const minValid = validateField(minPriceInput);
+                        const maxValid = validateField(maxPriceInput);
+                         if (!minValid) { markFieldInvalid(minPriceInput); if (!firstErrorField) firstErrorField = minPriceInput; }
+                         if (!maxValid) { markFieldInvalid(maxPriceInput); if (!firstErrorField) firstErrorField = maxPriceInput; }
+                         if(minValid && maxValid && parseFloat(maxPriceInput.value) < parseFloat(minPriceInput.value)) {
+                              markFieldInvalid(maxPriceInput); // Re-mark if range is invalid
+                              markFieldInvalid(minPriceInput);
+                              const priceRangeErrorMsg = form.querySelector('.error-message[data-field="price-range"]');
+                              markFieldInvalid(null, null, priceRangeErrorMsg); // Show specific range error
+                               if (!firstErrorField) firstErrorField = minPriceInput; // Focus min price on range error
+                         }
+                    } else { // Fixed Price
+                         if (!validateField(priceInput)) { markFieldInvalid(priceInput); if (!firstErrorField) firstErrorField = priceInput; }
+                    }
+                     if (!conditionInput.value || conditionInput.value === 'na' && conditionInput.required) {
+                          markFieldInvalid(conditionInput, conditionOptionsContainer);
+                          if (!firstErrorField) firstErrorField = conditionOptionsContainer;
+                     }
+                 } else if (stepIndex === 2) {
+                     const minImages = parseInt(imageCountInput.dataset.min || "1", 10);
+                     if (parseInt(imageCountInput.value, 10) < minImages) {
+                         markFieldInvalid(imageCountInput, imageUploadArea);
+                         if (!firstErrorField) firstErrorField = imageUploadArea;
+                     }
+                 } else if (stepIndex === 3) {
+                     const phoneInput = document.getElementById('phone-number');
+                     if (phoneInput.value && !phoneInput.checkValidity()) {
+                         markFieldInvalid(phoneInput);
+                          if (!firstErrorField) firstErrorField = phoneInput;
+                     }
+                 }
+
+
+                 // Scroll to the first error field and apply shake animation
+                 if (firstErrorField) {
+                     const elementToScroll = firstErrorField.closest('.form-group') || firstErrorField; // Scroll to group or field itself
+                     elementToScroll.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                     // Apply shake animation to the field or its visual representation
+                      const elementToShake = firstErrorField.classList.contains('category-chips') || firstErrorField.classList.contains('condition-options') || firstErrorField.classList.contains('image-upload-area') || firstErrorField.classList.contains('subcategory-container') ? firstErrorField : (firstErrorField.id === 'image-count' ? imageUploadArea : firstErrorField);
+                      elementToShake.classList.add('shake');
+                      elementToShake.addEventListener('animationend', () => {
+                           elementToShake.classList.remove('shake');
+                     }, { once: true });
+                 }
+            }
+
+            function markFieldInvalid(field, visualElement = null, specificErrorMsgElement = null) {
+                const elementToStyle = visualElement || field;
+                if (!elementToStyle) return; // Safety check
+
+                elementToStyle.classList.add('invalid');
+
+                 // Find the corresponding error message element
+                 let errorMsg;
+                 if (specificErrorMsgElement) {
+                     errorMsg = specificErrorMsgElement;
+                 } else if (field) {
+                     errorMsg = form.querySelector(`.error-message[data-field="${field.id || field.name}"]`);
+                     // Special cases for category/condition/image count
+                     if (!errorMsg && field.id === 'category') errorMsg = form.querySelector('.error-message[data-field="category"]');
+                     if (!errorMsg && field.id === 'subcategory') errorMsg = form.querySelector('.error-message[data-field="subcategory"]');
+                     if (!errorMsg && field.id === 'condition') errorMsg = form.querySelector('.error-message[data-field="condition"]');
+                     if (!errorMsg && field.id === 'image-count') errorMsg = form.querySelector('.error-message[data-field="image-count"]');
+                      if (!errorMsg && field.id === 'min-price') errorMsg = form.querySelector('.error-message[data-field="min-price"]');
+                      if (!errorMsg && field.id === 'max-price') errorMsg = form.querySelector('.error-message[data-field="max-price"]');
+                      if (!errorMsg && (field.id === 'price')) errorMsg = form.querySelector('.error-message[data-field="price"]');
+
+                 }
+
+                if (errorMsg) {
+                     errorMsg.classList.add('show'); // Display the error message
+                 }
+            }
+
+            function clearValidationError(field, visualElement = null) {
+                 const elementToStyle = visualElement || field;
+                 if (!elementToStyle) return; // Safety check
+
+                 elementToStyle.classList.remove('invalid');
+
+                 // Find and hide the corresponding error message
+                 let errorMsg;
+                 if (field) {
+                     errorMsg = form.querySelector(`.error-message[data-field="${field.id || field.name}"]`);
+                     // Special cases
+                      if (!errorMsg && field.id === 'category') errorMsg = form.querySelector('.error-message[data-field="category"]');
+                      if (!errorMsg && field.id === 'subcategory') errorMsg = form.querySelector('.error-message[data-field="subcategory"]');
+                      if (!errorMsg && field.id === 'condition') errorMsg = form.querySelector('.error-message[data-field="condition"]');
+                      if (!errorMsg && field.id === 'image-count') errorMsg = form.querySelector('.error-message[data-field="image-count"]');
+                      if (!errorMsg && field.id === 'min-price') errorMsg = form.querySelector('.error-message[data-field="min-price"]');
+                      if (!errorMsg && field.id === 'max-price') errorMsg = form.querySelector('.error-message[data-field="max-price"]');
+                      if (!errorMsg && (field.id === 'price')) errorMsg = form.querySelector('.error-message[data-field="price"]');
+
+                      // Hide the general price range error when either min/max is cleared
+                      if (field.id === 'min-price' || field.id === 'max-price') {
+                         const priceRangeErrorMsg = form.querySelector('.error-message[data-field="price-range"]');
+                          if(priceRangeErrorMsg) priceRangeErrorMsg.classList.remove('show');
+                      }
+                 }
+                 if (errorMsg) {
+                     errorMsg.classList.remove('show');
+                 }
+            }
+
+             // Add input listeners to clear errors on input for all relevant fields
+             form.querySelectorAll('input, textarea, select').forEach(input => {
+                 input.addEventListener('input', () => clearValidationError(input));
+                 input.addEventListener('change', () => clearValidationError(input)); // For selects
+             });
+
+
+            // --- Floating Label Setup ---
+            function setupFloatingLabels() {
+                const inputs = form.querySelectorAll('.floating-label-group input, .floating-label-group textarea, .floating-label-group select');
+                 inputs.forEach(input => {
+                     // Initial check in case of pre-filled values
+                     const label = input.nextElementSibling; // Assumes label is the next sibling
+                     if (label && label.classList.contains('floating-label')) {
+                          if (input.value || input.placeholder !== ' ') { // Check value or if placeholder attr is not just " "
+                             label.classList.add('active');
+                          }
+                     }
+
+                     // Event listeners already handle focus/blur implicitly via CSS :focus and :not(:placeholder-shown),
+                     // but we might need JS for select elements if they don't use placeholder-shown correctly.
+                      if (input.tagName === 'SELECT') {
+                         input.addEventListener('change', () => {
+                            const label = input.nextElementSibling;
+                            if(label && label.classList.contains('floating-label')){
+                               if(input.value) label.classList.add('active');
+                               else label.classList.remove('active');
+                           }
+                         });
+                         // Initial check for select
+                         const label = input.nextElementSibling;
+                         if(label && label.classList.contains('floating-label') && input.value) {
+                            label.classList.add('active');
+                         }
+                     }
+                 });
+            }
+
+             // --- Holographic Card Effect ---
+            const holographicCards = document.querySelectorAll('.holographic-card');
+            holographicCards.forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    const rotateX = (y - centerY) / centerY * 5; // Max rotation 5deg
+                    const rotateY = (x - centerX) / centerX * -5; // Max rotation 5deg
+
+                     // Apply subtle 3D rotation if it's also an interactive card
+                     if (card.classList.contains('interactive-card')) {
+                        card.style.transform = `perspective(1000px) translateY(-2px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                     }
+
+                     // Update holographic overlay position (optional refinement)
+                     const overlay = card.querySelector('::before'); // This doesn't work directly in JS
+                     // The :hover CSS handles the opacity, JS could refine position but CSS is often sufficient
+                });
+                card.addEventListener('mouseleave', () => {
+                     if (card.classList.contains('interactive-card')) {
+                        card.style.transform = 'perspective(1000px) translateY(0) rotateX(0deg) rotateY(0deg)'; // Reset rotation
+                     }
+                });
+            });
+
+             // --- Modal Logic ---
+            const successModal = document.getElementById('success-modal');
+            const closeModalBtn = document.getElementById('close-modal');
+
+             function showModal() {
+                successModal.classList.add('show');
+             }
+             function hideModal() {
+                successModal.classList.remove('show');
+             }
+
+            closeModalBtn.addEventListener('click', hideModal);
+            successModal.addEventListener('click', (e) => {
+                if (e.target === successModal) { // Close only if clicking backdrop
+                    hideModal();
+                }
+            });
+
+            // --- Form Submission ---
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (validateStep(currentStep)) { // Final validation on the review step
+                    console.log('Form is valid. Submitting...');
+                    const submitButton = form.querySelector('button[type="submit"]');
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+
+                    // --- Create FormData ---
+                    // You MUST handle file uploads separately or use FormData correctly
+                    const formData = new FormData();
+
+                    // Append standard fields
+                    const standardFields = form.querySelectorAll('input:not([type="file"]), select, textarea');
+                    standardFields.forEach(field => {
+                        if (field.type === 'checkbox') {
+                            formData.append(field.name, field.checked);
+                        } else if (field.name){ // Make sure field has a name
+                            formData.append(field.name, field.value);
+                        }
+                    });
+
+                     // Append tags separately from the hidden input if needed
+                     formData.append('tagsList', JSON.stringify(currentTags)); // Send tags as JSON array
+
+
+                    // Append Files
+                    uploadedFiles.forEach((file, index) => {
+                        formData.append(`productImage_${index}`, file, file.name); // Use unique names for each file
+                    });
+                    formData.append('imageTotalCount', uploadedFiles.length); // Send total count if backend needs it
+
+
+                    // ---- !!! AJAX Submission Placeholder !!! -----
+                    // Replace this setTimeout with your actual fetch/AJAX call to your backend server
+                    console.log("--- Form Data to Submit ---");
+                    for (let [key, value] of formData.entries()) {
+                        console.log(`${key}:`, value);
+                    }
+                    console.log("-----------------------------");
+
+                     setTimeout(() => { // Simulate network request
+                        console.log('Simulated submission successful.');
+                        submitButton.disabled = false; // Re-enable on completion/error
+                        submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Listing';
+                        showModal(); // Show success modal
+                         // Optionally reset the form: form.reset(); currentStep = 0; updateProgress(); setupFloatingLabels(); etc.
+                    }, 2000);
+
+                    // Example fetch:
+                    /*
+                    fetch('/api/your-listing-endpoint', {
+                        method: 'POST',
+                        body: formData // FormData handles multipart/form-data encoding automatically
+                        // No 'Content-Type' header needed when sending FormData with files
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Success:', data);
+                        showModal();
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                        alert('There was an error submitting your listing. Please try again.');
+                    })
+                    .finally(() => {
+                         submitButton.disabled = false;
+                         submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Listing';
+                    });
+                    */
+
+                } else {
+                    console.log('Form invalid on submit');
+                    showValidationErrors(currentStep); // Show errors on the review step if invalid
+                }
+            });
+
+        }); // End DOMContentLoaded
+    </script>
+
+<script src="script.js"></script>
+
+
+</body>
+</html>

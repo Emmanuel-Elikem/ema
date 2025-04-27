@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCC Campus Shopping - Modern</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/heroicons@2.1.3/24/outline/index.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/heroicons@2.1.3/24/solid/index.js"></script>
+    <style>
+        /* Custom Styles & Tailwind Configuration */
+        @layer base {
+          html {
+            scroll-behavior: smooth;
+          }
+          body {
+            @apply bg-[#FFCC08] antialiased font-sans text-gray-800;
+          }
+        }
+
+        /* Configuration for Tailwind */
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FFCC08',
+                        'primary-dark': '#E6B807',
+                        'primary-light': '#FFD63A',
+                        'text-dark': '#1F2937', /* gray-800 */
+                        'text-light': '#6B7280', /* gray-500 */
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', '"Noto Sans"', 'sans-serif', '"Apple Color Emoji"', '"Segoe UI Emoji"', '"Segoe UI Symbol"', '"Noto Color Emoji"'],
+                    },
+                    borderRadius: {
+                        'xl': '1rem',
+                        '2xl': '1.5rem',
+                        '3xl': '2rem',
+                    },
+                    boxShadow: {
+                        'subtle': '0 4px 12px rgba(0, 0, 0, 0.05)',
+                        'lifted': '0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)',
+                    },
+                    transitionTimingFunction: {
+                        'modern': 'cubic-bezier(0.4, 0, 0.2, 1)',
+                    },
+                    keyframes: {
+                        shimmer: {
+                            '0%': { backgroundPosition: '-1000px 0' },
+                            '100%': { backgroundPosition: '1000px 0' },
+                        },
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideInRight: {
+                            '0%': { transform: 'translateX(100%)', opacity: '0.5' },
+                            '100%': { transform: 'translateX(0)', opacity: '1' },
+                        },
+                        slideOutRight: {
+                            '0%': { transform: 'translateX(0)', opacity: '1' },
+                            '100%': { transform: 'translateX(100%)', opacity: '0' },
+                        },
+                        pulse: {
+                            '0%, 100%': { transform: 'scale(1)' },
+                            '50%': { transform: 'scale(1.1)' },
+                        }
+                    },
+                    animation: {
+                        shimmer: 'shimmer 2s infinite linear',
+                        fadeInUp: 'fadeInUp 0.5s ease-out forwards',
+                        slideInRight: 'slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards',
+                        slideOutRight: 'slideOutRight 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards',
+                        pulse: 'pulse 0.3s ease-in-out',
+                    }
+                }
+            }
+        }
+
+        /* Additional Custom CSS */
+        .skeleton {
+            background: linear-gradient(to right, #e2e8f0 8%, #f1f5f9 18%, #e2e8f0 33%);
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite linear;
+        }
+
+        .filter-panel {
+            transform: translateX(100%);
+            opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .filter-panel.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .overlay {
+             opacity: 0;
+             visibility: hidden;
+             transition: opacity 0.4s ease-in-out, visibility 0s linear 0.4s;
+        }
+        .overlay.show {
+             opacity: 1;
+             visibility: visible;
+             transition: opacity 0.4s ease-in-out;
+        }
+
+        .scroll-top {
+            opacity: 0;
+            transform: translateY(100%);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .scroll-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .sort-dropdown {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px) scale(0.95);
+            transition: all 0.2s ease-out;
+        }
+        .sort-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .top-header {
+            transition: transform 0.3s ease-in-out;
+        }
+        .top-header-hidden {
+            transform: translateY(-100%);
+        }
+
+        /* Custom Checkbox Styling */
+        .custom-checkbox:checked {
+            background-color: #FFCC08;
+            border-color: #E6B807;
+        }
+        .custom-checkbox:checked:hover {
+             background-color: #E6B807;
+        }
+        .custom-checkbox:focus {
+            ring: 2px;
+            ring-offset-0;
+            ring-[#FFD63A];
+        }
+
+        /* Subcategory Accordion */
+        details > summary {
+            list-style: none; /* Remove default marker */
+            cursor: pointer;
+            transition: margin 0.2s ease;
+        }
+        details > summary::-webkit-details-marker {
+            display: none; /* Remove default marker (Chrome) */
+        }
+        details > summary::marker {
+            display: none; /* Remove default marker (Firefox) */
+        }
+        details[open] > summary {
+            margin-bottom: 0.5rem; /* Add space when open */
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        details[open] .accordion-content {
+             max-height: 500px; /* Adjust as needed */
+        }
+        .accordion-arrow {
+            transition: transform 0.3s ease;
+        }
+        details[open] .accordion-arrow {
+            transform: rotate(90deg);
+        }
+        .sub-category-label {
+            transition: background-color 0.2s ease;
+        }
+        .sub-category-label:hover {
+            background-color: #f9fafb; /* gray-50 */
+        }
+
+    </style>
+</head>
+<body class="bg-primary">
+
+    <header id="topHeader" class="top-header bg-primary px-4 py-3 sm:px-6 lg:px-8 flex justify-between items-center sticky top-0 z-40">
+        <div class="flex items-center">
+            <span class="bg-black text-primary px-2 py-1 rounded-md font-bold text-lg mr-2">UCC</span>
+            <span class="text-black font-bold text-xl tracking-tight">Campus Shop</span>
+        </div>
+        <div class="relative cursor-pointer group">
+             <hero-icon name="bell" class="h-7 w-7 text-black"></hero-icon>
+            <div class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs font-semibold">3</div>
+        </div>
+    </header>
+
+    <div id="searchHeader" class="bg-primary px-4 sm:px-6 lg:px-8 py-3 sticky top-0 z-30 shadow-sm">
+        <div class="relative flex items-center bg-white rounded-lg shadow-subtle overflow-hidden">
+            <div class="pl-4 pr-2 text-gray-400">
+                <hero-icon name="magnifying-glass" class="h-5 w-5"></hero-icon>
+            </div>
+            <input type="text" class="search-input flex-grow border-none focus:ring-0 py-2.5 px-2 text-sm placeholder-gray-400" placeholder="Search products, brands...">
+            <button id="filterToggle" class="p-3 bg-gray-100 hover:bg-gray-200 transition-colors duration-200" aria-label="Open Filters">
+                <hero-icon name="adjustments-horizontal" class="h-5 w-5 text-text-dark"></hero-icon>
+            </button>
+        </div>
+    </div>
+
+    <main class="main-container bg-white min-h-[calc(100vh-120px)] rounded-t-3xl -mt-4 pt-4 relative z-10 shadow-lg">
+        <div class="products-container px-4 sm:px-6 lg:px-8 pb-20 max-h-[calc(100vh-120px)] overflow-y-auto relative" id="scrollableContainer">
+
+             <div class="relative flex justify-center mb-6 z-20">
+                 <button id="sortToggle" class="sort-button bg-white border border-gray-200 rounded-full px-5 py-2 text-sm font-medium text-text-dark shadow-subtle hover:shadow-md transition-shadow duration-200 flex items-center gap-1.5">
+                     <hero-icon name="arrows-up-down" class="h-4 w-4 text-gray-500"></hero-icon>
+                     Sort by: <span id="currentSortLabel" class="font-semibold">Newest</span>
+                 </button>
+
+                 <div id="sortDropdown" class="sort-dropdown absolute top-full mt-2 w-48 bg-white rounded-xl shadow-lifted overflow-hidden">
+                     <a href="#" class="sort-option block px-4 py-2.5 text-sm hover:bg-primary-light transition-colors duration-150 selected" data-sort="newest">Newest</a>
+                     <a href="#" class="sort-option block px-4 py-2.5 text-sm hover:bg-primary-light transition-colors duration-150" data-sort="popular">Popularity</a>
+                     <a href="#" class="sort-option block px-4 py-2.5 text-sm hover:bg-primary-light transition-colors duration-150" data-sort="rating">Rating: High to Low</a>
+                     <a href="#" class="sort-option block px-4 py-2.5 text-sm hover:bg-primary-light transition-colors duration-150" data-sort="price-asc">Price: Low to High</a>
+                     <a href="#" class="sort-option block px-4 py-2.5 text-sm hover:bg-primary-light transition-colors duration-150" data-sort="price-desc">Price: High to Low</a>
+                 </div>
+            </div>
+
+            <div class="products-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6" id="productsGrid">
+                </div>
+        </div>
+    </main>
+
+    <aside id="filterPanel" class="filter-panel fixed top-0 right-0 h-full w-full max-w-sm bg-white z-50 shadow-lifted flex flex-col">
+        <div class="flex items-center justify-between p-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-text-dark">Filters</h2>
+            <button id="closeFilter" class="text-gray-500 hover:text-gray-800 transition-colors" aria-label="Close Filters">
+                <hero-icon name="x-mark" class="h-6 w-6"></hero-icon>
+            </button>
+        </div>
+
+        <div class="flex-grow overflow-y-auto p-5 space-y-6">
+            <div class="filter-section">
+                <h3 class="text-sm font-medium text-gray-600 mb-3">University</h3>
+                <div class="space-y-2">
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" value="UCC" name="university" class="custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                        <span class="text-sm">University of Cape Coast (UCC)</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" value="KNUST" name="university" class="custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                        <span class="text-sm">Kwame Nkrumah University (KNUST)</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" value="UG" name="university" class="custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                        <span class="text-sm">University of Ghana (UG)</span>
+                    </label>
+                     <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" value="UEW" name="university" class="custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                        <span class="text-sm">University of Education, Winneba (UEW)</span>
+                    </label>
+                     <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" value="UDS" name="university" class="custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                        <span class="text-sm">University for Development Studies (UDS)</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <h3 class="text-sm font-medium text-gray-600 mb-3">Category</h3>
+                <div class="space-y-1">
+                    <details class="category-details">
+                        <summary class="flex justify-between items-center py-1">
+                            <label class="flex items-center space-x-2 cursor-pointer flex-grow">
+                                <input type="checkbox" value="Electronics" name="category" class="category-checkbox custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                                <span class="text-sm font-medium">Electronics</span>
+                            </label>
+                             <hero-icon name="chevron-right" class="accordion-arrow h-4 w-4 text-gray-400"></hero-icon>
+                        </summary>
+                        <div class="accordion-content pl-6 mt-1 space-y-1">
+                             <label class="sub-category-label flex items-center space-x-2 cursor-pointer p-1 rounded">
+                                <input type="checkbox" value="Laptops" name="subcategory_electronics" class="custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                                <span class="text-xs">Laptops</span>
+                            </label>
+                            <label class="sub-category-label flex items-center space-x-2 cursor-pointer p-1 rounded">
+                                <input type="checkbox" value="Accessories" name="subcategory_electronics" class="custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                                <span class="text-xs">Accessories (Mouse, Keyboard)</span>
+                            </label>
+                             <label class="sub-category-label flex items-center space-x-2 cursor-pointer p-1 rounded">
+                                <input type="checkbox" value="Audio" name="subcategory_electronics" class="custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                                <span class="text-xs">Audio (Speakers, Earbuds)</span>
+                            </label>
+                        </div>
+                    </details>
+                     <details class="category-details">
+                        <summary class="flex justify-between items-center py-1">
+                            <label class="flex items-center space-x-2 cursor-pointer flex-grow">
+                                <input type="checkbox" value="Books" name="category" class="category-checkbox custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                                <span class="text-sm font-medium">Books & Stationery</span>
+                            </label>
+                             <hero-icon name="chevron-right" class="accordion-arrow h-4 w-4 text-gray-400"></hero-icon>
+                        </summary>
+                        <div class="accordion-content pl-6 mt-1 space-y-1">
+                             <label class="sub-category-label flex items-center space-x-2 cursor-pointer p-1 rounded">
+                                <input type="checkbox" value="Textbooks" name="subcategory_books" class="custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                                <span class="text-xs">Textbooks</span>
+                            </label>
+                            <label class="sub-category-label flex items-center space-x-2 cursor-pointer p-1 rounded">
+                                <input type="checkbox" value="Stationery" name="subcategory_books" class="custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                                <span class="text-xs">Stationery</span>
+                            </label>
+                        </div>
+                    </details>
+                    <details class="category-details">
+                        <summary class="flex justify-between items-center py-1">
+                             <label class="flex items-center space-x-2 cursor-pointer flex-grow">
+                                <input type="checkbox" value="Fashion" name="category" class="category-checkbox custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                                <span class="text-sm font-medium">Fashion</span>
+                            </label>
+                            <hero-icon name="chevron-right" class="accordion-arrow h-4 w-4 text-gray-400"></hero-icon>
+                        </summary>
+                         <div class="accordion-content pl-6 mt-1 space-y-1">
+                             <label class="sub-category-label flex items-center space-x-2 cursor-pointer p-1 rounded">
+                                <input type="checkbox" value="Apparel" name="subcategory_fashion" class="custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                                <span class="text-xs">Apparel (Hoodies, Shirts)</span>
+                            </label>
+                             <label class="sub-category-label flex items-center space-x-2 cursor-pointer p-1 rounded">
+                                <input type="checkbox" value="Bags" name="subcategory_fashion" class="custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                                <span class="text-xs">Bags</span>
+                            </label>
+                        </div>
+                    </details>
+                    <details class="category-details">
+                         <summary class="flex justify-between items-center py-1">
+                             <label class="flex items-center space-x-2 cursor-pointer flex-grow">
+                                <input type="checkbox" value="Home" name="category" class="category-checkbox custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                                <span class="text-sm font-medium">Hostel Essentials</span>
+                            </label>
+                             <hero-icon name="chevron-right" class="accordion-arrow h-4 w-4 text-gray-400"></hero-icon>
+                        </summary>
+                         <div class="accordion-content pl-6 mt-1 space-y-1">
+                             <label class="sub-category-label flex items-center space-x-2 cursor-pointer p-1 rounded">
+                                <input type="checkbox" value="Lighting" name="subcategory_home" class="custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                                <span class="text-xs">Lighting</span>
+                            </label>
+                             <label class="sub-category-label flex items-center space-x-2 cursor-pointer p-1 rounded">
+                                <input type="checkbox" value="Storage" name="subcategory_home" class="custom-checkbox h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary-light">
+                                <span class="text-xs">Storage</span>
+                            </label>
+                        </div>
+                    </details>
+                </div>
+            </div>
+
+             <div class="filter-section">
+                <h3 class="text-sm font-medium text-gray-600 mb-3">Price Range (GH₵)</h3>
+                <div class="flex items-center space-x-3">
+                    <input type="number" id="minPrice" class="price-input w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring-primary-light" placeholder="Min">
+                    <span class="text-gray-400">-</span>
+                    <input type="number" id="maxPrice" class="price-input w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring-primary-light" placeholder="Max">
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <h3 class="text-sm font-medium text-gray-600 mb-3">Minimum Rating</h3>
+                <div class="space-y-2">
+                    <label class="flex items-center space-x-2 cursor-pointer p-1 rounded hover:bg-gray-50">
+                         <input type="radio" name="rating" value="4" class="custom-checkbox h-4 w-4 text-primary border-gray-300 focus:ring-primary-light">
+                        <span class="flex items-center text-sm">
+                            <hero-icon name="star" class="solid h-4 w-4 text-primary mr-1"></hero-icon>
+                            <hero-icon name="star" class="solid h-4 w-4 text-primary mr-1"></hero-icon>
+                            <hero-icon name="star" class="solid h-4 w-4 text-primary mr-1"></hero-icon>
+                            <hero-icon name="star" class="solid h-4 w-4 text-primary mr-1"></hero-icon>
+                            <hero-icon name="star" class="outline h-4 w-4 text-gray-300 mr-1"></hero-icon>
+                             & Up
+                        </span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer p-1 rounded hover:bg-gray-50">
+                         <input type="radio" name="rating" value="3" class="custom-checkbox h-4 w-4 text-primary border-gray-300 focus:ring-primary-light">
+                        <span class="flex items-center text-sm">
+                            <hero-icon name="star" class="solid h-4 w-4 text-primary mr-1"></hero-icon>
+                            <hero-icon name="star" class="solid h-4 w-4 text-primary mr-1"></hero-icon>
+                            <hero-icon name="star" class="solid h-4 w-4 text-primary mr-1"></hero-icon>
+                            <hero-icon name="star" class="outline h-4 w-4 text-gray-300 mr-1"></hero-icon>
+                            <hero-icon name="star" class="outline h-4 w-4 text-gray-300 mr-1"></hero-icon>
+                             & Up
+                        </span>
+                    </label>
+                     <label class="flex items-center space-x-2 cursor-pointer p-1 rounded hover:bg-gray-50">
+                         <input type="radio" name="rating" value="0" class="custom-checkbox h-4 w-4 text-primary border-gray-300 focus:ring-primary-light" checked> <span class="text-sm text-gray-500">All Ratings</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4 border-t border-gray-200 bg-gray-50 flex gap-3">
+            <button id="resetFilter" class="filter-button flex-1 py-2.5 px-4 rounded-lg text-sm font-semibold bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors duration-200">Reset</button>
+            <button id="applyFilter" class="filter-button flex-1 py-2.5 px-4 rounded-lg text-sm font-semibold bg-primary text-black hover:bg-primary-dark transition-colors duration-200 shadow-sm">Apply Filters</button>
+        </div>
+    </aside>
+
+    <button id="scrollTop" class="scroll-top fixed bottom-6 right-6 h-12 w-12 bg-primary rounded-full flex items-center justify-center shadow-lifted hover:bg-primary-dark transition-all duration-300 ease-modern z-40" aria-label="Scroll to top">
+        <hero-icon name="arrow-up" class="h-6 w-6 text-black"></hero-icon>
+    </button>
+
+    <div id="overlay" class="overlay fixed inset-0 bg-black bg-opacity-50 z-40"></div>
+
+    <div id="toast" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 translate-y-20 opacity-0 bg-gray-800 text-white px-5 py-2.5 rounded-full text-sm shadow-lg transition-all duration-300 ease-modern z-50">
+        Toast Message Here
+    </div>
+
+
+<script>
+    // --- ICON SETUP ---
+    // Dynamically import Heroicons modules if needed, or ensure they are loaded
+    // For this example, we assume the CDN script tags handle loading.
+
+    // --- SAMPLE DATA (Enhanced) ---
+    const products = [
+        { id: 1, name: "HP Laptop 15.6\" Core i5 8GB RAM 512GB SSD", price: 4500, rating: 4.8, image: "https://via.placeholder.com/400/FFCC08/000000?text=Laptop", category: "Electronics", subCategory: "Laptops", university: "UCC", dateAdded: "2025-04-20" },
+        { id: 2, name: "Introduction to Economics Textbook 5th Edition", price: 180, rating: 4.5, image: "https://via.placeholder.com/400/CCCCCC/FFFFFF?text=Book", category: "Books", subCategory: "Textbooks", university: "UCC", dateAdded: "2025-04-15" },
+        { id: 3, name: "UCC Branded Hoodie - Navy Blue", price: 150, rating: 4.9, image: "https://via.placeholder.com/400/003366/FFFFFF?text=Hoodie", category: "Fashion", subCategory: "Apparel", university: "UCC", dateAdded: "2025-04-22" },
+        { id: 4, name: "JBL Bluetooth Speaker Portable Wireless", price: 350, rating: 4.7, image: "https://via.placeholder.com/400/FF6B6B/FFFFFF?text=Speaker", category: "Electronics", subCategory: "Audio", university: "KNUST", dateAdded: "2025-04-18" },
+        { id: 5, name: "Scientific Calculator Casio FX-991ES", price: 120, rating: 4.8, image: "https://via.placeholder.com/400/DDDDDD/000000?text=Calc", category: "Books", subCategory: "Stationery", university: "UG", dateAdded: "2025-03-10" },
+        { id: 6, name: "Campus Room Desk Lamp with USB Charging Port", price: 85, rating: 4.3, image: "https://via.placeholder.com/400/EEEEEE/000000?text=Lamp", category: "Home", subCategory: "Lighting", university: "UEW", dateAdded: "2025-04-01" },
+        { id: 7, name: "Wireless Mouse and Keyboard Combo", price: 200, rating: 4.6, image: "https://via.placeholder.com/400/BBBBBB/FFFFFF?text=Combo", category: "Electronics", subCategory: "Accessories", university: "UCC", dateAdded: "2025-04-24" },
+        { id: 8, name: "Principles of Computer Science - Dr. Kwame Ansah", price: 130, rating: 4.4, image: "https://via.placeholder.com/400/CCCCCC/FFFFFF?text=CS+Book", category: "Books", subCategory: "Textbooks", university: "KNUST", dateAdded: "2025-04-05" },
+        { id: 9, name: "Adjustable Laptop Stand for Desk", price: 95, rating: 4.2, image: "https://via.placeholder.com/400/DDDDDD/000000?text=Stand", category: "Electronics", subCategory: "Accessories", university: "UDS", dateAdded: "2025-04-12" },
+        { id: 10, name: "UCC Branded Water Bottle - 750ml", price: 40, rating: 4.7, image: "https://via.placeholder.com/400/3498DB/FFFFFF?text=Bottle", category: "Home", subCategory: "Storage", university: "UCC", dateAdded: "2025-04-25" },
+        { id: 11, name: "Wireless Earbuds with Noise Cancellation", price: 280, rating: 4.5, image: "https://via.placeholder.com/400/FFFFFF/000000?text=Earbuds", category: "Electronics", subCategory: "Audio", university: "UG", dateAdded: "2025-04-19" },
+        { id: 12, name: "Modern African Literature Anthology", price: 110, rating: 4.8, image: "https://via.placeholder.com/400/CCCCCC/FFFFFF?text=Lit+Book", category: "Books", subCategory: "Textbooks", university: "UEW", dateAdded: "2025-04-08" },
+    ];
+
+    // --- DOM ELEMENTS ---
+    const productsGrid = document.getElementById('productsGrid');
+    const filterToggle = document.getElementById('filterToggle');
+    const filterPanel = document.getElementById('filterPanel');
+    const closeFilter = document.getElementById('closeFilter');
+    const overlay = document.getElementById('overlay');
+    const scrollTop = document.getElementById('scrollTop');
+    const sortToggle = document.getElementById('sortToggle');
+    const sortDropdown = document.getElementById('sortDropdown');
+    const searchInput = document.querySelector('.search-input');
+    const resetFilterBtn = document.getElementById('resetFilter');
+    const applyFilterBtn = document.getElementById('applyFilter');
+    const toast = document.getElementById('toast');
+    const currentSortLabel = document.getElementById('currentSortLabel');
+    const topHeader = document.getElementById('topHeader');
+    const searchHeader = document.getElementById('searchHeader');
+    const scrollableContainer = document.getElementById('scrollableContainer'); // For scroll events if needed within container
+
+    // --- STATE ---
+    let currentProducts = [...products]; // Holds the currently displayed/filtered/sorted products
+    let currentSort = 'newest';
+    let isFilterResetPending = false;
+    let lastScrollY = window.scrollY;
+
+    // --- FUNCTIONS ---
+
+    // Skeleton Loader
+    function showSkeletons(count = 8) {
+        productsGrid.innerHTML = '';
+        for (let i = 0; i < count; i++) {
+            productsGrid.innerHTML += `
+                <div class="product-card border border-gray-100 rounded-xl overflow-hidden bg-white">
+                    <div class="skeleton h-40 sm:h-48 w-full"></div>
+                    <div class="p-3 space-y-2">
+                        <div class="skeleton h-4 rounded w-3/4"></div>
+                        <div class="skeleton h-4 rounded w-1/2"></div>
+                        <div class="skeleton h-3 rounded w-1/4 mt-1"></div>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    // Render Products
+    function renderProducts(productsToRender) {
+        productsGrid.innerHTML = ''; // Clear previous content
+
+        if (!productsToRender || productsToRender.length === 0) {
+            productsGrid.innerHTML = `
+                <div class="col-span-full text-center py-16 px-4">
+                    <hero-icon name="archive-box-x-mark" class="h-16 w-16 mx-auto text-gray-300"></hero-icon>
+                    <h3 class="mt-4 text-lg font-semibold text-text-dark">No Products Found</h3>
+                    <p class="mt-1 text-sm text-text-light">Try adjusting your search or filters.</p>
+                </div>
+            `;
+            return;
+        }
+
+        productsToRender.forEach((product, index) => {
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card bg-white rounded-xl overflow-hidden shadow-subtle hover:shadow-lifted transition-shadow duration-300 ease-modern flex flex-col';
+            productCard.style.setProperty('--animation-delay', `${index * 50}ms`); // Stagger animation
+            productCard.classList.add('opacity-0', 'animate-fadeInUp');
+
+            productCard.innerHTML = `
+                <div class="relative">
+                    <img src="${product.image}" alt="${product.name}" class="aspect-square w-full object-cover">
+                    <button class="favorite-button absolute top-3 right-3 h-8 w-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-500 hover:text-red-500 transition-colors duration-200 active:animate-pulse" data-product-id="${product.id}">
+                         <hero-icon name="heart" class="outline h-5 w-5"></hero-icon>
+                        </button>
+                </div>
+                <div class="p-3 sm:p-4 flex flex-col flex-grow">
+                    <h3 class="product-name text-sm font-semibold text-text-dark leading-snug mb-1.5 h-10 overflow-hidden">
+                        ${product.name}
+                    </h3>
+                    <div class="flex justify-between items-center mt-auto pt-2">
+                        <div class="product-price text-base font-bold text-text-dark">GH₵ ${product.price.toLocaleString()}</div>
+                        <div class="product-rating flex items-center text-xs font-medium text-text-light">
+                            <hero-icon name="star" class="solid h-4 w-4 text-primary mr-0.5"></hero-icon>
+                            ${product.rating.toFixed(1)}
+                        </div>
+                    </div>
+                     <button class="view-product-button mt-3 w-full text-center py-2 px-3 border border-gray-200 rounded-lg text-xs font-semibold text-text-dark hover:bg-gray-50 hover:border-gray-300 transition-colors duration-200">
+                        View Product
+                    </button>
+                </div>
+            `;
+            productsGrid.appendChild(productCard);
+
+            // Add event listener for favorite button after adding to DOM
+            const favButton = productCard.querySelector('.favorite-button');
+            favButton.addEventListener('click', handleFavoriteClick);
+        });
+    }
+
+    // Handle Favorite Button Click
+    function handleFavoriteClick(event) {
+        const button = event.currentTarget;
+        const productId = button.dataset.productId;
+        const isFavorited = button.classList.toggle('favorited'); // Use a class to track state
+
+        if (isFavorited) {
+            button.innerHTML = `<hero-icon name="heart" class="solid h-5 w-5 text-red-500"></hero-icon>`;
+            showToast(`Product ${productId} added to favorites!`);
+        } else {
+            button.innerHTML = `<hero-icon name="heart" class="outline h-5 w-5"></hero-icon>`;
+            showToast(`Product ${productId} removed from favorites.`);
+        }
+         // Prevent card click/navigation if needed
+        event.stopPropagation();
+    }
+
+    // Apply Sorting
+    function sortProducts(productsArray, sortType) {
+        const sorted = [...productsArray]; // Create a copy to sort
+        switch (sortType) {
+            case 'popular':
+            case 'rating': // Treat popular same as rating for now
+                sorted.sort((a, b) => b.rating - a.rating);
+                break;
+            case 'price-asc':
+                sorted.sort((a, b) => a.price - b.price);
+                break;
+            case 'price-desc':
+                sorted.sort((a, b) => b.price - a.price);
+                break;
+            case 'newest':
+            default:
+                sorted.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
+                break;
+        }
+        return sorted;
+    }
+
+    // Apply All Filters & Search
+    function applyFiltersAndSearch(searchQuery = '') {
+        const form = filterPanel.querySelector('form') || filterPanel; // Get form or panel itself
+        const selectedUniversities = Array.from(form.querySelectorAll('input[name="university"]:checked')).map(cb => cb.value);
+        const selectedCategories = Array.from(form.querySelectorAll('input[name="category"]:checked')).map(cb => cb.value);
+
+        // Collect selected subcategories for checked main categories
+        const selectedSubCategories = {};
+        selectedCategories.forEach(catValue => {
+            const catKey = catValue.toLowerCase().replace(/[^a-z0-9]/g, ''); // Create a key like 'electronics'
+            const subCheckboxes = form.querySelectorAll(`input[name="subcategory_${catKey}"]:checked`);
+            if (subCheckboxes.length > 0) {
+                selectedSubCategories[catValue] = Array.from(subCheckboxes).map(cb => cb.value);
+            }
+        });
+
+        const minPrice = parseFloat(document.getElementById('minPrice').value) || 0;
+        const maxPrice = parseFloat(document.getElementById('maxPrice').value) || Infinity;
+        const minRating = parseFloat(form.querySelector('input[name="rating"]:checked')?.value || 0);
+        const query = searchQuery.toLowerCase().trim();
+
+        console.log("Filtering with:", { selectedUniversities, selectedCategories, selectedSubCategories, minPrice, maxPrice, minRating, query }); // Debugging
+
+        let filtered = products.filter(product => {
+            // University check
+            if (selectedUniversities.length > 0 && !selectedUniversities.includes(product.university)) {
+                return false;
+            }
+            // Category check
+            if (selectedCategories.length > 0) {
+                if (!selectedCategories.includes(product.category)) {
+                    return false; // Must match one selected category
+                }
+                // Sub-category check (only if the main category is selected and has sub-selections)
+                if (selectedSubCategories[product.category] && selectedSubCategories[product.category].length > 0) {
+                    if (!selectedSubCategories[product.category].includes(product.subCategory)) {
+                         return false; // Must match one selected sub-category for its parent
+                    }
+                }
+            }
+
+            // Price check
+            if (product.price < minPrice || product.price > maxPrice) {
+                return false;
+            }
+            // Rating check
+            if (product.rating < minRating) {
+                return false;
+            }
+            // Search Query Check (using previous fuzzy logic idea)
+            if (query) {
+                const productName = product.name.toLowerCase();
+                if (productName.includes(query)) return true; // Direct match
+
+                const words = query.split(' ').filter(w => w.length > 0);
+                if (!words.every(word => productName.includes(word))) { // More strict: all words must appear
+                     // Fuzzy attempt (simplified): check if any word is partially matched
+                     if (!words.some(word => {
+                         if (word.length < 3) return productName.includes(word);
+                         let matches = 0;
+                         for (let i = 0; i < word.length; i++) {
+                             if (productName.includes(word[i])) matches++;
+                         }
+                         return matches >= word.length * 0.7; // 70% char match threshold
+                     })) {
+                          return false;
+                     }
+                }
+            }
+            return true; // Passes all checks
+        });
+
+        // Apply current sorting
+        currentProducts = sortProducts(filtered, currentSort);
+        renderProducts(currentProducts);
+
+         // Show feedback
+        const filterCount = selectedUniversities.length + selectedCategories.length + (minPrice > 0 ? 1 : 0) + (maxPrice < Infinity ? 1 : 0) + (minRating > 0 ? 1: 0);
+        if (filterCount > 0 || query) {
+             showToast(`${currentProducts.length} product${currentProducts.length !== 1 ? 's' : ''} found`);
+        }
+    }
+
+    // Show Toast Notification
+    function showToast(message) {
+        toast.textContent = message;
+        toast.classList.remove('translate-y-20', 'opacity-0');
+        toast.classList.add('translate-y-0', 'opacity-100');
+
+        setTimeout(() => {
+            toast.classList.remove('translate-y-0', 'opacity-100');
+            toast.classList.add('translate-y-20', 'opacity-0');
+        }, 2500);
+    }
+
+    // Toggle Filter Panel
+    function toggleFilterPanel(show = true) {
+        if (show) {
+            filterPanel.classList.add('show');
+            overlay.classList.add('show');
+            document.body.style.overflow = 'hidden'; // Prevent body scroll
+        } else {
+            filterPanel.classList.remove('show');
+            overlay.classList.remove('show');
+             document.body.style.overflow = ''; // Restore body scroll
+        }
+    }
+
+    // Visually Reset Filter Form
+    function resetFilterForm() {
+        const form = filterPanel.querySelector('form') || filterPanel;
+        form.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+        form.querySelectorAll('input[type="radio"]').forEach(rb => rb.checked = false);
+        // Check the default 'All Ratings' radio button
+        const defaultRating = form.querySelector('input[name="rating"][value="0"]');
+        if (defaultRating) defaultRating.checked = true;
+        form.querySelectorAll('input[type="number"]').forEach(input => input.value = '');
+         // Close all accordions
+        form.querySelectorAll('details.category-details').forEach(detail => detail.removeAttribute('open'));
+
+        isFilterResetPending = true; // Mark that reset was clicked
+        console.log("Filter form visually reset.");
+    }
+
+    // --- EVENT LISTENERS ---
+
+    // Filter Panel Toggle
+    filterToggle.addEventListener('click', () => toggleFilterPanel(true));
+    closeFilter.addEventListener('click', () => toggleFilterPanel(false));
+    overlay.addEventListener('click', () => {
+        toggleFilterPanel(false);
+        sortDropdown.classList.remove('show'); // Also close sort dropdown
+    });
+
+    // Sort Dropdown Toggle & Selection
+    sortToggle.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent document click listener from closing it immediately
+        sortDropdown.classList.toggle('show');
+    });
+
+    document.addEventListener('click', (e) => { // Close sort dropdown if clicked outside
+        if (!sortToggle.contains(e.target) && !sortDropdown.contains(e.target)) {
+            sortDropdown.classList.remove('show');
+        }
+    });
+
+    sortDropdown.querySelectorAll('.sort-option').forEach(option => {
+        option.addEventListener('click', (e) => {
+            e.preventDefault();
+            const sortType = option.dataset.sort;
+            currentSort = sortType;
+
+            // Update button text
+            currentSortLabel.textContent = option.textContent;
+
+            // Update selected state in dropdown
+            sortDropdown.querySelectorAll('.sort-option').forEach(opt => opt.classList.remove('bg-primary-light', 'font-semibold'));
+            option.classList.add('bg-primary-light', 'font-semibold');
+
+            // Close dropdown
+            sortDropdown.classList.remove('show');
+
+            // Re-sort and re-render currently filtered products
+            currentProducts = sortProducts(currentProducts, currentSort);
+            renderProducts(currentProducts);
+            showToast(`Sorted by ${option.textContent}`);
+        });
+    });
+
+    // Scroll Events (Scroll-to-top and Sticky Header)
+    window.addEventListener('scroll', () => {
+        const scrollY = window.scrollY;
+
+        // Scroll-to-top button visibility
+        if (scrollY > 300) {
+            scrollTop.classList.add('visible');
+        } else {
+            scrollTop.classList.remove('visible');
+        }
+
+        // Hide Top Header on Scroll Down, Show on Scroll Up
+         if (scrollY > 80 && scrollY > lastScrollY) { // Scrolling Down past threshold
+             topHeader.classList.add('top-header-hidden');
+         } else if (scrollY < lastScrollY) { // Scrolling Up
+             topHeader.classList.remove('top-header-hidden');
+         }
+
+        lastScrollY = scrollY <= 0 ? 0 : scrollY; // For Mobile or negative scrolling
+    }, { passive: true }); // Improve scroll performance
+
+    scrollTop.addEventListener('click', () => {
+        window.scrollTo({ top: 0 /* Behavior handled by CSS html { scroll-behavior: smooth; } */ });
+    });
+
+    // Search Input
+    let searchTimeout;
+    searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            const query = e.target.value;
+            applyFiltersAndSearch(query);
+        }, 350); // Debounce search input
+    });
+
+    // Filter Buttons
+    resetFilterBtn.addEventListener('click', resetFilterForm);
+
+    applyFilterBtn.addEventListener('click', () => {
+        if (isFilterResetPending) {
+            // Apply the reset state (means filter back to all products)
+            currentSort = 'newest'; // Reset sort as well
+            currentSortLabel.textContent = 'Newest';
+            sortDropdown.querySelectorAll('.sort-option').forEach(opt => opt.classList.remove('bg-primary-light', 'font-semibold'));
+            sortDropdown.querySelector('.sort-option[data-sort="newest"]').classList.add('bg-primary-light', 'font-semibold');
+            searchInput.value = ''; // Clear search input too
+
+            currentProducts = sortProducts([...products], currentSort); // Start from original data
+            renderProducts(currentProducts);
+            isFilterResetPending = false; // Reset the flag
+             showToast('Filters reset');
+        } else {
+             // Apply currently selected filters
+            applyFiltersAndSearch(searchInput.value.trim());
+             showToast('Filters applied');
+        }
+        toggleFilterPanel(false); // Close panel after applying
+    });
+
+     // Category Checkbox => Toggle Subcategory Visibility & Check/Uncheck Subs
+    filterPanel.querySelectorAll('input.category-checkbox').forEach(catCheckbox => {
+        catCheckbox.addEventListener('change', (e) => {
+            const detailsElement = e.target.closest('details.category-details');
+            if (!detailsElement) return;
+
+            const subCheckboxes = detailsElement.querySelectorAll('.accordion-content input[type="checkbox"]');
+            // If main category is unchecked, uncheck all its subcategories
+            if (!e.target.checked) {
+                subCheckboxes.forEach(sub => sub.checked = false);
+                // Optionally close the accordion
+                // detailsElement.removeAttribute('open');
+            }
+            // If main category is checked, optionally check all subs? (Decided against this, let user select subs)
+        });
+    });
+
+    // Subcategory Checkbox => Check Parent Category if not already checked
+    filterPanel.querySelectorAll('.accordion-content input[type="checkbox"]').forEach(subCheckbox => {
+         subCheckbox.addEventListener('change', (e) => {
+             if (e.target.checked) {
+                 const parentCheckbox = e.target.closest('details.category-details')?.querySelector('input.category-checkbox');
+                 if (parentCheckbox && !parentCheckbox.checked) {
+                      parentCheckbox.checked = true;
+                 }
+             }
+         });
+    });
+
+
+    // --- INITIALIZATION ---
+    function init() {
+        showSkeletons(); // Show skeletons first
+
+        // Simulate network delay for loading
+        setTimeout(() => {
+            // Initial render (sorted by newest by default)
+            currentSort = 'newest'; // Ensure default sort
+            currentProducts = sortProducts([...products], currentSort);
+            renderProducts(currentProducts);
+
+            // Set default selected sort option visual state
+             sortDropdown.querySelectorAll('.sort-option').forEach(opt => opt.classList.remove('bg-primary-light', 'font-semibold'));
+             sortDropdown.querySelector('.sort-option[data-sort="newest"]').classList.add('bg-primary-light', 'font-semibold');
+        }, 1200); // Adjust delay as needed
+    }
+
+    // Run initialization when the DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', init);
+
+</script>
+
+</body>
+</html>

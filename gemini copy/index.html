@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusMart - Home</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+    <div class="loading-overlay active">
+        <p>Loading CampusMart...</p>
+    </div>
+
+    <div class="app-container">
+
+        <div class="header-container">
+            <header class="app-header">
+                <div class="location">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>UCC, Ghana</span> <i class="fas fa-chevron-down small-icon"></i>
+                </div>
+                <div class="notifications">
+                    <i class="fas fa-bell"></i>
+                </div>
+            </header>
+        </div> <section class="search-section">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search food, data, clothes...">
+                <button class="filter-btn">
+                    <i class="fas fa-sliders-h"></i>
+                </button>
+            </div>
+        </section>
+
+        <section class="banner-section">
+            <div class="section-header">
+                <h2>#SpecialForYou</h2>
+                <a href="#">See All</a>
+            </div>
+            <div class="banner-carousel">
+                <div class="banner-slides">
+                    <div class="banner-slide active">
+                        <img src="placeholder-banner-1.png" alt="Special Offer Banner 1">
+                    </div>
+                    <div class="banner-slide">
+                        <img src="placeholder-banner-2.png" alt="Special Offer Banner 2">
+                    </div>
+                    <div class="banner-slide">
+                        <img src="placeholder-banner-3.png" alt="Special Offer Banner 3">
+                    </div>
+                </div>
+                <div class="carousel-indicators">
+                    <span class="indicator active"></span>
+                    <span class="indicator"></span>
+                    <span class="indicator"></span>
+                </div>
+                <button class="carousel-arrow prev">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="carousel-arrow next">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <section class="category-section">
+             <div class="section-header">
+                <h2>Category</h2>
+                <a href="#">See All</a>
+            </div>
+            <div class="category-list skeleton">
+                <div class="category-item"> <div class="category-square"><i class="fas fa-utensils"></i></div> <span>Food</span> </div>
+                <div class="category-item"> <div class="category-square"><i class="fas fa-wifi"></i></div> <span>Data</span> </div>
+                <div class="category-item"> <div class="category-square"><i class="fas fa-tshirt"></i></div> <span>Clothes</span> </div>
+                <div class="category-item"> <div class="category-square"><i class="fas fa-laptop"></i></div> <span>Gadgets</span> </div>
+                <div class="category-item"> <div class="category-square"><i class="fas fa-concierge-bell"></i></div> <span>Services</span> </div>
+                <div class="category-item"> <div class="category-square"><i class="fas fa-ellipsis-h"></i></div> <span>Other</span> </div>
+            </div>
+        </section>
+
+        <section class="product-section">
+            <div class="filter-tabs-container">
+                 <button class="filter-tab active" data-filter="trending">Trending Now</button>
+                 <button class="filter-tab" data-filter="newest">Newest</button>
+                 <button class="filter-tab" data-filter="top-vendors">Top Vendors</button>
+            </div>
+            <div class="product-grid skeleton">
+                <div class="product-card"></div> <div class="product-card"></div>
+                <div class="product-card"></div> <div class="product-card"></div>
+            </div>
+        </section>
+
+        <div class="nav-spacer"></div>
+
+    </div> 
+    <nav class="floating-nav">
+        <div class="nav-indicator"></div>
+        <ul>
+            <li class="nav-item active" data-index="0"> <a href="#"><i class="fas fa-home"></i><span>Home</span></a> </li>
+            <li class="nav-item" data-index="1"> <a href="#"><i class="fas fa-th-large"></i><span>Categories</span></a> </li>
+            <li class="nav-item" data-index="2"> <a href="#"><i class="fas fa-plus-circle"></i><span>Sell</span></a> </li>
+            <li class="nav-item" data-index="3"> <a href="#"><i class="fas fa-heart"></i><span>Wishlist</span></a> </li>
+            <li class="nav-item" data-index="4"> <a href="#"><i class="fas fa-user"></i><span>Profile</span></a> </li>
+        </ul>
+    </nav>
+
+    <script src="script.js"></script>
+</body>
+</html>
