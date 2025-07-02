@@ -935,13 +935,6 @@
         <div class="product-gallery">
             <div class="gallery-container" id="galleryContainer">
                 <div class="gallery-slide">
-                    <img src="Picture1.png" alt="Product Image 1" class="gallery-image">
-                </div>
-                <div class="gallery-slide">
-                    <img src="me.png" alt="Product Image 2" class="gallery-image">
-                </div>
-                <div class="gallery-slide">
-                    <img src="me copy.png" alt="Product Image 3" class="gallery-image">
                 </div>
             </div>
             <div class="gallery-dots" id="galleryDots">
@@ -956,8 +949,8 @@
 
         <!-- Product Info -->
         <div class="container">
-            <h1 class="product-title">Apple MacBook Pro 13" M1 Chip (2020)</h1>
-            <div class="product-price"><span class="currency">GH₵</span> 5,500</div>
+            <h1 class="product-title" id="product-main-title">Product Name Loading...</h1>
+            <div class="product-price" id="product-main-price"><span class="currency">GH₵</span> 0.00</div>
 
             <!-- Variations Card -->
             <div class="card variations-card">
@@ -1001,7 +994,11 @@
                     </div>
                     <div class="spec-item">
                         <span class="spec-label">Condition</span>
-                        <span class="spec-value">Like New</span>
+                        <span class="spec-value" id="spec-condition-value">N/A</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Campus</span>
+                        <span class="spec-value" id="spec-campus-value">N/A</span>
                     </div>
                 </div>
             </div>
@@ -1011,17 +1008,8 @@
                 <div class="card-title">
                     <i class="fas fa-align-left"></i> Description
                 </div>
-                <div class="description-content" id="descriptionContent">
-                    <p>The MacBook Pro with Apple M1 chip offers incredible performance with up to 20 hours of battery life. This model comes with a 13-inch Retina display, 8GB unified memory, and Touch Bar.</p>
-                    <p>Features include:</p>
-                    <p>• Apple M1 chip with 8-core CPU and 8-core GPU<br>
-                    • 8GB unified memory<br>
-                    • 256GB SSD storage<br>
-                    • 13.3-inch Retina display with True Tone<br>
-                    • Magic Keyboard with Touch Bar and Touch ID<br>
-                    • Force Touch trackpad<br>
-                    • Two Thunderbolt / USB 4 ports</p>
-                    <p>Minor signs of use on the bottom case, but the screen and keyboard are in perfect condition. Original charger included. Purchase date: March 2021.</p>
+                <div class="description-content" id="product-description-content"> <p>Static p1...</p>
+                    <p>Static p2...</p>
                 </div>
                 <div class="description-toggle" id="descriptionToggle">
                     Show More <i class="fas fa-chevron-down"></i>
@@ -1034,7 +1022,7 @@
                     <i class="fas fa-store"></i> Vendor & Reviews
                 </div>
                 <div class="vendor-info">
-                    <a href="#" class="vendor-name">TechTrove UCC</a>
+                    <a href="#" class="vendor-name" id="vendor-name-link">Vendor Name</a>
                     <div class="vendor-rating">
                         <i class="fas fa-star"></i>
                         <i class="fas fa-star"></i>
@@ -1296,372 +1284,463 @@ My additional message/questions:
     <!-- Toast Notification -->
     <div class="toast" id="toast"></div>
 
+    <script src="js/product-detail.js" defer></script>
     <script>
-        // Utilities
+        document.addEventListener('DOMContentLoaded', () => {
+        console.log("Embedded script in product-detail.html is starting to parse.");
+    
+        // Global variable to store the fetched product data
+        let currentProductData = null;
+    
+        // --- UTILITIES ---
         function showToast(message, duration = 2000) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.add('active');
-            
-            setTimeout(() => {
-                toast.classList.remove('active');
+            const toastEl = document.getElementById('toast');
+            if (!toastEl) {
+                console.warn("Toast element not found for message:", message);
+                return;
+            }
+            toastEl.textContent = message;
+            toastEl.classList.add('active');
+            if (toastEl.timerId) clearTimeout(toastEl.timerId);
+            toastEl.timerId = setTimeout(() => {
+                toastEl.classList.remove('active');
             }, duration);
         }
-
+    
         function createRipple(event) {
             const button = event.currentTarget;
-            
+            if (!button) return;
             const circle = document.createElement('span');
             const diameter = Math.max(button.clientWidth, button.clientHeight);
-            
+            const radius = diameter / 2;
+            const rect = button.getBoundingClientRect();
+    
             circle.style.width = circle.style.height = `${diameter}px`;
-            circle.style.left = `${event.clientX - button.getBoundingClientRect().left}px`;
-            circle.style.top = `${event.clientY - button.getBoundingClientRect().top}px`;
-            
-            circle.classList.add('ripple-effect');
-            
-            const ripple = button.querySelector('.ripple-effect');
-            if (ripple) {
-                ripple.remove();
-            }
+            circle.style.left = `${event.clientX - rect.left - radius}px`;
+            circle.style.top = `${event.clientY - rect.top - radius}px`;
+            circle.classList.add('ripple-effect'); // Ensure you have CSS for .ripple-effect
+    
+            const existingRipple = button.querySelector('.ripple-effect');
+            if (existingRipple) existingRipple.remove();
             
             button.appendChild(circle);
-            
             setTimeout(() => {
-                circle.remove();
+                if (circle.parentNode) circle.remove();
             }, 600);
         }
-
-        // Simulating product data loading
-        window.addEventListener('DOMContentLoaded', () => {
-            // Simulate loading delay
-            setTimeout(() => {
-                document.getElementById('skeleton-loader').style.display = 'none';
-                document.getElementById('main-content').style.display = 'block';
-                initPage();
-            }, 1500);
-        });
-
-        function initPage() {
-            // Image Gallery
-            const galleryContainer = document.getElementById('galleryContainer');
-            const galleryDots = document.querySelectorAll('.gallery-dot');
-            const gallerySlides = document.querySelectorAll('.gallery-slide');
-            let currentSlide = 0;
-            let startX, moveX;
-            let autoSlideInterval;
-
-            function goToSlide(index) {
-                if (index < 0) index = gallerySlides.length - 1;
-                if (index >= gallerySlides.length) index = 0;
-                
-                currentSlide = index;
-                galleryContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
-                
-                // Update dots
-                galleryDots.forEach((dot, i) => {
-                    dot.classList.toggle('active', i === currentSlide);
-                });
+    
+        // --- FUNCTION TO UPDATE WHATSAPP MESSAGE ---
+        function updateWhatsAppMessage(product) {
+            const whatsappMessageEl = document.getElementById('whatsappMessage');
+            if (!whatsappMessageEl || !product) {
+                 console.warn("WhatsApp message element or product data not available for updateWhatsAppMessage.");
+                return;
             }
-
-            function startAutoSlide() {
-                stopAutoSlide();
-                autoSlideInterval = setInterval(() => {
-                    goToSlide(currentSlide + 1);
-                }, 5000);
-            }
-
-            function stopAutoSlide() {
-                if (autoSlideInterval) clearInterval(autoSlideInterval);
-            }
-
-            // Touch/mouse events for gallery
-            galleryContainer.addEventListener('touchstart', (e) => {
-                stopAutoSlide();
-                startX = e.touches[0].clientX;
-            }, { passive: true });
-
-            galleryContainer.addEventListener('touchmove', (e) => {
-                if (!startX) return;
-                moveX = e.touches[0].clientX;
-                const diff = startX - moveX;
-                const percentMove = (diff / window.innerWidth) * 100;
-                
-                // Only move slightly with finger to provide resistance
-                if (Math.abs(percentMove) < 30) {
-                    galleryContainer.style.transform = `translateX(calc(-${currentSlide * 100}% - ${percentMove}px))`;
-                }
-            }, { passive: true });
-
-            galleryContainer.addEventListener('touchend', (e) => {
-                if (!startX || !moveX) return;
-                const diff = startX - moveX;
-                
-                if (diff > 50) {
-                    goToSlide(currentSlide + 1);
-                } else if (diff < -50) {
-                    goToSlide(currentSlide - 1);
+    
+            const effectiveVendorName = product.vendor_display_name || product.vendor_username || 'Seller';
+            let selectedVariationsText = "";
+            const selectedOptions = [];
+            document.querySelectorAll('.variation-options .option-button.selected').forEach(btn => {
+                const variationGroup = btn.closest('.variation-options');
+                const variationNameElement = variationGroup?.querySelector('.variation-name');
+                const variationName = variationNameElement ? variationNameElement.textContent.trim() : '';
+                if (variationName) {
+                    selectedOptions.push(`${variationName}: ${btn.dataset.value}`);
                 } else {
-                    goToSlide(currentSlide);
+                    selectedOptions.push(btn.dataset.value);
                 }
-                
-                startX = null;
-                moveX = null;
-                startAutoSlide();
-            }, { passive: true });
-
-            // Dot navigation
-            galleryDots.forEach((dot, index) => {
-                dot.addEventListener('click', () => {
-                    goToSlide(index);
-                    stopAutoSlide();
-                    startAutoSlide();
-                });
             });
-
-            // Start auto slide
-            startAutoSlide();
-
-            // Fullscreen Gallery
-            const galleryImages = document.querySelectorAll('.gallery-image');
+            if (selectedOptions.length > 0) {
+                selectedVariationsText = `\nOptions: ${selectedOptions.join(', ')}`;
+            }
+    
+            whatsappMessageEl.textContent = `Hello ${effectiveVendorName},
+    
+    I'm interested in ordering the following item from ema-Campus Shopping:
+    
+    Product: ${product.name || 'N/A'}
+    Price: GH₵ ${parseFloat(product.price || 0).toFixed(2)}${selectedVariationsText}
+    
+    Link: ${window.location.href}
+    
+    My additional message/questions:`;
+        }
+    
+        // --- FUNCTION TO INITIALIZE ALL INTERACTIVE UI FEATURES ---
+        function initializePageSpecificUI(productDetails) {
+            console.log("EmbeddedJS: initializePageSpecificUI called. Setting up UI listeners for dynamic content.");
+            currentProductData = productDetails; // Update global reference if needed by other handlers
+    
+            // 1. Image Gallery Setup
+            const galleryContainer = document.getElementById('galleryContainer');
+            const galleryDots = document.querySelectorAll('#galleryDots .gallery-dot'); // Re-query
+            const gallerySlides = document.querySelectorAll('#galleryContainer .gallery-slide'); // Re-query
+            const galleryImages = document.querySelectorAll('#galleryContainer .gallery-image'); // Re-query
+    
             const fullscreenContainer = document.getElementById('fullscreenContainer');
             const fullscreenImage = document.getElementById('fullscreenImage');
             const fullscreenClose = document.getElementById('fullscreenClose');
-
-            galleryImages.forEach((img, index) => {
-                img.addEventListener('click', () => {
-                    fullscreenImage.src = img.src.replace('600/400', '800/600');
-                    fullscreenImage.alt = img.alt;
-                    fullscreenContainer.classList.add('active');
-                    document.body.style.overflow = 'hidden';
+    
+            if (galleryContainer && gallerySlides.length > 0) {
+                let currentSlide = 0;
+                let startX, moveX;
+                let autoSlideInterval = null;
+    
+                function goToSlide(index) {
+                    if (gallerySlides.length === 0) return;
+                    if (index < 0) index = gallerySlides.length - 1;
+                    else if (index >= gallerySlides.length) index = 0;
+                    currentSlide = index;
+                    galleryContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
+                    if (galleryDots.length === gallerySlides.length) {
+                        galleryDots.forEach((dot, i) => dot.classList.toggle('active', i === currentSlide));
+                    }
+                }
+    
+                function startAutoSlide() {
+                    if (gallerySlides.length <= 1) return;
+                    stopAutoSlide();
+                    autoSlideInterval = setInterval(() => goToSlide(currentSlide + 1), 5000);
+                }
+    
+                function stopAutoSlide() {
+                    if (autoSlideInterval) clearInterval(autoSlideInterval);
+                }
+    
+                // Clone and replace listeners for touch events on galleryContainer
+                const newGalleryContainer = galleryContainer.cloneNode(false); // false for shallow clone
+                while(galleryContainer.firstChild) { // Move children
+                     newGalleryContainer.appendChild(galleryContainer.firstChild);
+                }
+                galleryContainer.parentNode.replaceChild(newGalleryContainer, galleryContainer);
+                // Update galleryContainer reference
+                // galleryContainer = newGalleryContainer; // This won't work if galleryContainer is const outside, must re-select or pass
+                const activeGalleryContainer = document.getElementById('galleryContainer');
+    
+    
+                activeGalleryContainer.addEventListener('touchstart', (e) => { stopAutoSlide(); startX = e.touches[0].clientX; }, { passive: true });
+                activeGalleryContainer.addEventListener('touchmove', (e) => { if (!startX) return; moveX = e.touches[0].clientX; /* ...your move logic for visual feedback if any... */ }, { passive: true });
+                activeGalleryContainer.addEventListener('touchend', () => {
+                    if (!startX || typeof moveX === 'undefined') { startX = null; moveX = undefined; if (gallerySlides.length > 1) startAutoSlide(); return; }
+                    const diff = startX - moveX;
+                    if (diff > 50) goToSlide(currentSlide + 1);
+                    else if (diff < -50) goToSlide(currentSlide - 1);
+                    else goToSlide(currentSlide);
+                    startX = null; moveX = undefined;
+                    if (gallerySlides.length > 1) startAutoSlide();
+                }, { passive: true });
+    
+                galleryDots.forEach((dot, index) => {
+                    const newDot = dot.cloneNode(true);
+                    dot.parentNode.replaceChild(newDot, dot);
+                    newDot.addEventListener('click', () => {
+                        goToSlide(index); stopAutoSlide(); if (gallerySlides.length > 1) startAutoSlide();
+                    });
                 });
-            });
-
-            fullscreenClose.addEventListener('click', () => {
-                fullscreenContainer.classList.remove('active');
-                document.body.style.overflow = '';
-            });
-
-            // Close fullscreen on background click
-            fullscreenContainer.addEventListener('click', (e) => {
-                if (e.target === fullscreenContainer) {
-                    fullscreenContainer.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-            });
-
-            // Description toggle
-            const descriptionContent = document.getElementById('descriptionContent');
-            const descriptionToggle = document.getElementById('descriptionToggle');
-
-            descriptionToggle.addEventListener('click', () => {
-                descriptionContent.classList.toggle('expanded');
                 
-                if (descriptionContent.classList.contains('expanded')) {
-                    descriptionToggle.innerHTML = 'Show Less <i class="fas fa-chevron-up"></i>';
-                } else {
-                    descriptionToggle.innerHTML = 'Show More <i class="fas fa-chevron-down"></i>';
+                if (gallerySlides.length > 1) startAutoSlide();
+    
+                if (galleryImages.length > 0 && fullscreenContainer && fullscreenImage && fullscreenClose) {
+                    galleryImages.forEach(img => {
+                        const newImg = img.cloneNode(true);
+                        img.parentNode.replaceChild(newImg, img);
+                        newImg.addEventListener('click', () => {
+                            fullscreenImage.src = newImg.src; fullscreenImage.alt = newImg.alt;
+                            fullscreenContainer.classList.add('active'); document.body.style.overflow = 'hidden';
+                        });
+                    });
+                     if (!fullscreenClose.dataset.listenerAttached) { // Attach static listeners only once
+                        fullscreenClose.addEventListener('click', () => { fullscreenContainer.classList.remove('active'); document.body.style.overflow = ''; });
+                        fullscreenContainer.addEventListener('click', (e) => { if (e.target === fullscreenContainer) { fullscreenContainer.classList.remove('active'); document.body.style.overflow = ''; }});
+                        fullscreenClose.dataset.listenerAttached = 'true';
+                        fullscreenContainer.dataset.listenerAttached = 'true';
+                     }
                 }
-            });
-
-            // View All Reviews
+            } else { console.warn("Gallery elements not found for UI setup."); }
+    
+            // 2. Description Toggle
+            const descriptionContentEl = document.getElementById('product-description-content'); // Ensure this is the correct ID
+            const descriptionToggleEl = document.getElementById('descriptionToggle');
+            if (descriptionToggleEl && descriptionContentEl) {
+                if (!descriptionToggleEl.dataset.listenerAttachedD) { // Use unique dataset key
+                    descriptionToggleEl.addEventListener('click', () => {
+                        descriptionContentEl.classList.toggle('expanded');
+                        descriptionToggleEl.innerHTML = descriptionContentEl.classList.contains('expanded')
+                            ? 'Show Less <i class="fas fa-chevron-up"></i>'
+                            : 'Show More <i class="fas fa-chevron-down"></i>';
+                    });
+                    descriptionToggleEl.dataset.listenerAttachedD = 'true';
+                }
+            }
+    
+            // 3. View All Reviews Modal
             const viewAllReviews = document.getElementById('viewAllReviews');
             const reviewsModal = document.getElementById('reviewsModal');
             const closeReviews = document.getElementById('closeReviews');
-
-            viewAllReviews.addEventListener('click', () => {
-                reviewsModal.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            });
-
-            closeReviews.addEventListener('click', () => {
-                reviewsModal.classList.remove('active');
-                document.body.style.overflow = '';
-            });
-
-            // Close reviews modal on background click
-            reviewsModal.addEventListener('click', (e) => {
-                if (e.target === reviewsModal) {
-                    reviewsModal.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-            });
-
-            // Wishlist button
-            const wishlistButton = document.getElementById('wishlistButton');
-            wishlistButton.addEventListener('click', () => {
-                wishlistButton.classList.toggle('active');
-                
-                if (wishlistButton.classList.contains('active')) {
-                    wishlistButton.innerHTML = '<i class="fas fa-heart"></i>';
-                    showToast('Added to your wishlist');
-                } else {
-                    wishlistButton.innerHTML = '<i class="far fa-heart"></i>';
-                    showToast('Removed from your wishlist');
-                }
-                
-                wishlistButton.classList.add('pulse');
-                setTimeout(() => {
-                    wishlistButton.classList.remove('pulse');
-                }, 300);
-            });
-
-            // Product variations selection
-            const optionButtons = document.querySelectorAll('.option-button');
-            
-            optionButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    // Find parent variation group
-                    const parent = button.closest('.variation-options');
-                    
-                    // Remove selected class from siblings
-                    parent.querySelectorAll('.option-button').forEach(btn => {
-                        btn.classList.remove('selected');
-                    });
-                    
-                    // Add selected class to clicked button
-                    button.classList.add('selected');
-                    
-                    // Update WhatsApp message with selected variations
-                    updateWhatsAppMessage();
+            if (viewAllReviews && reviewsModal && !viewAllReviews.dataset.listenerAttachedR) {
+                viewAllReviews.addEventListener('click', () => { reviewsModal.classList.add('active'); document.body.style.overflow = 'hidden'; });
+                viewAllReviews.dataset.listenerAttachedR = 'true';
+            }
+            if (closeReviews && reviewsModal && !closeReviews.dataset.listenerAttachedR) {
+                closeReviews.addEventListener('click', () => { reviewsModal.classList.remove('active'); document.body.style.overflow = ''; });
+                closeReviews.dataset.listenerAttachedR = 'true';
+            }
+            if (reviewsModal && !reviewsModal.dataset.bgListenerAttachedR) {
+                reviewsModal.addEventListener('click', (e) => {
+                    if (e.target === reviewsModal) { reviewsModal.classList.remove('active'); document.body.style.overflow = ''; }
                 });
-            });
-
-            // WhatsApp Order
+                reviewsModal.dataset.bgListenerAttachedR = 'true';
+            }
+            
+            // 4. Wishlist button
+            const wishlistButton = document.getElementById('wishlistButton');
+            if (wishlistButton && !wishlistButton.dataset.listenerAttached) {
+                wishlistButton.addEventListener('click', () => {
+                    wishlistButton.classList.toggle('active');
+                    wishlistButton.innerHTML = wishlistButton.classList.contains('active') ? '<i class="fas fa-heart"></i>' : '<i class="far fa-heart"></i>';
+                    showToast(wishlistButton.classList.contains('active') ? 'Added to your wishlist' : 'Removed from your wishlist');
+                    wishlistButton.classList.add('pulse');
+                    setTimeout(() => wishlistButton.classList.remove('pulse'), 300);
+                });
+                wishlistButton.dataset.listenerAttached = 'true';
+            }
+    
+            // 5. Product variations selection
+            const optionButtons = document.querySelectorAll('.option-button');
+            if (optionButtons.length > 0) {
+                // Check first button to see if listeners are already attached to prevent duplication.
+                // This assumes if one has it, all do (from a previous call to this function).
+                if (!optionButtons[0].dataset.listenerAttachedV) {
+                    optionButtons.forEach(button => {
+                        button.addEventListener('click', () => {
+                            const parent = button.closest('.variation-options');
+                            if (parent) parent.querySelectorAll('.option-button').forEach(btn => btn.classList.remove('selected'));
+                            button.classList.add('selected');
+                            if (typeof updateWhatsAppMessage === 'function' && currentProductData) {
+                                 updateWhatsAppMessage(currentProductData);
+                            }
+                        });
+                        button.dataset.listenerAttachedV = 'true';
+                    });
+                }
+            }
+    
+            // 6. WhatsApp Order Overlay Toggles & Send
             const orderButton = document.getElementById('orderButton');
             const whatsappOverlay = document.getElementById('whatsappOverlay');
-            const closeOverlay = document.getElementById('closeOverlay');
-            const sendWhatsapp = document.getElementById('sendWhatsapp');
+            const closeOverlayBtn = document.getElementById('closeOverlay'); // Your original id was 'closeOverlay'
+            const sendWhatsappBtn = document.getElementById('sendWhatsapp');   // Your original id was 'sendWhatsapp'
             const messageInput = document.getElementById('messageInput');
-
-            function updateWhatsAppMessage() {
-                const productName = document.querySelector('.product-title').textContent;
-                const productPrice = document.querySelector('.product-price').textContent.trim();
-                
-                // Get selected variations
-                const variations = [];
-                document.querySelectorAll('.variation-options').forEach(variation => {
-                    const variationName = variation.querySelector('.variation-name').textContent;
-                    const selectedValue = variation.querySelector('.option-button.selected').dataset.value;
-                    variations.push(`${selectedValue}`);
+    
+    
+            if (orderButton && whatsappOverlay && !orderButton.dataset.listenerAttachedW) {
+                orderButton.addEventListener('click', () => {
+                    if (typeof updateWhatsAppMessage === 'function' && currentProductData) updateWhatsAppMessage(currentProductData);
+                    whatsappOverlay.classList.add('active');
+                    document.body.style.overflow = 'hidden';
                 });
-                
-                // Format the message
-                const message = `Hello TechTrove UCC,
-
-I'm interested in ordering the following item from ema-Campus Shopping:
-
-Product: ${productName}
-Price: ${productPrice}
-Options: ${variations.join(', ')}
-
-Link: https://ema-campus.com/product/12345
-
-My additional message/questions:`;
-                
-                document.getElementById('whatsappMessage').textContent = message;
+                orderButton.dataset.listenerAttachedW = 'true';
             }
-
-            orderButton.addEventListener('click', () => {
-                updateWhatsAppMessage();
-                whatsappOverlay.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            });
-
-            closeOverlay.addEventListener('click', () => {
-                whatsappOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-            });
-
-            sendWhatsapp.addEventListener('click', () => {
-                // Get the base message
-                const baseMessage = document.getElementById('whatsappMessage').textContent;
-                // Get additional message
-                const additionalMessage = messageInput.value.trim();
-                
-                // Combine them
-                const fullMessage = additionalMessage ? 
-                    baseMessage + '\n' + additionalMessage + '\n\nThanks!' :
-                    baseMessage + '\n\nThanks!';
-                
-                // Encode for WhatsApp URL
-                const encodedMessage = encodeURIComponent(fullMessage);
-                
-                // Simulate WhatsApp redirect
-                // In production, this would use a real phone number
-                const whatsappUrl = `https://wa.me/233XXXXXXXXX?text=${encodedMessage}`;
-                
-                // For demo purposes, show success message
-                showToast('Redirecting to WhatsApp...', 1500);
-                
-                // Close the overlay
-                setTimeout(() => {
-                    whatsappOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                    
-                    // In a real implementation, you would use:
-                    // window.location.href = whatsappUrl;
-                    // For demo, we'll just show a message
-                    console.log('WhatsApp URL:', whatsappUrl);
-                }, 1500);
-            });
-
-            // Add to Cart button
-            const cartButton = document.getElementById('cartButton');
-            
-            cartButton.addEventListener('click', () => {
-                // Get selected variations to add to cart
-                const variations = [];
-                document.querySelectorAll('.variation-options').forEach(variation => {
-                    const variationName = variation.querySelector('.variation-name').textContent;
-                    const selectedValue = variation.querySelector('.option-button.selected').dataset.value;
-                    variations.push(`${variationName}: ${selectedValue}`);
+            if (closeOverlayBtn && whatsappOverlay && !closeOverlayBtn.dataset.listenerAttachedW) {
+                closeOverlayBtn.addEventListener('click', () => {
+                    whatsappOverlay.classList.remove('active'); document.body.style.overflow = '';
                 });
-                
-                // Animation effect
-                cartButton.classList.add('pulse');
-                setTimeout(() => {
-                    cartButton.classList.remove('pulse');
-                }, 300);
-                
-                showToast('Added to your cart!');
-            });
-
-            // Call Vendor button
+                closeOverlayBtn.dataset.listenerAttachedW = 'true';
+            }
+            if (sendWhatsappBtn && messageInput && !sendWhatsappBtn.dataset.listenerAttachedW) {
+                sendWhatsappBtn.addEventListener('click', () => {
+                    const baseMessage = document.getElementById('whatsappMessage')?.textContent || '';
+                    const additionalMessage = messageInput.value.trim();
+                    const fullMessage = additionalMessage ? `${baseMessage}\n${additionalMessage}\n\nThanks!` : `${baseMessage}\n\nThanks!`;
+                    const encodedMessage = encodeURIComponent(fullMessage);
+                    // TODO: Get actual vendor WhatsApp number from currentProductData.vendor_whatsapp (if available)
+                    const vendorWhatsappNumber = currentProductData?.vendor_whatsapp || "233XXXXXXXXX"; // Replace with actual or fetched vendor number
+                    const whatsappUrl = `https://wa.me/${vendorWhatsappNumber}?text=${encodedMessage}`;
+                    showToast('Redirecting to WhatsApp...', 1500);
+                    console.log('WhatsApp URL (simulated for dev):', whatsappUrl);
+                    // For actual redirection: window.open(whatsappUrl, '_blank');
+                    setTimeout(() => {
+                        if(whatsappOverlay) whatsappOverlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }, 1500);
+                });
+                sendWhatsappBtn.dataset.listenerAttachedW = 'true';
+            }
+            
+            // 7. Call Vendor button
             const callButton = document.getElementById('callButton');
+            if (callButton && !callButton.dataset.listenerAttached) {
+                callButton.addEventListener('click', () => {
+                    // TODO: Get actual vendor phone number from currentProductData.vendor_phone
+                    const vendorPhoneNumber = currentProductData?.vendor_phone || "233YYYYYYYYY";
+                    showToast('Calling vendor...');
+                    callButton.classList.add('pulse');
+                    setTimeout(() => callButton.classList.remove('pulse'), 300);
+                    console.log(`Calling vendor at (simulated for dev): ${vendorPhoneNumber}`);
+                    // For actual call: window.location.href = `tel:${vendorPhoneNumber}`;
+                });
+                callButton.dataset.listenerAttached = 'true';
+            }
             
-            callButton.addEventListener('click', () => {
-                // Simulate call action
-                // In production, this would trigger a real call
-                showToast('Calling vendor...');
-                
-                // Animation effect
-                callButton.classList.add('pulse');
-                setTimeout(() => {
-                    callButton.classList.remove('pulse');
-                }, 300);
-                
-                // For demo purposes only
-                console.log('Calling vendor at: 233XXXXXXXXX');
-            });
-
-            // Back button navigation
+            // 8. Back button navigation
             const backButton = document.getElementById('backButton');
-            
-            backButton.addEventListener('click', () => {
-                // In a real app, this would navigate back
-                // For demo purposes, just show a message
-                showToast('Navigating back...');
-                
-                // For demo purposes only
-                console.log('Back navigation triggered');
-            });
-
-            // Add ripple effect to all buttons
+            if (backButton && !backButton.dataset.listenerAttached) {
+                backButton.addEventListener('click', () => { window.history.back(); });
+                backButton.dataset.listenerAttached = 'true';
+            }
+    
+            // 9. Ripple effect for .ripple buttons
             document.querySelectorAll('.ripple').forEach(button => {
-                button.addEventListener('click', createRipple);
+                if (!button.dataset.rippleListenerS) { // Use unique dataset key
+                    button.addEventListener('click', createRipple);
+                    button.dataset.rippleListenerS = 'true';
+                }
             });
+    
+            console.log("EmbeddedJS: Dynamic UI features initialization finished.");
+        } // End of initializePageSpecificUI
+    
+    
+        // --- Main Data Loading and Display Function ---
+        async function loadAndDisplayProductDetails() {
+            console.log("EmbeddedJS: Initiating loadAndDisplayProductDetails...");
+            const mainContentContainer = document.getElementById('main-content');
+            const skeletonLoader = document.getElementById('skeleton-loader');
+            const productDisplaySection = mainContentContainer?.querySelector('.container'); // Use optional chaining
+    
+            if (typeof getProductIdFromUrl !== 'function') {
+                console.error("EmbeddedJS: getProductIdFromUrl() is not defined.");
+                if(productDisplaySection) productDisplaySection.innerHTML = "Error: Page setup issue (cannot get product ID).";
+                if (skeletonLoader) skeletonLoader.style.display = 'none';
+                if (mainContentContainer) mainContentContainer.style.display = 'block';
+                return;
+            }
+            const productId = getProductIdFromUrl();
+    
+            if (!productId) {
+                const errorMsgHtml = '<div style="padding:20px; text-align:center; color:red;">Product ID not found in URL. Please go back and select a product.</div>';
+                if (productDisplaySection) productDisplaySection.innerHTML = errorMsgHtml;
+                else if(mainContentContainer) mainContentContainer.innerHTML = errorMsgHtml;
+                else document.body.innerHTML = errorMsgHtml;
+                if (skeletonLoader) skeletonLoader.style.display = 'none';
+                if (mainContentContainer) mainContentContainer.style.display = 'block';
+                console.error("EmbeddedJS: Product ID missing from URL.");
+                return;
+            }
+    
+            try {
+                if (typeof fetchProductDetailsById !== 'function') {
+                    throw new Error("Page setup error: Product data fetching function (fetchProductDetailsById from product-detail.js) is missing.");
+                }
+                const product = await fetchProductDetailsById(productId); // From product-detail.js
+    
+                if (product) {
+                    console.log("EmbeddedJS: Product data fetched, populating HTML:", product);
+                    currentProductData = product; // Store for global access by UI functions
+    
+                    // Populate Gallery
+                    const galleryContainer = document.getElementById('galleryContainer');
+                    const galleryDotsContainer = document.getElementById('galleryDots');
+                    if (galleryContainer && galleryDotsContainer) {
+                        galleryContainer.innerHTML = ''; galleryDotsContainer.innerHTML = '';
+                        let imagesToDisplay = [];
+                        if (product.image) imagesToDisplay.push({ src: product.image, alt: product.name || 'Main product image' });
+                        if (product.additional_images && product.additional_images.length > 0) {
+                            product.additional_images.forEach(imgObj => {
+                                imagesToDisplay.push({ src: imgObj.image, alt: imgObj.alt_text || product.name || 'Product image' });
+                            });
+                        }
+                        if (imagesToDisplay.length === 0) {
+                            galleryContainer.innerHTML = '<div class="gallery-slide"><img src="images/placeholder.png" alt="No image" class="gallery-image"></div>'; // Path relative to HTML file
+                            galleryDotsContainer.innerHTML = '<div class="gallery-dot active"></div>';
+                        } else {
+                            imagesToDisplay.forEach((imgData, index) => {
+                                const slide = document.createElement('div'); slide.className = 'gallery-slide';
+                                const imgEl = document.createElement('img');
+                                imgEl.src = imgData.src; imgEl.alt = imgData.alt; imgEl.className = 'gallery-image';
+                                slide.appendChild(imgEl); galleryContainer.appendChild(slide);
+                                const dot = document.createElement('div'); dot.className = 'gallery-dot';
+                                if (index === 0) dot.classList.add('active');
+                                galleryDotsContainer.appendChild(dot);
+                            });
+                        }
+                    }
+    
+                    // Populate Main Info
+                    const mainTitleEl = document.getElementById('product-main-title');
+                    const mainPriceEl = document.getElementById('product-main-price');
+                    const topNavTitleEl = document.querySelector('.top-nav .top-nav-title');
+                    if(mainTitleEl) mainTitleEl.textContent = product.name || 'N/A';
+                    if(mainPriceEl) mainPriceEl.innerHTML = `<span class="currency">GH₵</span> ${parseFloat(product.price || 0).toFixed(2)}`;
+                    if(topNavTitleEl) topNavTitleEl.textContent = product.name || 'Product Details';
+                    
+                    // Populate Specifications
+                    const specConditionEl = document.getElementById('spec-condition-value');
+                    const specCampusEl = document.getElementById('spec-campus-value');
+                    if(specConditionEl) specConditionEl.textContent = product.condition || 'N/A';
+                    if(specCampusEl) specCampusEl.textContent = product.campus || 'N/A';
+                    
+                    // Populate Description
+                    const descriptionContentEl = document.getElementById('product-description-content'); // YOUR ID
+                    if (descriptionContentEl) {
+                        descriptionContentEl.innerHTML = ''; // Clear static content
+                        const descP = document.createElement('p');
+                        descP.style.whiteSpace = 'pre-line';
+                        descP.textContent = product.description || 'No description available.';
+                        descriptionContentEl.appendChild(descP);
+                        // Initial state for description toggle is now handled in initializePageSpecificUI
+                    }
+    
+                    // Populate Vendor Info
+                    const vendorNameLinkEl = document.getElementById('vendor-name-link');
+                    if (vendorNameLinkEl) {
+                        vendorNameLinkEl.textContent = product.vendor_display_name || product.vendor_username || 'Unknown Vendor';
+                    }
+                    
+                    // Update WhatsApp Message Pre-fill (initial setup using fetched product)
+                    updateWhatsAppMessage(product);
+    
+                    // Hide Skeleton, Show Content
+                    if (skeletonLoader) skeletonLoader.style.display = 'none';
+                    if (mainContentContainer) mainContentContainer.style.display = 'block';
+    
+                    // Initialize/Re-initialize all UI features that depend on this dynamic content
+                    if (typeof initializePageSpecificUI === 'function') { // Changed function name
+                        initializePageSpecificUI(product); // Pass product for context
+                    } else {
+                        console.warn("initializePageSpecificUI function not found. Some UI might not be fully interactive.");
+                    }
+    
+                } else {
+                    if (productDisplaySection) productDisplaySection.innerHTML = '<div style="padding:20px; text-align:center; color:red;">Could not load product details. Product not found.</div>';
+                    if (skeletonLoader) skeletonLoader.style.display = 'none';
+                    if (mainContentContainer) mainContentContainer.style.display = 'block';
+                }
+            } catch (error) {
+                console.error("EmbeddedJS: Error in loadAndDisplayProductDetails:", error);
+                if (productDisplaySection) productDisplaySection.innerHTML = `<div style="padding:20px; text-align:center; color:red;">Error loading product details: ${error.message}</div>`;
+                if (skeletonLoader) skeletonLoader.style.display = 'none';
+                if (mainContentContainer) mainContentContainer.style.display = 'block';
+            }
         }
+    
+        // --- DOMContentLoaded MAIN EXECUTION ---
+        console.log("DOM fully loaded. Main execution sequence starting...");
+        
+        setTimeout(() => {
+            console.log("EmbeddedJS: Timeout finished, hiding skeleton and initiating data load.");
+            const skeletonLoaderElem = document.getElementById('skeleton-loader');
+            const mainContentElem = document.getElementById('main-content');
+            if (skeletonLoaderElem) skeletonLoaderElem.style.display = 'none';
+            if (mainContentElem) mainContentElem.style.display = 'block';
+            
+            // This will fetch data and then call initializePageSpecificUI
+            loadAndDisplayProductDetails(); 
+    
+        }, 1500); // Your existing delay
+    
+        console.log("Campus Connect Product Detail Page Initialized (End of embedded script).");
+    });
     </script>
 </body>
 </html>

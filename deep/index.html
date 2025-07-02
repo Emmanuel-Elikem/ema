@@ -2,136 +2,217 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Product Detail - ema-Campus Shopping</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Give Online - Lighthouse City Church</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --text-light: #ffffff;
+            --overlay: rgba(0, 0, 0, 0.6);
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        body {
+            min-height: 100%;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(var(--overlay), var(--overlay)),
+                        url('https://images.pexels.com/photos/6646944/pexels-photo-6646944.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            padding: 1.5rem;
+            text-align: center;
+            background-color: var(--overlay);
+        }
+
+        .container {
+            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .content-box {
+            background: var(--overlay);
+            padding: 3rem 2rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+            backdrop-filter: blur(5px);
+            width: 100%;
+            max-width: 800px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .instruction {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .countries-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            width: 100%;
+            margin-bottom: 2rem;
+        }
+
+        .country-btn {
+            padding: 1.2rem;
+            background: var(--primary-color);
+            border: none;
+            border-radius: var(--border-radius);
+            color: var(--text-light);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .country-btn:hover,
+        .country-btn:focus {
+            background: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        .blessing {
+            font-size: 1.1rem;
+            margin-top: 2rem;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .content-box {
+                padding: 2rem 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .countries-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
+    <header class="header">
+        <h1>Lighthouse City Church</h1>
+    </header>
 
-    <div class="product-detail-page" id="productDetailPage">
-        <div class="skeleton-loader">
-            <header class="skeleton-header">
-                <div class="skeleton skeleton-back-arrow"></div>
-            </header>
-            <div class="skeleton-gallery"></div>
-            <div class="skeleton-info">
-                <div class="skeleton skeleton-text skeleton-title"></div>
-                <div class="skeleton skeleton-text skeleton-price"></div>
-            </div>
-            <div class="skeleton-card">
-                <div class="skeleton skeleton-text"></div>
-                <div class="skeleton skeleton-text"></div>
-                <div class="skeleton skeleton-text"></div>
-            </div>
-            <div class="skeleton-card">
-                <div class="skeleton skeleton-text"></div>
-                <div class="skeleton skeleton-text"></div>
-                <div class="skeleton skeleton-text"></div>
-                <div class="skeleton skeleton-text skeleton-short"></div>
-            </div>
-             <div class="skeleton-card">
-                <div class="skeleton skeleton-text skeleton-short"></div>
-            </div>
-            <div class="skeleton-similar">
-                <div class="skeleton skeleton-text skeleton-title-short"></div>
-                <div class="skeleton-similar-items">
-                    <div class="skeleton skeleton-similar-item"></div>
-                    <div class="skeleton skeleton-similar-item"></div>
-                    <div class="skeleton skeleton-similar-item"></div>
-                </div>
-            </div>
-        </div>
-        <div class="page-content" style="display: none;">
-            <header class="page-header">
-                <button class="back-button" aria-label="Go back">←</button>
-                </header>
-
-            <section class="product-gallery-container">
-                <div class="product-gallery" id="productGallery">
-                    </div>
-                <div class="gallery-dots" id="galleryDots">
-                    </div>
-                <button class="wishlist-button" id="wishlistBtn" aria-label="Add to Wishlist">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="heart-icon"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+    <main class="container">
+        <div class="content-box">
+            <h2>Give Online</h2>
+            <p class="instruction">Select your location to continue</p>
+            
+            <div class="countries-grid">
+                <button class="country-btn" data-country="GH">
+                    🇬🇧 Ghana
                 </button>
-                 <button class="fullscreen-toggle" id="fullscreenToggle" aria-label="Toggle fullscreen image">⛶</button> </section>
-
-            <section class="product-info">
-                <h1 class="product-name" id="productName"></h1>
-                <p class="product-price" id="productPrice"></p>
-            </section>
-
-            <section class="product-variations card" id="productVariations" style="display: none;">
-                <h3 class="variation-title">Select Size:</h3>
-                <div class="variation-options" id="variationOptions">
-                    </div>
-            </section>
-
-            <section class="specs-card card">
-                <h3>Specifications</h3>
-                <ul class="specs-list" id="specsList">
-                    </ul>
-            </section>
-
-            <section class="description-card card">
-                <h3>Description</h3>
-                <div class="description-content" id="descriptionContent">
-                    <p id="productDescription"></p>
-                </div>
-                <button class="toggle-description" id="toggleDescriptionBtn">
-                    Show More <span class="arrow">▼</span>
+                <button class="country-btn" data-country="KE">
+                    🇰🇪 Kenya
                 </button>
-            </section>
-
-            <section class="vendor-reviews-card card">
-                <div class="vendor-info" id="vendorInfo">
-                    </div>
-                <div class="reviews-preview">
-                    <h4>Customer Reviews</h4>
-                    <ul class="review-list" id="reviewList">
-                       </ul>
-                    <button class="view-all-reviews-btn" id="viewAllReviewsBtn">View All Reviews</button>
-                </div>
-                <a href="#" class="report-link" id="reportLink">Report incorrect product details</a>
-            </section>
-
-            <section class="similar-products">
-                <h3>Similar Products</h3>
-                <div class="similar-products-scroll" id="similarProductsScroll">
-                   </div>
-            </section>
-
-            <div class="content-spacer"></div>
-        </div>
-        <div class="bottom-action-bar">
-            <button class="action-button call-button" id="callVendorBtn" aria-label="Call Vendor">
-                📞 </button>
-            <button class="action-button order-button" id="orderNowBtn">Order Now</button>
-            <button class="action-button cart-button" id="addToCartBtn" aria-label="Add to Cart">
-                🛒 </button>
-        </div>
-
-        <div class="whatsapp-overlay" id="whatsappOverlay">
-            <div class="overlay-content">
-                 <button class="close-overlay-btn" id="closeOverlayBtn" aria-label="Close overlay">✕</button>
-                <h3>Confirm WhatsApp Order</h3>
-                <p class="whatsapp-intro">Review the message below and add any questions before sending.</p>
-                <textarea id="whatsappMessage" rows="8" readonly></textarea>
-                <textarea id="whatsappUserInput" rows="3" placeholder="Add your message or questions here..."></textarea>
-                <button class="confirm-whatsapp-btn" id="confirmWhatsappBtn">Send on WhatsApp</button>
-            </div>
-        </div>
-
-        <div class="fullscreen-viewer" id="fullscreenViewer">
-            <button class="close-fullscreen-btn" id="closeFullscreenBtn" aria-label="Close fullscreen view">✕</button>
-            <img src="" alt="Fullscreen product image" id="fullscreenImage">
+                <button class="country-btn" data-country="NG">
+                    🇳🇬 Nigeria
+                </button>
+                <button class="country-btn" data-country="TG">
+                    🇹🇬 Togo
+                </button>
+                <button class="country-btn" data-country="US">
+                    🇺🇸 United States
+                </button>
+                <button class="country-btn" data-country="GB">
+                    🇬🇧 United Kingdom
+                </button>
+                <button class="country-btn" data-country="OTHER">
+                    🌍 Other Countries
+                </button>
             </div>
 
-         <div class="toast-notification" id="toastNotification"></div>
+            <p class="blessing">"God loves a cheerful giver." - 2 Corinthians 9:7</p>
+        </div>
+    </main>
 
-    </div>
+    <script>
+        // Handle country selection
+        document.querySelectorAll('.country-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const countryCode = this.dataset.country;
+                handleCountrySelection(countryCode);
+            });
+        });
 
-    <script src="script.js"></script>
+        // PSPax integration placeholder
+        function handleCountrySelection(countryCode) {
+            // Map country codes to full names
+            const countryNames = {
+                GH: 'Ghana',
+                KE: 'Kenya',
+                NG: 'Nigeria',
+                TG: 'Togo',
+                US: 'United States',
+                GB: 'United Kingdom',
+                OTHER: 'Other Countries'
+            };
+
+            const countryName = countryNames[countryCode];
+            
+            // For demo purposes - replace with PSPax API call
+            console.log(`Initiating donation process for: ${countryName}`);
+            alert(`Proceeding with donation for ${countryName}...`);
+            
+            /* 
+            // PSPax Integration Example (to be implemented)
+            fetch('https://api.pspax.com/init', {
+                method: 'POST',
+                body: JSON.stringify({
+                    country: countryCode
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Handle response
+            });
+            */
+        }
+    </script>
 </body>
 </html>

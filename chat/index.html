@@ -1,294 +1,148 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Product Detail - Campus E-Commerce</title>
-  <!-- Mobile-first CSS -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lighthouse City Church - Give Online</title>
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    /* Variables */
     :root {
-      --brand-color: #FFCC08;
-      --bg-color: #ffffff;
-      --text-color: #333;
-      --transition: 0.3s ease;
+      --primary-color: #f2c94c; /* gold accent */
+      --overlay-color: rgba(0, 0, 0, 0.5);
+      --text-color: #ffffff;
+      --font-family: 'Poppins', sans-serif;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; background: var(--bg-color); color: var(--text-color); line-height: 1.5; }
-    a { color: inherit; text-decoration: none; }
-    img { max-width: 100%; display: block; }
-
-    /* Skeleton loader styles */
-    .skeleton { background: #eee; border-radius: 4px; }
-    .skeleton.text { height: 1em; margin-bottom: 0.5em; }
-    .skeleton.image { width: 100%; padding-top: 75%; }
-
-    /* Container */
-    .container { padding: 1rem; padding-bottom: 6rem; /* space for bottom bar */ }
-
-    /* Back arrow */
-    .back-btn { display: inline-flex; align-items: center; font-size: 1.2rem; cursor: pointer; margin-bottom: 1rem; }
-    .back-btn svg { width: 1.5rem; height: 1.5rem; margin-right: 0.5rem; }
-
-    /* Image gallery */
-    .gallery { position: relative; overflow: hidden; }
-    .gallery img { width: 100%; border-radius: 0.5rem; transition: transform var(--transition); }
-    .gallery .heart { position: absolute; top: 1rem; right: 1rem; font-size: 1.6rem; color: white; cursor: pointer; transition: transform var(--transition); }
-    .gallery .heart.favorited { color: var(--brand-color); transform: scale(1.2); }
-    .dots { text-align: center; margin-top: 0.5rem; }
-    .dots span { display: inline-block; width: 8px; height: 8px; margin: 0 4px; background: #ccc; border-radius: 50%; cursor: pointer; transition: background var(--transition); }
-    .dots span.active { background: var(--brand-color); }
-
-    /* Fullscreen overlay */
-    .lightbox { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); display:none; align-items:center; justify-content:center; }
-    .lightbox img { max-width:90%; max-height:90%; }
-    .lightbox:active { cursor: zoom-out; }
-
-    /* Product info */
-    .product-name { font-size: 1.4rem; margin: 1rem 0 0.5rem; }
-    .price { font-size: 1.2rem; font-weight: bold; color: var(--brand-color); }
-
-    /* Specs & description cards */
-    .card { background: #fafafa; border-radius: 0.5rem; padding: 1rem; margin-top: 1rem; }
-    .specs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem 1rem; }
-    .specs div { font-size: 0.9rem; }
-    .description { position: relative; }
-    .desc-text { max-height: 5em; overflow: hidden; transition: max-height var(--transition); }
-    .desc-text.expanded { max-height: 100vh; }
-    .toggle-desc { position: absolute; bottom: 0; right: 0; background: var(--bg-color); cursor: pointer; display: flex; align-items: center; }
-
-    /* Vendor & reviews */
-    .vendor { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; }
-    .reviews { margin-top: 0.5rem; }
-    .review { margin-bottom: 0.75rem; font-size: 0.85rem; }
-    .review .stars { color: #f5a623; }
-
-    /* Similar products carousel */
-    .similar { margin-top: 1.5rem; }
-    .similar .scroll { display: flex; overflow-x: auto; gap: 1rem; padding-bottom: 0.5rem; }
-    .similar .item { min-width: 40%; background: #fafafa; border-radius: 0.5rem; padding: 0.5rem; flex-shrink: 0; }
-
-    /* Bottom action bar */
-    .action-bar { position: fixed; bottom: 3.5rem; left:0; width:100%; background: #fff; display: flex; border-top: 1px solid #ddd; }
-    .action-bar button { flex:1; padding: 1rem 0; font-size: 1rem; border:none; background: none; cursor: pointer; transition: background var(--transition); }
-    .action-bar button.primary { background: var(--brand-color); color:#fff; flex:2; }
-    .action-bar button:hover { background: #f0f0f0; }
-
-    /* Floating bottom nav placeholder */
-    .bottom-nav { position: fixed; bottom:0; left:0; width:100%; height:3.5rem; background: #fff; border-top:1px solid #ccc; }
-
-    /* Variations */
-    .variations { margin: 1rem 0; display: flex; gap: 0.5rem; flex-wrap: wrap; }
-    .variations button { padding: 0.5rem 1rem; border:1px solid #ccc; border-radius:0.5rem; background:#fff; cursor:pointer; transition: border var(--transition), background var(--transition); }
-    .variations button.selected { border-color: var(--brand-color); background: var(--brand-color); color: #fff; }
-
-    /* WhatsApp overlay */
-    .whatsapp-overlay { position: fixed; bottom:-100%; left:0; width:100%; height:66%; background:#fff; border-top-left-radius:1rem; border-top-right-radius:1rem; box-shadow:0 -2px 10px rgba(0,0,0,0.1); padding:1rem; transition: bottom var(--transition); }
-    .overlay-header { font-weight: bold; margin-bottom:0.5rem; }
-    .overlay textarea { width:100%; height:4rem; border:1px solid #ccc; border-radius:0.5rem; padding:0.5rem; resize:none; }
-    .overlay .send-btn { margin-top:0.75rem; padding:0.75rem; width:100%; border:none; border-radius:0.5rem; background: var(--brand-color); color:#fff; font-size:1rem; cursor:pointer; }
-
-    /* Media queries for larger screens */
-    @media(min-width: 768px) {
-      .container { padding:2rem; }
-      .product-name { font-size:2rem; }
-      .price { font-size:1.5rem; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      height: 100%;
+      font-family: var(--font-family);
+      color: var(--text-color);
+    }
+    body {
+      background: url('https://source.unsplash.com/1600x900/?church,congregation') center/cover no-repeat;
+      position: relative;
+    }
+    /* Dark overlay for readability */
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--overlay-color);
+      z-index: 1;
+    }
+    .container {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      padding: 2rem;
+      text-align: center;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+    }
+    .countries {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 1rem;
+      width: 100%;
+      max-width: 600px;
+    }
+    .country-btn {
+      background: var(--overlay-color);
+      border: none;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.2s ease, background 0.2s ease;
+      color: var(--text-color);
+      font-size: 1rem;
+    }
+    .country-btn:hover,
+    .country-btn:focus {
+      transform: translateY(-5px);
+      background: var(--primary-color);
+      outline: none;
+    }
+    .country-flag {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    @media (max-width: 600px) {
+      h1 { font-size: 2rem; }
+      p  { font-size: 1rem; }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- Back Button -->
-    <div class="back-btn" onclick="history.back()">
-      <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
-      <span>Back</span>
+    <h1>Lighthouse City Church</h1>
+    <p>Select your location to give:</p>
+
+    <div class="countries">
+      <button class="country-btn" onclick="selectCountry('Ghana')">
+        <span class="country-flag">🇬🇭</span>
+        Ghana
+      </button>
+      <button class="country-btn" onclick="selectCountry('Kenya')">
+        <span class="country-flag">🇰🇪</span>
+        Kenya
+      </button>
+      <button class="country-btn" onclick="selectCountry('Nigeria')">
+        <span class="country-flag">🇳🇬</span>
+        Nigeria
+      </button>
+      <button class="country-btn" onclick="selectCountry('Togo')">
+        <span class="country-flag">🇹🇬</span>
+        Togo
+      </button>
+      <button class="country-btn" onclick="selectCountry('USA')">
+        <span class="country-flag">🇺🇸</span>
+        USA
+      </button>
+      <button class="country-btn" onclick="selectCountry('UK')">
+        <span class="country-flag">🇬🇧</span>
+        UK
+      </button>
+      <button class="country-btn" onclick="selectCountry('Other')">
+        <span class="country-flag">🌐</span>
+        Other
+      </button>
     </div>
 
-    <!-- Image Gallery -->
-    <div class="gallery">
-      <div class="skeleton image" id="gallery-loader"></div>
-      <img src="image1.jpg" alt="Product Image" id="main-img" style="display:none;" />
-      <div class="heart" id="wishlist-btn">♡</div>
-      <div class="dots" id="dot-container"></div>
-    </div>
-
-    <!-- Product Info -->
-    <h1 class="product-name">Product Name Example</h1>
-    <div class="price">GHS 120</div>
-
-    <!-- Variations -->
-    <div class="variations" id="variations-container">
-      <!-- Dynamic options -->
-    </div>
-
-    <!-- Short Specs -->
-    <div class="card specs" id="specs-container">
-      <!-- Dynamic specs -->
-    </div>
-
-    <!-- Description -->
-    <div class="card description">
-      <div class="desc-text" id="desc-text">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vehicula.
-      </div>
-      <div class="toggle-desc" id="toggle-desc">
-        <span>Show More</span>
-      </div>
-    </div>
-
-    <!-- Vendor & Reviews -->
-    <div class="card">
-      <div class="vendor">
-        <a href="#" id="vendor-name">ShopName</a>
-        <div class="stars">★★★★★</div>
-      </div>
-      <div class="reviews" id="reviews-container">
-        <!-- Review snippets -->
-      </div>
-      <button onclick="reportIssue()">Report incorrect product details</button>
-    </div>
-
-    <!-- Similar Products -->
-    <div class="similar">
-      <h2>Similar Products</h2>
-      <div class="scroll" id="similar-container">
-        <!-- Similar items -->
-      </div>
-    </div>
+    <p style="margin-top: 2rem;">Thank you for your generosity. God bless you as you give.</p>
   </div>
 
-  <!-- Bottom Action Bar -->
-  <div class="action-bar">
-    <button onclick="callVendor()"><svg viewBox="0 0 24 24" width="24" height="24"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.11-.27 11.36 11.36 0 003.55.57 1 1 0 011 1v3.5a1 1 0 01-1 1A17 17 0 013 5a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.57 3.55 1 1 0 01-.27 1.11l-2.2 2.2z" fill="#333"/></svg></button>
-    <button class="primary" id="order-btn">Order Now</button>
-    <button onclick="addToCart()"><svg viewBox="0 0 24 24" width="24" height="24"><path d="M6 6h15l-1.5 9h-13z" stroke="#333" stroke-width="2" fill="none"/><circle cx="9" cy="21" r="1"/><circle cx="19" cy="21" r="1"/></svg></button>
-  </div>
-  <div class="bottom-nav"></div>
-
-  <!-- WhatsApp Overlay -->
-  <div class="whatsapp-overlay" id="wa-overlay">
-    <div class="overlay-header">Message Vendor via WhatsApp</div>
-    <textarea id="wa-message"></textarea>
-    <button class="send-btn" id="wa-send">Send on WhatsApp</button>
-  </div>
-
-  <!-- Fullscreen Lightbox -->
-  <div class="lightbox" id="lightbox">
-    <img src="" alt="Zoomed Image" id="lightbox-img" />
-  </div>
-
-  <!-- JavaScript -->
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // Simulate data fetch
-      setTimeout(initPage, 1000);
-
-      // Wishlist toggle
-      document.getElementById('wishlist-btn').addEventListener('click', () => {
-        const btn = document.getElementById('wishlist-btn');
-        btn.classList.toggle('favorited');
-        btn.textContent = btn.classList.contains('favorited') ? '♥' : '♡';
-      });
-
-      // Description toggle
-      document.getElementById('toggle-desc').addEventListener('click', () => {
-        const txt = document.getElementById('desc-text');
-        const toggle = document.getElementById('toggle-desc').querySelector('span');
-        txt.classList.toggle('expanded');
-        toggle.textContent = txt.classList.contains('expanded') ? 'Show Less' : 'Show More';
-      });
-
-      // Order overlay
-      document.getElementById('order-btn').addEventListener('click', () => {
-        const overlay = document.getElementById('wa-overlay');
-        const msg = document.getElementById('wa-message');
-        overlay.style.bottom = '0';
-        msg.value = `Hello ${vendorName},\n\nI'm interested in ordering the following item from ema-Campus Shopping:\n\nProduct: ${productName}\nPrice: ${productPrice}\n\nMy additional message/questions:\n`;
-      });
-      document.getElementById('wa-send').addEventListener('click', () => {
-        const overlay = document.getElementById('wa-overlay');
-        const text = document.getElementById('wa-message').value;
-        window.location.href = `https://wa.me/${vendorPhone}?text=${encodeURIComponent(text)}`;
-      });
-
-      // Lightbox
-      document.getElementById('main-img').addEventListener('click', () => {
-        const lb = document.getElementById('lightbox');
-        document.getElementById('lightbox-img').src = document.getElementById('main-img').src;
-        lb.style.display = 'flex';
-      });
-      document.getElementById('lightbox').addEventListener('click', () => {
-        document.getElementById('lightbox').style.display = 'none';
-      });
-    });
-
-    // Placeholder variables (replace with real data)
-    const vendorName = 'ShopName';
-    const productName = 'Product Name Example';
-    const productPrice = 'GHS 120';
-    const vendorPhone = '233501234567';
-
-    function initPage() {
-      // Hide skeletons, show real data
-      document.getElementById('gallery-loader').style.display = 'none';
-      const img = document.getElementById('main-img'); img.style.display = 'block';
-
-      // Populate dots (example for 3 images)
-      const dots = document.getElementById('dot-container');
-      [1,2,3].forEach((_, i) => {
-        const dot = document.createElement('span');
-        dot.addEventListener('click', () => changeImage(i));
-        if(i===0) dot.classList.add('active');
-        dots.append(dot);
-      });
-
-      // Specs example
-      const specs = { Brand: 'XYZ', Color: 'Red', Condition: 'New', Size: 'M' };
-      const specContainer = document.getElementById('specs-container');
-      Object.entries(specs).forEach(([key,val]) => {
-        const div = document.createElement('div'); div.textContent = `${key}: ${val}`;
-        specContainer.append(div);
-      });
-
-      // Variations example
-      const variations = ['S','M','L'];
-      const varContainer = document.getElementById('variations-container');
-      variations.forEach(opt => {
-        const btn = document.createElement('button'); btn.textContent = opt;
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.variations button').forEach(b => b.classList.remove('selected'));
-          btn.classList.add('selected');
-        }); varContainer.append(btn);
-      });
-
-      // Reviews example
-      const reviews = [ {user:'Alice',rating:5,text:'Great product!'}, {user:'Bob',rating:4,text:'Good, but...'}, {user:'Eve',rating:5,text:'Excellent!'} ];
-      const revContainer = document.getElementById('reviews-container');
-      reviews.forEach(r => {
-        const div = document.createElement('div'); div.className='review';
-        div.innerHTML = `<strong>${r.user}:</strong> ${r.text.length>50?r.text.slice(0,50)+'...':r.text} <span class='stars'>${'★'.repeat(r.rating)}</span>`;
-        revContainer.append(div);
-      });
-
-      // Similar products example
-      const similar = [1,2,3,4].map(i=>`<div class=\"item\"><img src=\"sim${i}.jpg\" alt=\"Sim ${i}\"><p>Sim Product ${i}</p></div>`);
-      document.getElementById('similar-container').innerHTML = similar.join('');
-    }
-
-    function changeImage(index) {
-      // Change main image src as needed
-      document.getElementById('main-img').src = `image${index+1}.jpg`;
-      document.querySelectorAll('.dots span').forEach((d,i)=>d.classList.toggle('active', i===index));
-    }
-
-    function callVendor() {
-      window.location.href = `tel:${vendorPhone}`;
-    }
-    function addToCart() {
-      alert('Added to cart!');
-    }
-    function reportIssue() {
-      alert('Report submitted. Thank you!');
+    /**
+     * Handles country selection and prepares for PSPax integration.
+     * @param {string} country - The selected country code.
+     */
+    function selectCountry(country) {
+      console.log('Selected Country:', country);
+      alert('Proceeding with donation for ' + country + '...');
+      // TODO: Integrate PSPax API here:
+      // Example placeholder:
+      // pspax.initializePayment({ country: country, amount: amount, currency: currency });
     }
   </script>
 </body>

@@ -1,0 +1,2751 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Dashboard | Campus E-commerce</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        :root {
+            --primary: #FFCC08;
+            --primary-light: #fff3c9;
+            --primary-dark: #e6b800;
+            --secondary: #333333;
+            --text-dark: #222222;
+            --text-light: #666666;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --white: #ffffff;
+            --light-bg: #f8f9fa;
+            --border: #e0e0e0;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+        
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: var(--text-dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        button, a.btn {
+            cursor: pointer;
+            border: none;
+            border-radius: var(--radius);
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: var(--transition);
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--secondary);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--primary);
+            color: var(--secondary);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--primary-light);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: var(--white);
+        }
+        
+        .btn-danger:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+        }
+        
+        .badge {
+            padding: 0.35rem 0.65rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .badge-success { background-color: #d4f7dd; color: #0f5132; }
+        .badge-warning { background-color: #fff8db; color: #997404; }
+        .badge-danger { background-color: #f8d7da; color: #842029; }
+        .badge-info { background-color: #cff4fc; color: #055160; }
+        
+        .flex {
+            display: flex;
+        }
+        
+        .flex-col {
+            flex-direction: column;
+        }
+        
+        .items-center {
+            align-items: center;
+        }
+        
+        .justify-between {
+            justify-content: space-between;
+        }
+        
+        .gap-1 { gap: 0.25rem; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+        
+        .mb-1 { margin-bottom: 0.25rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-3 { margin-bottom: 0.75rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+        
+        .card {
+            background-color: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+        
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+        
+        /* Layout Styles */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            background-color: var(--white);
+            padding: 1.5rem;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            position: fixed;
+            width: 240px;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .logo-img {
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--secondary);
+        }
+        
+        .logo-text {
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        
+        .nav-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .nav-item {
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-light);
+            text-decoration: none;
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+        
+        .nav-link:hover {
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+        }
+        
+        .nav-link.active {
+            background-color: var(--primary-light);
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+        
+        .main-content {
+            padding: 2rem;
+            margin-left: 240px;
+            width: calc(100% - 240px);
+            min-height: 100vh;
+        }
+        
+        /* Components */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .user-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .dropdown-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            background-color: var(--white);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .dropdown-toggle:hover {
+            box-shadow: var(--shadow);
+        }
+        
+        .dropdown-toggle .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary);
+            font-weight: 600;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 120%;
+            right: 0;
+            background-color: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            min-width: 180px;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.2s ease;
+        }
+        
+        .dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .dropdown-item:hover {
+            background-color: var(--light-bg);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        
+        .stat-icon.sales { background-color: rgba(255, 204, 8, 0.15); color: var(--primary-dark); }
+        .stat-icon.orders { background-color: rgba(40, 167, 69, 0.15); color: var(--success); }
+        .stat-icon.products { background-color: rgba(23, 162, 184, 0.15); color: var(--info); }
+        .stat-icon.pending { background-color: rgba(255, 193, 7, 0.15); color: var(--warning); }
+        
+        .stat-info h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            color: var(--text-dark);
+        }
+        
+        .stat-info p {
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+        
+        .tab-container {
+            margin-bottom: 2rem;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 0.75rem 1.25rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+            color: var(--text-light);
+            transition: var(--transition);
+        }
+        
+        .tab:hover {
+            color: var(--text-dark);
+        }
+        
+        .tab.active {
+            color: var(--primary-dark);
+            border-bottom-color: var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .product-card {
+            display: flex;
+            flex-direction: column;
+            border-radius: var(--radius);
+            overflow: hidden;
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        
+        .product-details {
+            padding: 1rem;
+            flex: 1;
+        }
+        
+        .product-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+        
+        .product-price {
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .product-status {
+            margin-bottom: 1rem;
+        }
+        
+        .product-actions {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: space-between;
+            margin-top: auto;
+        }
+        
+        /* Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--success);
+        }
+        
+        input:focus + .slider {
+            box-shadow: 0 0 1px var(--success);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+        
+        /* Form Styles */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(255, 204, 8, 0.25);
+        }
+        
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+        
+        th {
+            text-align: left;
+            padding: 1rem;
+            background-color: var(--light-bg);
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-light);
+        }
+        
+        tr:hover td {
+            background-color: var(--primary-light);
+        }
+        
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-backdrop.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            background-color: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+        }
+        
+        .modal-backdrop.show .modal {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-light);
+            transition: var(--transition);
+        }
+        
+        .modal-close:hover {
+            color: var(--danger);
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+        
+        /* File Upload */
+        .file-upload {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .file-upload:hover {
+            border-color: var(--primary);
+            background-color: var(--primary-light);
+        }
+        
+        .file-upload input {
+            display: none;
+        }
+        
+        .file-upload i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .file-upload p {
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+        }
+        
+        .file-upload span {
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+        
+        /* Charts */
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        
+        /* Notifications */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius);
+            background-color: var(--white);
+            box-shadow: var(--shadow-lg);
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .notification-success {
+            border-left: 4px solid var(--success);
+        }
+        
+        .notification-error {
+            border-left: 4px solid var(--danger);
+        }
+        
+        /* Media Queries */
+        @media (max-width: 991px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                position: fixed;
+                left: -240px;
+                transition: all 0.3s ease;
+            }
+            
+            .sidebar.show {
+                left: 0;
+                box-shadow: var(--shadow-lg);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 1rem;
+            }
+            
+            .mobile-toggle {
+                display: block;
+                font-size: 1.5rem;
+                cursor: pointer;
+            }
+        }
+        
+        @media (min-width: 992px) {
+            .mobile-toggle {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(100%, 1fr));
+            }
+            
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+            }
+            
+            .modal {
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-img">V</div>
+                <div class="logo-text">Vendor Dashboard</div>
+            </div>
+            
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="#dashboard" class="nav-link active" data-tab="dashboard">
+                        <i class="fas fa-th-large"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#products" class="nav-link" data-tab="products">
+                        <i class="fas fa-box"></i>
+                        <span>Products</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#orders" class="nav-link" data-tab="orders">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span>Orders</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#analytics" class="nav-link" data-tab="analytics">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Analytics</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#settings" class="nav-link" data-tab="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div style="margin-top: auto; padding-top: 2rem;">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header">
+                <div class="flex items-center gap-3">
+                    <div class="mobile-toggle">
+                        <i class="fas fa-bars"></i>
+                    </div>
+                    <h1>Welcome, <span class="vendor-name">Vendor Name</span></h1>
+                </div>
+                
+                <div class="user-dropdown">
+                    <div class="dropdown-toggle">
+                        <div class="user-avatar">A</div>
+                        <span class="vendor-name">Vendor Name</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="dropdown-menu">
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-user"></i>
+                            <span>Profile</span>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dashboard Tab Content -->
+            <div class="tab-content active" id="dashboard-content">
+                <div class="stats-grid">
+                    <div class="card stat-card">
+                        <div class="stat-icon sales">
+                            <i class="fas fa-money-bill"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>₵12,580</h3>
+                            <p>Total Sales</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card stat-card">
+                        <div class="stat-icon orders">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>124</h3>
+                            <p>Total Orders</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card stat-card">
+                        <div class="stat-icon products">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>18</h3>
+                            <p>Active Products</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card stat-card">
+                        <div class="stat-icon pending">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>5</h3>
+                            <p>Pending Orders</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid" style="grid-template-columns: 2fr 1fr;">
+                    <div class="card">
+                        <h2 class="mb-4">Sales Overview</h2>
+                        <div class="chart-container">
+                            <canvas id="salesChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h2 class="mb-4">Recent Orders</h2>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>#1022</td>
+                                        <td>₵150</td>
+                                        <td><span class="badge badge-success">Delivered</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>#1021</td>
+                                        <td>₵75</td>
+                                        <td><span class="badge badge-warning">Pending</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>#1020</td>
+                                        <td>₵210</td>
+                                        <td><span class="badge badge-success">Delivered</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>#1019</td>
+                                        <td>₵65</td>
+                                        <td><span class="badge badge-danger">Cancelled</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <a href="#orders" class="btn btn-outline" data-tab-link="orders">View All Orders</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card" style="margin-top: 1.5rem;">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2>Popular Products</h2>
+                        <a href="#products" class="btn btn-outline" data-tab-link="products">View All Products</a>
+                    </div>
+                    
+                    <div class="product-grid">
+                        <div class="product-card">
+                            <img src="/api/placeholder/400/320" alt="Product" class="product-image">
+                            <div class="product-details">
+                                <h3 class="product-title">UCC Branded Hoodie</h3>
+                                <div class="product-price">₵150.00</div>
+                                <div class="product-status">
+                                    <span class="badge badge-success">Active</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>12 sales</span>
+                                    <span>★★★★★</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="product-card">
+                            <img src="/api/placeholder/400/320" alt="Product" class="product-image">
+                            <div class="product-details">
+                                <h3 class="product-title">MTN Data Bundle - 10GB</h3>
+                                <div class="product-price">₵85.00</div>
+                                <div class="product-status">
+                                    <span class="badge badge-success">Active</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>48 sales</span>
+                                    <span>★★★★☆</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="product-card">
+                            <img src="/api/placeholder/400/320" alt="Product" class="product-image">
+                            <div class="product-details">
+                                <h3 class="product-title">Customized Study Notes</h3>
+                                <div class="product-price">₵50.00</div>
+                                <div class="product-status">
+                                    <span class="badge badge-success">Active</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>32 sales</span>
+                                    <span>★★★★★</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Products Tab Content -->
+            <div class="tab-content" id="products-content">
+                <div class="flex justify-between items-center mb-4">
+                    <h1>Product Management</h1>
+                    <button class="btn btn-primary" id="add-product-btn">
+                        <i class="fas fa-plus"></i> Add New Product
+                    </button>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center gap-2">
+                            <input type="text" class="form-control" placeholder="Search products..." id="product-search">
+                        </div>
+                        <div class="flex gap-2">
+                            <select class="form-control" id="product-filter">
+                                <option value="all">All Products</option>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                                <option value="out-of-stock">Out of Stock</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="product-grid" id="products-grid">
+                    <!-- Product 1 -->
+                    <div class="product-card">
+                        <img src="/api/placeholder/400/320" alt="Product" class="product-image">
+                        <div class="product-details">
+                            <h3 class="product-title">UCC Branded Hoodie</h3>
+                            <div class="product-price">₵150.00</div>
+                            <div class="product-status">
+                                <span class="badge badge-success">Active</span>
+                            </div>
+                            <div class="product-actions">
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <div>
+                                    <button class="btn btn-sm btn-outline edit-product" data-id="1">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger delete-product" data-id="1">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Product 2 -->
+                    <div class="product-card">
+                        <img src="/api/placeholder/400/320" alt="Product" class="product-image">
+                        <div class="product-details">
+                            <h3 class="product-title">MTN Data Bundle - 10GB</h3>
+                            <div class="product-price">₵85.00</div>
+                            <div class="product-status">
+                                <span class="badge badge-success">Active</span>
+                            </div>
+                            <div class="product-actions">
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <div>
+                                    <button class="btn btn-sm btn-outline edit-product" data-id="2">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger delete-product" data-id="2">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Product 3 -->
+                    <div class="product-card">
+                        <img src="/api/placeholder/400/320" alt="Product" class="product-image">
+                        <div class="product-details">
+                            <h3 class="product-title">Customized Study Notes</h3>
+                            <div class="product-price">₵50.00</div>
+                            <div class="product-status">
+                                <span class="badge badge-success">Active</span>
+                            </div>
+                            <div class="product-actions">
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <div>
+                                    <button class="btn btn-sm btn-outline edit-product" data-id="3">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger delete-product" data-id="3">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Product 4 (Inactive) -->
+                    <div class="product-card">
+                        <img src="/api/placeholder/400/320" alt="Product" class="product-image" style="filter: grayscale(1);">
+                        <div class="product-details">
+                            <h3 class="product-title">Campus Delivery Service</h3>
+                            <div class="product-price">₵15.00</div>
+                            <div class="product-status">
+                                <span class="badge badge-danger">Inactive</span>
+                            </div>
+                            <div class="product-actions">
+                                <label class="switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                                <div>
+                                    <button class="btn btn-sm btn-outline edit-product" data-id="4">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger delete-product" data-id="4">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Product 5 -->
+                    <div class="product-card">
+                        <img src="/api/placeholder/400/320" alt="Product" class="product-image">
+                        <div class="product-details">
+                            <h3 class="product-title">UCC Logo T-Shirt</h3>
+                            <div class="product-price">₵70.00</div>
+                            <div class="product-status">
+                                <span class="badge badge-success">Active</span>
+                            </div>
+                            <div class="product-actions">
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <div>
+                                    <button class="btn btn-sm btn-outline edit-product" data-id="5">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger delete-product" data-id="5">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Product 6 -->
+                    <div class="product-card">
+                        <img src="/api/placeholder/400/320" alt="Product" class="product-image">
+                        <div class="product-details">
+                            <h3 class="product-title">Vodafone Data Bundle - 5GB</h3>
+                            <div class="product-price">₵45.00</div>
+                            <div class="product-status">
+                                <span class="badge badge-success">Active</span>
+                            </div>
+                            <div class="product-actions">
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <div>
+                                    <button class="btn btn-sm btn-outline edit-product" data-id="6">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger delete-product" data-id="6">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Orders Tab Content -->
+            <div class="tab-content" id="orders-content">
+                <div class="flex justify-between items-center mb-4">
+                    <h1>Order Management</h1>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center gap-2">
+                            <input type="text" class="form-control" placeholder="Search orders..." id="order-search">
+                        </div>
+                        <div class="flex gap-2">
+                            <select class="form-control" id="order-filter">
+                                <option value="all">All Orders</option>
+                                <option value="pending">Pending</option>
+                                <option value="delivered">Delivered</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="table-container">
+                        <table id="orders-table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#1022</td>
+                                    <td>John D.</td>
+                                    <td>Apr 22, 2025</td>
+                                    <td>₵150.00</td>
+                                    <td><span class="badge badge-success">Delivered</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline view-order" data-id="1022">
+                                            <i class="fas fa-eye"></i> View
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#1021</td>
+                                    <td>Sarah K.</td>
+                                    <td>Apr 21, 2025</td>
+                                    <td>₵75.00</td>
+                                    <td><span class="badge badge-warning">Pending</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline view-order" data-id="1021">
+                                            <i class="fas fa-eye"></i> View
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#1020</td>
+                                    <td>Michael T.</td>
+                                    <td>Apr 20, 2025</td>
+                                    <td>₵210.00</td>
+                                    <td><span class="badge badge-success">Delivered</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline view-order" data-id="1020">
+                                            <i class="fas fa-eye"></i> View
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#1019</td>
+                                    <td>Emily R.</td>
+                                    <td>Apr 19, 2025</td>
+                                    <td>₵65.00</td>
+                                    <td><span class="badge badge-danger">Cancelled</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline view-order" data-id="1019">
+                                            <i class="fas fa-eye"></i> View
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#1018</td>
+                                    <td>David L.</td>
+                                    <td>Apr 18, 2025</td>
+                                    <td>₵125.00</td>
+                                    <td><span class="badge badge-success">Delivered</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline view-order" data-id="1018">
+                                            <i class="fas fa-eye"></i> View
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#1017</td>
+                                    <td>Grace O.</td>
+                                    <td>Apr 17, 2025</td>
+                                    <td>₵95.00</td>
+                                    <td><span class="badge badge-warning">Pending</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline view-order" data-id="1017">
+                                            <i class="fas fa-eye"></i> View
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#1016</td>
+                                    <td>Robert M.</td>
+                                    <td>Apr 16, 2025</td>
+                                    <td>₵180.00</td>
+                                    <td><span class="badge badge-warning">Pending</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline view-order" data-id="1016">
+                                            <i class="fas fa-eye"></i> View
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#1015</td>
+                                    <td>Sophie A.</td>
+                                    <td>Apr 15, 2025</td>
+                                    <td>₵55.00</td>
+                                    <td><span class="badge badge-danger">Cancelled</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline view-order" data-id="1015">
+                                            <i class="fas fa-eye"></i> View
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Analytics Tab Content -->
+            <div class="tab-content" id="analytics-content">
+                <div class="flex justify-between items-center mb-4">
+                    <h1>Sales Analytics</h1>
+                    <div class="flex gap-2">
+                        <select class="form-control" id="analytics-period">
+                            <option value="week">Last 7 Days</option>
+                            <option value="month" selected>Last 30 Days</option>
+                            <option value="quarter">Last 3 Months</option>
+                            <option value="year">Last Year</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+                    <div class="card stat-card">
+                        <div class="stat-icon sales">
+                            <i class="fas fa-money-bill"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>₵12,580</h3>
+                            <p>Total Sales</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card stat-card">
+                        <div class="stat-icon orders">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>124</h3>
+                            <p>Total Orders</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card stat-card">
+                        <div class="stat-icon products">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>24%</h3>
+                            <p>Growth Rate</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid" style="margin-top: 1.5rem; grid-template-columns: 2fr 1fr;">
+                    <div class="card">
+                        <h2 class="mb-4">Sales Trend</h2>
+                        <div class="chart-container">
+                            <canvas id="analyticsChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h2 class="mb-4">Top Products</h2>
+                        <div class="chart-container">
+                            <canvas id="productsPieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card" style="margin-top: 1.5rem;">
+                    <h2 class="mb-4">Sales by Day of Week</h2>
+                    <div class="chart-container">
+                        <canvas id="weekdayChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Settings Tab Content -->
+            <div class="tab-content" id="settings-content">
+                <div class="flex justify-between items-center mb-4">
+                    <h1>Account Settings</h1>
+                    <button class="btn btn-primary" id="save-settings-btn">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+                
+                <div class="card mb-4">
+                    <h2 class="mb-4">Profile Information</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Business Name</label>
+                            <input type="text" class="form-control" value="Loading Name..." id="business-name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Owner Name</label>
+                            <input type="text" class="form-control" value="Loading username..." id="owner-name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" class="form-control" value="vendor@example.com" id="email">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" value="Loading phone number..." id="phone">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <h2 class="mb-4">Store Settings</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Store Description</label>
+                            <textarea class="form-control" id="store-description">We offer a variety of campus essentials including UCC branded merchandise, data bundles, and study materials for students.</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Location on Campus</label>
+                            <input type="text" class="form-control" value="Science Block, Room 204" id="location">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Business Hours</label>
+                        <div class="flex gap-2">
+                            <input type="text" class="form-control" value="9:00 AM - 6:00 PM" id="business-hours">
+                            <select class="form-control" id="business-days">
+                                <option value="weekdays">Weekdays Only</option>
+                                <option value="all" selected>All Days</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2 class="mb-4">Payment Settings</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">MoMo Number</label>
+                            <input type="text" class="form-control" value="+233 24 987 6543" id="momo-number">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Bank Account</label>
+                            <input type="text" class="form-control" value="GCB - 12345678901234" id="bank-account">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Add Product Modal -->
+    <div class="modal-backdrop" id="add-product-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Add New Product</h3>
+                <button class="modal-close" id="close-add-product">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="add-product-form">
+                    <div class="form-group">
+                        <label class="form-label">Product Name</label>
+                        <input type="text" class="form-control" placeholder="Enter product name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Product Description</label>
+                        <textarea class="form-control" placeholder="Enter product description"></textarea>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Price (₵)</label>
+                            <input type="number" class="form-control" placeholder="0.00" step="0.01" min="0" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Category</label>
+                            <select class="form-control">
+                                <option value="">Select Category</option>
+                                <option value="merchandise">Merchandise</option>
+                                <option value="data-bundles">Data Bundles</option>
+                                <option value="services">Services</option>
+                                <option value="academics">Academic Materials</option>
+                                <option value="food">Food & Drinks</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Product Image</label>
+                        <div class="file-upload">
+                            <input type="file" id="product-image" accept="image/*">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Drag and drop your image here or</p>
+                            <span>Browse files</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <div class="flex items-center gap-2">
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                            <span>Active (Available for purchase)</span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancel-add-product">Cancel</button>
+                <button class="btn btn-primary" id="save-add-product">Add Product</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- View Order Modal -->
+    <div class="modal-backdrop" id="view-order-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Order #<span id="order-id">1021</span></h3>
+                <button class="modal-close" id="close-view-order">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="card mb-4">
+                    <h4 class="mb-3">Order Information</h4>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-light">Order Date:</span>
+                        <span>April 21, 2025</span>
+                    </div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-light">Status:</span>
+                        <span class="badge badge-warning">Pending</span>
+                    </div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-light">Customer:</span>
+                        <span>Sarah K.</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-light">Contact:</span>
+                        <span>+233 20 987 6543</span>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <h4 class="mb-3">Order Items</h4>
+                    <table class="mb-3">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Price</th>
+                                <th>Qty</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>MTN Data Bundle - 10GB</td>
+                                <td>₵85.00</td>
+                                <td>1</td>
+                                <td>₵85.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="flex justify-between">
+                        <span class="text-light">Total Amount:</span>
+                        <span class="font-bold">₵85.00</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h4 class="mb-3">Update Order Status</h4>
+                    <div class="form-group">
+                        <select class="form-control" id="order-status">
+                            <option value="pending" selected>Pending</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="close-order-button">Close</button>
+                <button class="btn btn-primary" id="update-order-status">Update Status</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-backdrop" id="delete-confirm-modal">
+        <div class="modal" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Confirm Deletion</h3>
+                <button class="modal-close" id="close-delete-confirm">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this product? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancel-delete">Cancel</button>
+                <button class="btn btn-danger" id="confirm-delete">Delete Product</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div class="notification notification-success" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notification-message">Action completed successfully!</span>
+    </div>
+    <!--<script src="js/vendor-dashboard-api.js" defer></script>-->   
+<script>
+    // Add near the top of your embedded script
+    let vendorAllProducts = []; // To store products fetched from API
+    let loggedInVendorProfile = null; // To store vendor's profile data
+
+        // DOM Elements
+        const sidebar = document.querySelector('.sidebar');
+        const mobileToggle = document.querySelector('.mobile-toggle');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const tabLinks = document.querySelectorAll('[data-tab-link]');
+        const dropdownToggle = document.querySelector('.dropdown-toggle');
+        const dropdownMenu = document.querySelector('.dropdown-menu');
+        const addProductBtn = document.getElementById('add-product-btn');
+        const addProductModal = document.getElementById('add-product-modal');
+        const closeAddProduct = document.getElementById('close-add-product');
+        const cancelAddProduct = document.getElementById('cancel-add-product');
+        const saveAddProduct = document.getElementById('save-add-product');
+        const viewOrderBtns = document.querySelectorAll('.view-order');
+        const viewOrderModal = document.getElementById('view-order-modal');
+        const closeViewOrder = document.getElementById('close-view-order');
+        const closeOrderButton = document.getElementById('close-order-button');
+        const updateOrderStatus = document.getElementById('update-order-status');
+        const deleteProductBtns = document.querySelectorAll('.delete-product');
+        const deleteConfirmModal = document.getElementById('delete-confirm-modal');
+        const closeDeleteConfirm = document.getElementById('close-delete-confirm');
+        const cancelDelete = document.getElementById('cancel-delete');
+        const confirmDelete = document.getElementById('confirm-delete');
+        const notification = document.getElementById('notification');
+        const notificationMessage = document.getElementById('notification-message');
+        const productsGridEl = document.getElementById('products-grid'); // Specific ID for products grid in "Products" tab
+        const vendorNameDisplayElements = document.querySelectorAll('.vendor-name'); // For header
+        const userAvatarElements = document.querySelectorAll('.user-avatar'); // For header
+    // Settings tab inputs
+    const settingsBusinessNameInput = document.getElementById('business-name');
+    const settingsOwnerNameDisplay = document.getElementById('owner-name'); // Will show username
+    const settingsEmailDisplay = document.getElementById('email');
+    const settingsPhoneInput = document.getElementById('phone');
+    const saveSettingsBtn = document.getElementById('save-settings-btn');
+    // (Add other settings input IDs if you have them)
+
+    // Ensure your showNotification function is defined (as you provided)
+    function showNotification(message, type = 'success') {
+        if (!notification || !notificationMessage) {
+            console.warn("Notification elements not found. Message:", message);
+            alert(message); // Fallback
+            return;
+        }
+        notificationMessage.textContent = message;
+        notification.className = 'notification show'; // Base classes
+        if (type === 'error') {
+            notification.classList.add('notification-error');
+        } else {
+            notification.classList.add('notification-success');
+        }
+        if (notification.timerId) clearTimeout(notification.timerId);
+        notification.timerId = setTimeout(() => notification.classList.remove('show'), 3000);
+    }
+
+        // Toggle Mobile Sidebar
+        mobileToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('show');
+        });
+        
+        // Tab Navigation
+navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const tabId = link.getAttribute('data-tab');
+        
+        // Update navigation
+        navLinks.forEach(item => item.classList.remove('active'));
+        link.classList.add('active');
+        
+        // Update content
+        tabContents.forEach(content => content.classList.remove('active'));
+        document.getElementById(`${tabId}-content`).classList.add('active');
+        
+        // Close mobile sidebar if open
+        sidebar.classList.remove('show');
+    });
+});
+
+// Handle tab links within content
+tabLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const tabId = link.getAttribute('data-tab-link');
+        
+        // Update navigation
+        navLinks.forEach(item => {
+            if (item.getAttribute('data-tab') === tabId) {
+                item.click();
+            }
+        });
+    });
+});
+
+// User Dropdown Toggle
+dropdownToggle.addEventListener('click', () => {
+    dropdownMenu.classList.toggle('show');
+});
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+    if (!dropdownToggle.contains(e.target)) {
+        dropdownMenu.classList.remove('show');
+    }
+});
+
+async function loadInitialVendorData() {
+    if (typeof fetchVendorProfile !== 'function' || typeof fetchMyProductsApi !== 'function') {
+        showNotification("Error: Page setup failed. API functions missing.", "error");
+        return;
+    }
+
+    // Fetch vendor profile first to display name and check vendor status
+    loggedInVendorProfile = await fetchVendorProfile();
+    if (loggedInVendorProfile) {
+        vendorNameDisplayElements.forEach(el => {
+            el.textContent = loggedInVendorProfile.business_name || loggedInVendorProfile.username || 'Vendor';
+        });
+        userAvatarElements.forEach(el => { // Update avatar initials
+             const name = loggedInVendorProfile.business_name || loggedInVendorProfile.username || 'V';
+             el.textContent = name.substring(0,1).toUpperCase(); // First letter of name
+        });
+
+        if (!loggedInVendorProfile.is_vendor) {
+            showNotification("Access Denied: You are not a registered vendor.", "error");
+            // Optionally redirect to account page or show a message
+            // For now, we'll just prevent loading products if not a vendor.
+            if(productsGridEl) productsGridEl.innerHTML = "<p>You are not authorized to view this page.</p>";
+            return;
+        }
+            // --- ENSURE THIS PART IS PRESENT AND CORRECT ---
+        if (typeof populateSettingsForm === 'function') {
+            populateSettingsForm(loggedInVendorProfile);
+        } else {
+            console.error("Error: populateSettingsForm function is not defined!");
+        }
+         // --- END ENSURE ---
+
+        if (typeof fetchAndRenderVendorProducts === 'function') {
+            fetchAndRenderVendorProducts();
+        }
+    } else {
+        // fetchVendorProfile would have redirected to login if token was invalid/missing
+        // This case is if fetchVendorProfile returns null for other reasons (e.g. server error after login)
+        showNotification("Could not load your profile information.", "error");
+    }
+}
+
+// Add Product Modal
+addProductBtn.addEventListener('click', () => {
+    addProductModal.classList.add('show');
+});
+
+closeAddProduct.addEventListener('click', () => {
+    addProductModal.classList.remove('show');
+});
+
+cancelAddProduct.addEventListener('click', () => {
+    addProductModal.classList.remove('show');
+});
+
+saveAddProduct.addEventListener('click', () => {
+    // Here you would handle the form submission
+    addProductModal.classList.remove('show');
+    showNotification('Product added successfully!');
+});
+
+// View Order Modal
+viewOrderBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const orderId = btn.getAttribute('data-id');
+        document.getElementById('order-id').textContent = orderId;
+        viewOrderModal.classList.add('show');
+    });
+});
+
+closeViewOrder.addEventListener('click', () => {
+    viewOrderModal.classList.remove('show');
+});
+
+closeOrderButton.addEventListener('click', () => {
+    viewOrderModal.classList.remove('show');
+});
+
+updateOrderStatus.addEventListener('click', () => {
+    const status = document.getElementById('order-status').value;
+    // Here you would update the order status
+    viewOrderModal.classList.remove('show');
+    showNotification(`Order status updated to ${status}!`);
+});
+
+// Delete Product Confirmation
+let productToDelete = null;
+
+deleteProductBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        productToDelete = btn.getAttribute('data-id');
+        deleteConfirmModal.classList.add('show');
+    });
+});
+
+closeDeleteConfirm.addEventListener('click', () => {
+    deleteConfirmModal.classList.remove('show');
+});
+
+cancelDelete.addEventListener('click', () => {
+    deleteConfirmModal.classList.remove('show');
+});
+
+confirmDelete.addEventListener('click', () => {
+    // Here you would handle the product deletion
+    deleteConfirmModal.classList.remove('show');
+    showNotification('Product deleted successfully!');
+});
+
+// Save Settings
+saveSettingsBtn.addEventListener('click', () => {
+    // Here you would handle saving the settings
+    showNotification('Settings saved successfully!');
+});
+
+// Notification
+function showNotification(message) {
+    notificationMessage.textContent = message;
+    notification.classList.add('show');
+    
+    setTimeout(() => {
+        notification.classList.remove('show');
+    }, 3000);
+}
+
+// --- ADD THESE NEW HELPER FUNCTIONS ---
+
+    // Function to RENDER vendor's products into the #products-grid
+    function renderVendorProducts(productsToRender) {
+        const productsGridEl = document.getElementById('products-grid'); // Make sure this ID matches your HTML
+        if (!productsGridEl) {
+            console.error("Error: products-grid element not found for rendering vendor products.");
+            return;
+        }
+        productsGridEl.innerHTML = ''; // Clear loading or previous products
+
+        if (!productsToRender || productsToRender.length === 0) {
+            productsGridEl.innerHTML = '<p style="text-align:center; padding:20px;">You have no products listed yet. Click "Add New Product" to start.</p>';
+            return;
+        }
+
+        productsToRender.forEach(product => {
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card'; // Use your existing class
+            productCard.dataset.productId = product.id; // Store product ID
+
+            const isActiveChecked = product.is_active ? 'checked' : '';
+            const imageSrc = product.image || '/api/placeholder/400/320'; // Default placeholder
+            const statusBadgeClass = product.is_active ? 'badge-success' : 'badge-danger';
+            const statusText = product.is_active ? 'Active' : 'Inactive';
+            const imageStyle = product.is_active ? '' : 'filter: grayscale(1);';
+
+            // This HTML structure is based on your static example in vendor-dashboard.html
+            productCard.innerHTML = `
+                <img src="${imageSrc}" alt="${product.name || 'Product'}" class="product-image" style="${imageStyle}">
+                <div class="product-details">
+                    <h3 class="product-title">${product.name || 'N/A'}</h3>
+                    <div class="product-price">GH₵ ${parseFloat(product.price || 0).toFixed(2)}</div>
+                    <div class="product-status">
+                        <span class="badge ${statusBadgeClass}">${statusText}</span>
+                    </div>
+                    <div class="product-actions">
+                        <label class="switch">
+                            <input type="checkbox" class="product-status-toggle" ${isActiveChecked} data-productid="${product.id}">
+                            <span class="slider"></span>
+                        </label>
+                        <div>
+                            <button class="btn btn-sm btn-outline edit-product" data-productid="${product.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger delete-product" data-productid="${product.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            productsGridEl.appendChild(productCard);
+        });
+    }
+
+// Inside your embedded <script>
+
+function populateSettingsForm(profileData) {
+    if (!profileData) {
+        console.warn("VD Embedded: No profile data to populate settings form.");
+        return;
+    }
+    console.log("VD Embedded: Populating settings form with:", profileData);
+
+    // Use the globally defined consts for these elements
+    // const settingsBusinessNameInput = document.getElementById('business-name'); // Already global
+    // const settingsOwnerNameDisplay = document.getElementById('owner-name');    // Already global
+    // const settingsEmailDisplay = document.getElementById('email');             // Already global
+    // const settingsPhoneInput = document.getElementById('phone');             // Already global
+
+    if (settingsBusinessNameInput) { // Check if the global const exists
+        settingsBusinessNameInput.value = profileData.business_name || '';
+        console.log("Set business name to:", settingsBusinessNameInput.value);
+    } else { console.warn("Input const 'settingsBusinessNameInput' (for id 'business-name') not found or element missing."); }
+
+    if (settingsOwnerNameDisplay) {
+        settingsOwnerNameDisplay.value = profileData.username || ''; // Display username
+        settingsOwnerNameDisplay.readOnly = true;
+        console.log("Set owner name (username) to:", settingsOwnerNameDisplay.value);
+    } else { console.warn("Input const 'settingsOwnerNameDisplay' (for id 'owner-name') not found or element missing."); }
+
+    if (settingsEmailDisplay) {
+        settingsEmailDisplay.value = profileData.email || '';
+        settingsEmailDisplay.readOnly = true;
+        console.log("Set email to:", settingsEmailDisplay.value);
+    } else { console.warn("Input const 'settingsEmailDisplay' (for id 'email') not found or element missing."); }
+
+    if (settingsPhoneInput) {
+        settingsPhoneInput.value = profileData.whatsapp || ''; // Using whatsapp field for phone
+        console.log("Set phone (whatsapp) to:", settingsPhoneInput.value);
+    } else { console.warn("Input const 'settingsPhoneInput' (for id 'phone') not found or element missing."); }
+
+    console.log("VD Embedded: Settings form population attempt finished.");
+}
+
+    // Function to attach event listeners to dynamically created product cards
+    function attachProductActionListeners() {
+        const productsGridEl = document.getElementById('products-grid');
+        if (!productsGridEl) return;
+
+        productsGridEl.addEventListener('click', async (event) => {
+            const productCard = event.target.closest('.product-card');
+            if (!productCard) return;
+            
+            const productId = productCard.dataset.productId;
+
+            // Handle Status Toggle
+            if (event.target.classList.contains('product-status-toggle')) {
+                const isActive = event.target.checked;
+                console.log(`Toggling product ${productId} status to: ${isActive}`);
+                if (typeof updateProductStatusApi === 'function') {
+                    const result = await updateProductStatusApi(productId, isActive);
+                    if (result.success && result.product) {
+                        showNotification(`Product status updated to ${result.product.is_active ? 'Active' : 'Inactive'}!`);
+                        // Update UI for this specific card's badge and image style
+                        const statusBadge = productCard.querySelector('.badge');
+                        const productImageEl = productCard.querySelector('.product-image');
+                        if(statusBadge) {
+                            statusBadge.className = `badge ${result.product.is_active ? 'badge-success' : 'badge-danger'}`;
+                            statusBadge.textContent = result.product.is_active ? 'Active' : 'Inactive';
+                        }
+                        if(productImageEl) productImageEl.style.filter = result.product.is_active ? '' : 'grayscale(1)';
+                    } else {
+                        showNotification(`Error updating status: ${result.message || 'Unknown error'}`, 'error'); // Assuming showNotification can take type
+                        event.target.checked = !isActive; // Revert toggle on failure
+                    }
+                }
+            }
+
+            // Handle Edit Button
+            if (event.target.closest('.edit-product')) {
+                console.log(`Edit product ID: ${productId} clicked`);
+                // IMPORTANT: Replace 'edit-product.html' with your actual edit page path
+                window.location.href = `edit-product.html?id=${productId}`;
+            }
+
+            // Handle Delete Button
+            if (event.target.closest('.delete-product')) {
+                console.log(`Delete product ID: ${productId} clicked`);
+                // Use your existing modal IDs and logic
+                const deleteConfirmModal = document.getElementById('delete-confirm-modal');
+                const confirmDeleteBtn = document.getElementById('confirm-delete'); // Your confirm button in modal
+
+                if (deleteConfirmModal && confirmDeleteBtn) {
+                    // Store product ID on a temporary attribute or global var for the confirm button
+                    confirmDeleteBtn.dataset.productIdToDelete = productId;
+                    deleteConfirmModal.classList.add('show');
+                } else {
+                    console.error("Delete confirmation modal elements not found.");
+                }
+            }
+        });
+    }
+
+    // Function to fetch products and then render them
+    async function fetchAndRenderVendorProducts() {
+        const productsGridEl = document.getElementById('products-grid');
+        if (!productsGridEl) {
+            console.error("Products grid element not found for fetching.");
+            return;
+        }
+        productsGridEl.innerHTML = "<p>Loading your products...</p>"; 
+
+        if (typeof fetchMyProductsApi !== 'function') {
+             showNotification("Error: Product fetching function missing.", "error"); return;
+        }
+        vendorAllProducts = await fetchMyProductsApi(); 
+
+        if (vendorAllProducts === null) {
+            productsGridEl.innerHTML = "<p style='color:red;'>Could not load your products. Please try refreshing.</p>";
+            return;
+        }
+        renderVendorProducts(vendorAllProducts);
+        // Attach listeners AFTER products are rendered
+        attachProductActionListeners(); 
+    }
+
+    // Function to load initial vendor data (profile then products)
+    async function loadInitialVendorData() {
+        console.log("VD Embedded: Loading initial vendor data...");
+        const vendorNameDisplayElements = document.querySelectorAll('.vendor-name'); // For header/dropdown
+        const userAvatarElements = document.querySelectorAll('.user-avatar'); // For header/dropdown
+
+        if (typeof fetchVendorProfile !== 'function') {
+            showNotification("Error: Profile fetching function missing.", "error");
+            // Potentially redirect to login as auth headers might not be creatable
+            if(!localStorage.getItem('authToken')) window.location.href = 'singup.html';
+            return;
+        }
+
+        loggedInVendorProfile = await fetchVendorProfile(); // from vendor-dashboard-api.js
+
+        if (loggedInVendorProfile) {
+            vendorNameDisplayElements.forEach(el => {
+                el.textContent = loggedInVendorProfile.business_name || loggedInVendorProfile.username || 'Vendor';
+            });
+            userAvatarElements.forEach(el => {
+                 const name = loggedInVendorProfile.business_name || loggedInVendorProfile.username || 'V';
+                 el.textContent = name.substring(0,Math.min(2, name.length)).toUpperCase(); // First 1 or 2 letters
+            });
+
+            if (!loggedInVendorProfile.is_vendor) {
+                showNotification("Access Denied: You are not a registered vendor.", "error");
+                const productsGridEl = document.getElementById('products-grid');
+                if(productsGridEl) productsGridEl.innerHTML = "<p>You need to be a registered vendor to manage products. Please apply from your account page.</p>";
+                // Disable "Add Product" button if it exists
+                const addProductButton = document.getElementById('add-product-btn');
+                if (addProductButton) addProductButton.style.display = 'none';
+                return; // Stop if not a vendor
+            }
+        // --- ADD THIS DETAILED LOG ---
+            console.log("VD Embedded: Data being passed to populateSettingsForm:", JSON.stringify(loggedInVendorProfile, null, 2));
+        // --- END ADD ---
+           
+            // If vendor, then fetch their products
+            fetchAndRenderVendorProducts();
+        } else {
+            showNotification("Could not load your profile. You may need to log in.", "error");
+        }
+    }
+    // --- END ADD NEW HELPER FUNCTIONS ---
+
+
+// File Upload Preview
+const productImage = document.getElementById('product-image');
+const fileUpload = document.querySelector('.file-upload');
+
+if (productImage) {
+    productImage.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            const fileUploadEl = this.parentElement;
+            fileUploadEl.innerHTML = '<i class="fas fa-check-circle"></i><p>File selected:</p><span>' + this.files[0].name + '</span>';
+        }
+    });
+
+    fileUpload.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.style.borderColor = '#FFCC08';
+        this.style.backgroundColor = 'rgba(255, 204, 8, 0.1)';
+    });
+
+    fileUpload.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        this.style.borderColor = '#e0e0e0';
+        this.style.backgroundColor = '';
+    });
+
+    fileUpload.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.style.borderColor = '#e0e0e0';
+        this.style.backgroundColor = '';
+        
+        if (e.dataTransfer.files.length) {
+            productImage.files = e.dataTransfer.files;
+            this.innerHTML = '<i class="fas fa-check-circle"></i><p>File selected:</p><span>' + e.dataTransfer.files[0].name + '</span>';
+        }
+    });
+}
+
+// Product Switches
+const productSwitches = document.querySelectorAll('.product-card .switch input');
+productSwitches.forEach(switchEl => {
+    switchEl.addEventListener('change', function() {
+        const productCard = this.closest('.product-card');
+        const statusBadge = productCard.querySelector('.badge');
+        const productImage = productCard.querySelector('.product-image');
+        
+        if (this.checked) {
+            statusBadge.className = 'badge badge-success';
+            statusBadge.textContent = 'Active';
+            productImage.style.filter = '';
+        } else {
+            statusBadge.className = 'badge badge-danger';
+            statusBadge.textContent = 'Inactive';
+            productImage.style.filter = 'grayscale(1)';
+        }
+    });
+});
+
+// Search and Filter Products
+const productSearch = document.getElementById('product-search');
+const productFilter = document.getElementById('product-filter');
+const productsGrid = document.getElementById('products-grid');
+const productCards = document.querySelectorAll('#products-grid .product-card');
+
+if (productSearch && productFilter) {
+    function filterProducts() {
+        const searchTerm = productSearch.value.toLowerCase();
+        const filterValue = productFilter.value;
+        
+        productCards.forEach(card => {
+            const title = card.querySelector('.product-title').textContent.toLowerCase();
+            const status = card.querySelector('.badge').textContent.toLowerCase();
+            const matchesSearch = title.includes(searchTerm);
+            const matchesFilter = filterValue === 'all' || status === filterValue;
+            
+            if (matchesSearch && matchesFilter) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+    
+    productSearch.addEventListener('input', filterProducts);
+    productFilter.addEventListener('change', filterProducts);
+}
+
+// Search and Filter Orders
+const orderSearch = document.getElementById('order-search');
+const orderFilter = document.getElementById('order-filter');
+const orderRows = document.querySelectorAll('#orders-table tbody tr');
+
+if (orderSearch && orderFilter) {
+    function filterOrders() {
+        const searchTerm = orderSearch.value.toLowerCase();
+        const filterValue = orderFilter.value;
+        
+        orderRows.forEach(row => {
+            const orderId = row.cells[0].textContent.toLowerCase();
+            const customer = row.cells[1].textContent.toLowerCase();
+            const status = row.querySelector('.badge').textContent.toLowerCase();
+            
+            const matchesSearch = orderId.includes(searchTerm) || customer.includes(searchTerm);
+            const matchesFilter = filterValue === 'all' || status === filterValue;
+            
+            if (matchesSearch && matchesFilter) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+    
+    orderSearch.addEventListener('input', filterOrders);
+    orderFilter.addEventListener('change', filterOrders);
+}
+
+// Initialize Charts
+function initCharts() {
+    // Sales Overview Chart (Dashboard)
+    const salesCtx = document.getElementById('salesChart');
+    if (salesCtx) {
+        const salesChart = new Chart(salesCtx, {
+            type: 'line',
+            data: {
+                labels: ['Apr 16', 'Apr 17', 'Apr 18', 'Apr 19', 'Apr 20', 'Apr 21', 'Apr 22'],
+                datasets: [{
+                    label: 'Sales (₵)',
+                    data: [450, 520, 380, 640, 580, 420, 590],
+                    backgroundColor: 'rgba(255, 204, 8, 0.1)',
+                    borderColor: '#FFCC08',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    pointBackgroundColor: '#FFCC08',
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            drawBorder: false
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Analytics Chart
+    const analyticsCtx = document.getElementById('analyticsChart');
+    if (analyticsCtx) {
+        const analyticsChart = new Chart(analyticsCtx, {
+            type: 'line',
+            data: {
+                labels: ['Mar 23', 'Mar 30', 'Apr 6', 'Apr 13', 'Apr 20'],
+                datasets: [{
+                    label: 'Sales (₵)',
+                    data: [2200, 2800, 2400, 3100, 3580],
+                    backgroundColor: 'rgba(255, 204, 8, 0.1)',
+                    borderColor: '#FFCC08',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    pointBackgroundColor: '#FFCC08',
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            drawBorder: false
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Products Pie Chart
+    const productsCtx = document.getElementById('productsPieChart');
+    if (productsCtx) {
+        const productsPieChart = new Chart(productsCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Merchandise', 'Data Bundles', 'Academic', 'Services', 'Food'],
+                datasets: [{
+                    data: [30, 25, 20, 15, 10],
+                    backgroundColor: [
+                        '#FFCC08',
+                        '#28a745',
+                        '#17a2b8',
+                        '#ffc107',
+                        '#dc3545'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+                cutout: '65%'
+            }
+        });
+    }
+    
+    // Weekday Chart
+    const weekdayCtx = document.getElementById('weekdayChart');
+    if (weekdayCtx) {
+        const weekdayChart = new Chart(weekdayCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+                datasets: [{
+                    label: 'Sales (₵)',
+                    data: [1200, 1900, 1700, 2100, 2300, 1800, 800],
+                    backgroundColor: [
+                        'rgba(255, 204, 8, 0.7)',
+                        'rgba(255, 204, 8, 0.7)',
+                        'rgba(255, 204, 8, 0.7)',
+                        'rgba(255, 204, 8, 0.7)',
+                        'rgba(255, 204, 8, 0.7)',
+                        'rgba(255, 204, 8, 0.7)',
+                        'rgba(255, 204, 8, 0.7)'
+                    ],
+                    borderColor: [
+                        '#FFCC08',
+                        '#FFCC08',
+                        '#FFCC08',
+                        '#FFCC08',
+                        '#FFCC08',
+                        '#FFCC08',
+                        '#FFCC08'
+                    ],
+                    borderWidth: 1,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            drawBorder: false
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
+
+// --- Function to fetch and render vendor's products ---
+async function fetchAndRenderVendorProducts() {
+    if (!productsGridEl) {
+        console.error("Products grid element (#products-grid) not found.");
+        return;
+    }
+    productsGridEl.innerHTML = "<p>Loading your products...</p>"; // Loading message
+
+    vendorAllProducts = await fetchMyProductsApi(); // From vendor-dashboard-api.js
+
+    if (vendorAllProducts === null) { // API call failed, fetchMyProductsApi returns null on major error
+        productsGridEl.innerHTML = "<p style='color:red;'>Could not load your products. Please try refreshing.</p>";
+        return;
+    }
+    renderVendorProducts(vendorAllProducts); // Call a new function to render them
+}
+
+// --- Function to RENDER vendor's products ---
+function renderVendorProducts(productsToRender) {
+    if (!productsGridEl) return;
+    productsGridEl.innerHTML = ''; // Clear loading or previous products
+
+    if (productsToRender.length === 0) {
+        productsGridEl.innerHTML = '<p>You have no products listed yet. Click "Add New Product" to start.</p>';
+        return;
+    }
+
+    productsToRender.forEach(product => {
+        const productCard = document.createElement('div');
+        productCard.className = 'product-card'; // Use your existing class
+        productCard.dataset.productId = product.id; // Store product ID for easy access
+
+        const isActiveChecked = product.is_active ? 'checked' : '';
+        const imageSrc = product.image || '/api/placeholder/400/320'; // Use your placeholder path
+        const statusBadgeClass = product.is_active ? 'badge-success' : 'badge-danger';
+        const statusText = product.is_active ? 'Active' : 'Inactive';
+        const imageStyle = product.is_active ? '' : 'filter: grayscale(1);';
+
+        productCard.innerHTML = `
+            <img src="<span class="math-inline">\{imageSrc\}" alt\="</span>{product.name || 'Product'}" class="product-image" style="<span class="math-inline">\{imageStyle\}"\>
+<div class="product-details">
+<h3 class="product-title">{product.name || 'N/A'}</h3>
+<div class="product-price">GH₵ ${parseFloat(product.price || 0).toFixed(2)}</div>
+<div class="product-status">
+<span class="badge statusBadgeClass">{statusText}</span>
+</div>
+<div class="product-actions">
+<label class="switch">
+<input type="checkbox" class="product-status-toggle" isActiveCheckeddata−id="{product.id}">
+<span class="slider"></span>
+</label>
+<div>
+<button class="btn btn-sm btn-outline edit-product" data-id="product.id"><iclass="fasfa−edit"></i></button><buttonclass="btnbtn−smbtn−dangerdelete−product"data−id="{product.id}">
+<i class="fas fa-trash"></i>
+</button>
+</div>
+</div>
+</div>
+`;
+productsGridEl.appendChild(productCard);
+});
+// Client-side filtering might need re-application here if you want it active on initial load
+if (typeof filterProducts === 'function') filterProducts();
+}
+
+// Inside your embedded <script>
+
+    async function handleSettingsFormSubmit(event) {
+    if (event && typeof event.preventDefault === 'function') { // Check if event is valid
+         event.preventDefault(); 
+    }
+    console.log("VD Embedded: handleSettingsFormSubmit triggered.");
+
+    // Use the globally defined consts to get values
+    const businessNameVal = settingsBusinessNameInput ? settingsBusinessNameInput.value.trim() : null;
+    const whatsappVal = settingsPhoneInput ? settingsPhoneInput.value.trim() : null;
+    // const campusVal = document.getElementById('settings-campus-input')?.value.trim(); // If you add campus
+
+    const dataToUpdate = {};
+    let changesMade = false;
+
+    if (businessNameVal !== null && businessNameVal !== (loggedInVendorProfile?.business_name || '')) {
+        dataToUpdate.business_name = businessNameVal;
+        changesMade = true;
+    }
+    if (whatsappVal !== null && whatsappVal !== (loggedInVendorProfile?.whatsapp || '')) {
+        dataToUpdate.whatsapp = whatsappVal;
+        changesMade = true;
+    }
+    // Add campus here if you implement it
+
+    if (!changesMade) {
+        showNotification("No changes made to Profile Information.");
+        return;
+    }
+
+    console.log("VD Embedded: Data to update settings:", dataToUpdate);
+    // const saveSettingsBtn = document.getElementById('save-settings-btn'); // Already global
+
+    if (typeof updateUserProfileApiVendor === 'function') {
+        if (saveSettingsBtn) { saveSettingsBtn.disabled = true; saveSettingsBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...'; }
+
+        const result = await updateUserProfileApiVendor(dataToUpdate); // from vendor-dashboard-api.js
+
+        if (result.success && result.data) {
+            loggedInVendorProfile = result.data; 
+            showNotification("Settings saved successfully!");
+            populateSettingsForm(loggedInVendorProfile); 
+            vendorNameDisplayElements.forEach(el => {
+                el.textContent = loggedInVendorProfile.business_name || loggedInVendorProfile.username || 'Vendor';
+            });
+        } else {
+            showNotification(`Failed to save settings: ${result.message || 'Unknown error'}`, 'error');
+        }
+        if (saveSettingsBtn) { saveSettingsBtn.disabled = false; saveSettingsBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes'; }
+    } else {
+        showNotification("Error: Settings update API function (updateUserProfileApiVendor) missing.", "error");
+        if (saveSettingsBtn) { saveSettingsBtn.disabled = false; saveSettingsBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes'; }
+    }
+}
+
+// ---- MODIFIED DOMContentLoaded Listener ----
+document.addEventListener('DOMContentLoaded', function() {
+        console.log("Vendor Dashboard DOMContentLoaded.");
+        initCharts(); // Your existing chart init
+
+        // --- MODIFIED: Call to load initial data ---
+        loadInitialVendorData();
+        // --- END MODIFIED ---
+
+        // Mobile Sidebar Toggle (Keep your existing logic)
+        const mobileToggle = document.querySelector('.mobile-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        if (mobileToggle && sidebar) { /* ... */ }
+
+        // Tab Navigation (Keep your existing logic)
+        const navLinks = document.querySelectorAll('.nav-link');
+        const tabContents = document.querySelectorAll('.tab-content');
+        if (navLinks.length > 0 && tabContents.length > 0) {
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    // ... your existing tab switching logic ...
+                    const tabId = link.getAttribute('data-tab');
+                    // If 'Products' tab is clicked, ensure products are rendered (they should be by initial load)
+                    // Or you could re-fetch if you want:
+                    // if (tabId === 'products' && typeof fetchAndRenderVendorProducts === 'function') {
+                    //    fetchAndRenderVendorProducts();
+                    // }
+                });
+            });
+        }
+        
+        // Handle tab links within content (Keep your existing logic)
+        const tabLinks = document.querySelectorAll('[data-tab-link]');
+        if(tabLinks.length > 0 && navLinks.length > 0) { /* ... */ }
+
+        // User Dropdown Toggle (Keep your existing logic)
+        const dropdownToggle = document.querySelector('.dropdown-toggle');
+        const dropdownMenu = document.querySelector('.dropdown-menu');
+        if(dropdownToggle && dropdownMenu) { /* ... */ }
+        document.addEventListener('click', (e) => { /* ... close dropdown ... */ });
+
+
+        // --- "ADD NEW PRODUCT" BUTTON - MODIFIED ---
+        const addProductBtn = document.getElementById('add-product-btn');
+        const addProductModal = document.getElementById('add-product-modal'); // We are not using this modal now
+
+        if (addProductBtn) {
+            addProductBtn.addEventListener('click', (e) => {
+                e.preventDefault(); // Good practice if it's an <a> tag
+                console.log("Add New Product button clicked. Navigating to add-product.html");
+                // **IMPORTANT**: Replace 'add-product.html' with the actual path
+                window.location.href = 'add-product.html';
+            });
+        }
+        // Remove or comment out listeners for addProductModal's close/cancel/save buttons
+        // const closeAddProduct = document.getElementById('close-add-product');
+        // const cancelAddProduct = document.getElementById('cancel-add-product');
+        // const saveAddProduct = document.getElementById('save-add-product');
+        // if(closeAddProduct) closeAddProduct.addEventListener('click', () => addProductModal.classList.remove('show'));
+        // if(cancelAddProduct) cancelAddProduct.addEventListener('click', () => addProductModal.classList.remove('show'));
+        // if(saveAddProduct) saveAddProduct.addEventListener('click', () => { /* old mock logic */ });
+
+
+        // --- DELETE CONFIRMATION MODAL - MODIFIED ---
+        const deleteConfirmModal = document.getElementById('delete-confirm-modal');
+        const closeDeleteConfirm = document.getElementById('close-delete-confirm');
+        const cancelDeleteBtn = document.getElementById('cancel-delete'); // Variable name consistency
+        const confirmDeleteBtn = document.getElementById('confirm-delete'); // Variable name consistency
+        // let productIdToDelete = null; // This was moved to be set by the event delegate
+
+        if (closeDeleteConfirm && deleteConfirmModal) closeDeleteConfirm.addEventListener('click', () => deleteConfirmModal.classList.remove('show'));
+        if (cancelDeleteBtn && deleteConfirmModal) cancelDeleteBtn.addEventListener('click', () => deleteConfirmModal.classList.remove('show'));
+
+        if (confirmDeleteBtn && deleteConfirmModal) {
+            confirmDeleteBtn.addEventListener('click', async () => {
+                const productId = confirmDeleteBtn.dataset.productIdToDelete; // Get ID from button
+                if (productId && typeof deleteProductApi === 'function') {
+                    console.log(`Confirming delete for product ID: ${productId}`);
+                    const result = await deleteProductApi(productId);
+                    if (result.success) {
+                        showNotification('Product deleted successfully!');
+                        fetchAndRenderVendorProducts(); // Refresh the product list
+                    } else {
+                        showNotification(`Error deleting product: ${result.message || 'Unknown error'}`, 'error');
+                    }
+                }
+                deleteConfirmModal.classList.remove('show');
+                confirmDeleteBtn.removeAttribute('data-product-id-to-delete'); // Clear stored ID
+            });
+        }
+        // --- END DELETE CONFIRMATION MODAL ---
+
+
+        // View Order Modal (Keep existing UI logic, no API yet)
+        const viewOrderBtns = document.querySelectorAll('.view-order');
+        const viewOrderModal = document.getElementById('view-order-modal');
+        // ... your existing listeners for viewOrderBtns, closeViewOrder, closeOrderButton, updateOrderStatus ...
+
+
+        // Save Settings (Keep existing dummy logic)
+        const saveSettingsBtn = document.getElementById('save-settings-btn');
+
+        if (saveSettingsBtn) {
+        // Get the form element for easier data gathering if all inputs are inside a form
+        const settingsForm = document.querySelector('#settings-content form'); // Adjust if your form has an ID
+
+        const settingsSubmitHandler = async (event) => { // Made this an async function
+            if (event.target.tagName === 'FORM') event.preventDefault(); // Prevent submit if attached to form
+            console.log("VD Embedded: Save Settings button/form submitted.");
+
+            const businessNameVal = document.getElementById('business-name')?.value.trim();
+            const whatsappVal = document.getElementById('phone')?.value.trim();
+            // Add campus here if you decide to make it editable in settings:
+            // const campusVal = document.getElementById('input-settings-campus')?.value.trim();
+
+            // Only include fields in dataToUpdate if they have changed or are meant to be set
+            const dataToUpdate = {};
+            let hasChanges = false;
+
+            if (businessNameVal !== undefined && businessNameVal !== (loggedInVendorProfile?.business_name || '')) {
+                dataToUpdate.business_name = businessNameVal;
+                hasChanges = true;
+            }
+            if (whatsappVal !== undefined && whatsappVal !== (loggedInVendorProfile?.whatsapp || '')) {
+                dataToUpdate.whatsapp = whatsappVal;
+                hasChanges = true;
+            }
+            // if (campusVal !== undefined && campusVal !== (loggedInVendorProfile?.campus || '')) {
+            //     dataToUpdate.campus = campusVal;
+            //     hasChanges = true;
+            // }
+            // Add other fields like store_description, location if you implement them
+
+            if (!hasChanges) {
+                showNotification("No changes made to Profile Information.");
+                return;
+            }
+
+            if (typeof updateUserProfileApiVendor === 'function') { // Call the renamed function
+                saveSettingsBtn.disabled = true;
+                saveSettingsBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+                const result = await updateUserProfileApiVendor(dataToUpdate);
+                if (result.success && result.data) {
+                    loggedInVendorProfile = result.data; // Update global profile data
+                    showNotification("Settings saved successfully!");
+                    // Re-populate form and header with potentially cleaned/updated data from API
+                    populateSettingsForm(loggedInVendorProfile);
+                    vendorNameDisplayElements.forEach(el => {
+                        el.textContent = loggedInVendorProfile.business_name || loggedInVendorProfile.username || 'Vendor';
+                    });
+                } else {
+                    showNotification(`Failed to save settings: ${result.message || 'Unknown error'}`, 'error');
+                }
+                saveSettingsBtn.disabled = false;
+                saveSettingsBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+            } else {
+                showNotification("Error: Settings update function (updateUserProfileApiVendor) is missing.", "error");
+            }
+        };
+
+        // If #save-settings-btn is a submit button inside a form:
+        if (settingsForm) {
+             settingsForm.addEventListener('submit', settingsSubmitHandler);
+        } else { // If it's a standalone button:
+             saveSettingsBtn.addEventListener('click', settingsSubmitHandler);
+        }
+    }
+
+        // --- REMOVE OLD PRODUCT LISTENERS ---
+        // const productSwitches = document.querySelectorAll('.product-card .switch input'); // DELETE THIS
+        // const deleteProductBtns = document.querySelectorAll('.delete-product'); // DELETE THIS
+        // (The forEach loops for these old listeners should also be deleted as they are now handled by delegation)
+
+        // Client-side Product Search and Filter (Modify to use vendorAllProducts)
+        const productSearch = document.getElementById('product-search');
+        const productFilter = document.getElementById('product-filter');
+        // const productsGrid = document.getElementById('products-grid'); // Already defined as productsGridEl
+        // const productCards = document.querySelectorAll('#products-grid .product-card'); // This will be dynamic
+
+        if (productSearch && productFilter) {
+            window.filterVendorProducts = function() { // Make it global or pass vendorAllProducts
+                const searchTerm = productSearch.value.toLowerCase();
+                const filterValue = productFilter.value;
+                
+                const filtered = vendorAllProducts.filter(product => {
+                    const title = (product.name || '').toLowerCase();
+                    // For status, we'll assume product.is_active is boolean
+                    const status = product.is_active ? 'active' : 'inactive'; 
+                    // Note: Your filter dropdown has 'out-of-stock' which 'is_active' doesn't cover.
+                    // You'd need a 'stock_status' or 'quantity' field from API for that.
+
+                    const matchesSearch = title.includes(searchTerm);
+                    const matchesFilter = filterValue === 'all' || status === filterValue;
+                    
+                    return matchesSearch && matchesFilter;
+                });
+                renderVendorProducts(filtered); // Re-render with filtered products
+            }
+            
+            productSearch.addEventListener('input', filterVendorProducts);
+            productFilter.addEventListener('change', filterVendorProducts);
+        }
+
+        // Client-side Order Search and Filter (Keep as is, no API yet)
+        // ...
+
+        // --- Logout Link (Sidebar) ---
+        const sidebarLogoutLink = document.querySelector('.sidebar .nav-link span:last-child'); // Your HTML has span
+        if (sidebarLogoutLink && sidebarLogoutLink.textContent.trim().toLowerCase() === 'logout') {
+            const actualLinkElement = sidebarLogoutLink.closest('.nav-link'); // Get the <a> tag
+            if (actualLinkElement) {
+                actualLinkElement.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    console.log("Sidebar logout clicked.");
+                    const token = localStorage.getItem('authToken');
+                    if (!token) { window.location.href = 'singup.html'; return; } // Adjust login page
+                    try {
+                        // Use getAuthHeadersVendor to ensure Content-Type is set if needed by API
+                        const headers = getAuthHeadersVendor();
+                        if(headers) { // Token exists
+                             await fetch('http://127.0.0.1:8000/api/auth/logout/', {
+                                method: 'POST',
+                                headers: headers
+                            });
+                        }
+                    } catch(err) { console.error("Logout API error", err); }
+                    finally {
+                        localStorage.removeItem('authToken');
+                        console.log("Auth token cleared. Redirecting to login/signup page.");
+                        window.location.href = 'singup.html'; // Adjust to your login/signup page path
+                    }
+                });
+            }
+        }
+
+
+        console.log("Vendor Dashboard Main Event Listeners Set Up.");
+    }); // End DOMContentLoaded
+</script>
+
+
+</body>
+</html>                   

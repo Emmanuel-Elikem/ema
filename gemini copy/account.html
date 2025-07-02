@@ -1452,7 +1452,7 @@
                     </svg>
                     <span class="badge cart-badge">2</span>
                 </button>
-                <button class="action-btn logout-btn">
+                <button class="action-btn logout-btn" id="userLogoutButton">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                         <polyline points="16 17 21 12 16 7"></polyline>
@@ -1472,9 +1472,10 @@
                             <circle cx="12" cy="7" r="4"></circle>
                         </svg>
                         </div>
-                    <h2 class="profile-name">John Doe</h2>
-                    <p class="profile-email">johndoe@example.com</p>
-                    <p class="profile-whatsapp">+233 50 123 4567</p>
+                        <h2 class="profile-name" id="display-name" id="sidebar-profile-name">John Doe</h2>
+                        <p class="profile-email" id="display-email" id="sidebar-profile-email">johndoe@example.com</p>
+                        <div class="info-value" id="display-whatsapp" id="sidebar-profile-whatsapp">+233 50 123 4567</div>
+                        <div class="info-value" id="display-campus">University of Cape Coast</div>
                     <button class="edit-profile-btn">Edit Profile</button>
                 </div>
                 <ul class="sidebar-menu">
@@ -1542,22 +1543,22 @@
                     <div class="profile-info">
                         <div class="info-item">
                             <div class="info-label">Username</div>
-                            <div class="info-value">JohnDoe</div>
+                            <div class="info-value" id="display-username">JohnDoe</div>
                             <button class="info-edit" data-field="username">Edit</button>
                         </div>
                         <div class="info-item">
                             <div class="info-label">Email Address</div>
-                            <div class="info-value">johndoe@example.com</div>
+                            <div class="info-value" id="display-email">johndoe@example.com</div>
                             <button class="info-edit" data-field="email">Edit</button>
                         </div>
                         <div class="info-item">
                             <div class="info-label">WhatsApp Number</div>
-                            <div class="info-value">+233 50 123 4567</div>
+                            <div class="info-value" id="display-whatsapp">+233 50 123 4567</div>
                             <button class="info-edit" data-field="whatsapp">Edit</button>
                         </div>
                         <div class="info-item">
                             <div class="info-label">Campus</div>
-                            <div class="info-value">University of Cape Coast</div>
+                            <div class="info-value" id="display-campus">University of Cape Coast</div>
                             <button class="info-edit" data-field="campus">Edit</button>
                         </div>
                         <div class="info-item">
@@ -1814,19 +1815,19 @@
             <form id="profile-form">
                 <div class="form-group">
                     <label class="form-label">Username</label>
-                    <input type="text" class="form-input" name="username" value="JohnDoe">
+                    <input type="text" class="form-input" name="username" id="input-username">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Email Address</label>
-                    <input type="email" class="form-input" name="email" value="johndoe@example.com">
+                    <input type="email" class="form-input" name="email" id="input-email">
                 </div>
                 <div class="form-group">
                     <label class="form-label">WhatsApp Number</label>
-                    <input type="tel" class="form-input" name="whatsapp" value="+233 50 123 4567">
+                    <input type="tel" class="form-input" name="whatsapp" id="input-whatsapp">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Campus</label>
-                    <select class="form-select" name="campus">
+                    <select class="form-select" name="campus" id="input-campus">
                         <option value="ucc" selected>University of Cape Coast</option>
                         <option value="legon">University of Ghana, Legon</option>
                         <option value="knust">Kwame Nkrumah University of Science and Technology</option>
@@ -1836,7 +1837,7 @@
                 </div>
                 <div class="form-actions">
                     <button type="button" class="cancel-btn" id="cancel-edit">Cancel</button>
-                    <button type="submit" class="save-btn">Save Changes</button>
+                    <button type="submit" class="save-btn" id="save-profile-btn">Save Changes</button>
                 </div>
             </form>
         </div>
@@ -1849,19 +1850,19 @@
             <form id="password-form">
                 <div class="form-group">
                     <label class="form-label">Current Password</label>
-                    <input type="password" class="form-input" name="current-password">
+                    <input type="password" class="form-input" name="current-password" id="input-current-password">
                 </div>
                 <div class="form-group">
                     <label class="form-label">New Password</label>
-                    <input type="password" class="form-input" name="new-password">
+                    <input type="password" class="form-input" name="new-password" id="input-new-password">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Confirm New Password</label>
-                    <input type="password" class="form-input" name="confirm-password">
+                    <input type="password" class="form-input" name="confirm-password" id="input-confirm-password">
                 </div>
                 <div class="form-actions">
                     <button type="button" class="cancel-btn" id="cancel-password">Cancel</button>
-                    <button type="submit" class="save-btn">Change Password</button>
+                    <button type="submit" class="save-btn" id="change-password-btn">Change Password</button>
                 </div>
             </form>
         </div>
@@ -1894,7 +1895,7 @@
                 </div>
                 <div class="form-actions">
                     <button type="button" class="cancel-btn" id="cancel-vendor">Cancel</button>
-                    <button type="submit" class="save-btn">Submit Application</button>
+                    <button type="submit" class="save-btn" id="submitVendorApplicationBtn">Submit Application</button>
                 </div>
             </form>
         </div>
@@ -1903,354 +1904,483 @@
     <script>
         /*
         Campus Connect User Profile Dashboard JavaScript
-
-        This script handles the interactivity of the user profile dashboard,
-        including section navigation, filtering, modal management, and mock form submissions.
+        MODIFIED to integrate API calls for profile data, updates, password change, and vendor status.
         */
-
-        // Wait for the entire page to load
+    
+        // Global variable to store loaded profile data, accessible by various functions
+        let loadedUserProfileData = null;
+    
         window.addEventListener('load', function() {
-            // Add a slight delay before fading out the loader
+            // Loader logic
             setTimeout(() => {
                 const loader = document.querySelector('.loader');
                 if (loader) {
                     loader.style.opacity = '0';
-                    // After fading, hide it completely
                     setTimeout(() => {
                         loader.style.display = 'none';
                     }, 1000); // Match CSS transition duration
                 }
-            }, 1000); // Wait 1 second before starting fade out
-        });
-
-        // --- Section Navigation ---
-        // Get all menu items and dashboard sections
+    
+                // --- Fetch and display initial profile data ---
+                console.log("Attempting to fetch profile data after load...");
+                if (typeof fetchUserProfile === 'function') { // Check if API function from profile-api.js is loaded
+                    fetchUserProfile().then(profileData => {
+                        if (profileData) {
+                            loadedUserProfileData = profileData; // Store fetched data globally
+                            console.log("Populating profile data into HTML. Fetched Data:", profileData);
+    
+                            // Populate display elements in the main profile section
+                            const displayNameEl = document.getElementById('display-name'); // In .profile-info
+                            const displayEmailEl = document.getElementById('display-email'); // In .profile-info
+                            const displayWhatsappEl = document.getElementById('display-whatsapp'); // In .profile-info
+                            const displayCampusEl = document.getElementById('display-campus');   // In .profile-info
+    
+                            // Populate sidebar header elements
+                            const sidebarNameEl = document.querySelector('.profile-header .profile-name'); // Direct child of .profile-header
+                            const sidebarEmailEl = document.querySelector('.profile-header .profile-email'); // Direct child of .profile-header
+                            // const sidebarWhatsappEl = document.querySelector('.profile-header .profile-whatsapp'); // If you want to update this too
+    
+                            if (displayNameEl) displayNameEl.textContent = profileData.username || 'N/A';
+                            if (sidebarNameEl) sidebarNameEl.textContent = profileData.username || 'User'; // Using username
+                            if (displayEmailEl) displayEmailEl.textContent = profileData.email || 'N/A';
+                            if (sidebarEmailEl) sidebarEmailEl.textContent = profileData.email || '';
+    
+                            if (displayWhatsappEl) displayWhatsappEl.textContent = profileData.whatsapp || 'Not set';
+                            if (displayCampusEl) displayCampusEl.textContent = profileData.campus || 'Not set';
+                            // if (sidebarWhatsappEl && profileData.whatsapp) sidebarWhatsappEl.textContent = profileData.whatsapp;
+    
+    
+                            // Pre-fill edit profile modal form inputs
+                            const inputUsername = document.getElementById('input-username');
+                            const inputEmail = document.getElementById('input-email');
+                            const inputWhatsapp = document.getElementById('input-whatsapp');
+                            const inputCampus = document.getElementById('input-campus');
+    
+                            if(inputUsername) {
+                                inputUsername.value = profileData.username || '';
+                                inputUsername.readOnly = true; // Username is not editable via this form
+                            }
+                            if(inputEmail) {
+                                inputEmail.value = profileData.email || '';
+                                inputEmail.readOnly = true;    // Email is not editable via this form
+                            }
+                            if(inputWhatsapp) inputWhatsapp.value = profileData.whatsapp || '';
+                            if(inputCampus && profileData.campus) {
+                                 // For <select>, set the value to make the corresponding <option> selected
+                                 inputCampus.value = profileData.campus;
+                            } else if (inputCampus) {
+                                inputCampus.value = ''; // Default to empty if no campus set
+                            }
+                            const displayBusinessNameEl = document.getElementById('display-business-name'); // You'd need to add this <span> or <div> in your HTML
+                            if (displayBusinessNameEl && profileData.business_name) {
+                                displayBusinessNameEl.textContent = profileData.business_name;
+                            } else if (displayBusinessNameEl) {
+                                displayBusinessNameEl.textContent = 'N/A';
+                            }
+    
+                            // Update Vendor Section Text and Behavior based on fetched is_vendor status
+                            const vendorSectionElement = document.getElementById('vendor-section');
+                            if (vendorSectionElement) {
+                                if (profileData.is_vendor) {
+                                    vendorSectionElement.innerHTML = `
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
+                                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline>
+                                        </svg>
+                                        View Vendor Dashboard
+                                    `;
+                                } else {
+                                    vendorSectionElement.innerHTML = `
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
+                                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                        </svg>
+                                        Become a Vendor
+                                    `;
+                                }
+                            }
+    
+                        } else {
+                            console.error("Could not display profile: fetchUserProfile likely redirected or failed silently (e.g. no token).");
+                            // This case often means user is not logged in and getAuthHeadersProfile in profile-api.js handled redirect.
+                        }
+                    }).catch(error => {
+                        console.error("Error fetching profile on load in embedded script:", error);
+                        const profileInfoSection = document.getElementById('profile-section')?.querySelector('.profile-info');
+                        if(profileInfoSection) profileInfoSection.innerHTML = `<p style="color:red; padding: 20px;">Could not load profile data: ${error.message}. Please log in.</p>`;
+                    });
+                } else {
+                    console.error("Error: fetchUserProfile function not found. Was profile-api.js loaded correctly and linked AFTER this embedded script?");
+                     if (!localStorage.getItem('authToken')) { // Double check if token is missing
+                         window.location.href = 'singup.html'; // Adjust to your login/signup page path
+                     }
+                }
+            }, 1000); // End of loader setTimeout
+        }); // End of window.addEventListener('load')
+    
+        // --- Section Navigation (Your existing code - keep as is) ---
         const menuItems = document.querySelectorAll('.menu-item');
         const sections = document.querySelectorAll('.dashboard-section');
-
-        // Add click event listener to each menu item
-        menuItems.forEach(item => {
-            item.addEventListener('click', function() {
-                // Get the ID of the target section from the data-section attribute
-                const sectionId = this.getAttribute('data-section');
-
-                // Remove 'active' class from all menu items
-                menuItems.forEach(menuItem => menuItem.classList.remove('active'));
-                // Add 'active' class to the clicked menu item
-                this.classList.add('active');
-
-                // Hide all main content sections
-                sections.forEach(section => section.classList.add('hidden'));
-
-                // Find the target section and show it with an animation
-                const targetSection = document.getElementById(`${sectionId}-section`);
-                if (targetSection) {
-                    targetSection.classList.remove('hidden');
-                    // Re-add animation class to trigger animation on display
-                    targetSection.classList.remove('fade-in'); // Remove first to allow re-adding
-                    void targetSection.offsetWidth; // Trigger reflow
-                    targetSection.classList.add('fade-in');
-                    targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
-        });
-
-
-        // --- Order Filtering ---
-        const orderFilters = document.querySelectorAll('[data-filter]');
-        const orderCards = document.querySelectorAll('.order-card');
-
-        orderFilters.forEach(filter => {
-            filter.addEventListener('click', function() {
-                // Get the filter value (all, pending, completed, cancelled)
-                const filterValue = this.getAttribute('data-filter');
-
-                // Update active filter button style
-                orderFilters.forEach(btn => btn.classList.remove('active'));
-                this.classList.add('active');
-
-                // Loop through all order cards and show/hide based on the filter
-                orderCards.forEach(card => {
-                    const orderStatus = card.getAttribute('data-status');
-                    if (filterValue === 'all' || orderStatus === filterValue) {
-                        card.style.display = 'flex'; // Show the card
-                    } else {
-                        card.style.display = 'none'; // Hide the card
+        if (menuItems.length > 0 && sections.length > 0) {
+            menuItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const sectionId = this.getAttribute('data-section');
+                    menuItems.forEach(menuItem => menuItem.classList.remove('active'));
+                    this.classList.add('active');
+                    sections.forEach(section => section.classList.add('hidden'));
+                    const targetSection = document.getElementById(`${sectionId}-section`);
+                    if (targetSection) {
+                        targetSection.classList.remove('hidden');
+                        targetSection.classList.remove('fade-in');
+                        void targetSection.offsetWidth; // Trigger reflow
+                        targetSection.classList.add('fade-in');
+                        // Consider scrolling main-content area if sidebar is fixed
+                         targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }
                 });
             });
-        });
-
-        // --- Review Filtering ---
+        }
+    
+        // --- Order Filtering (Your existing code - keep as is, no API yet) ---
+        const orderFilters = document.querySelectorAll('[data-filter]');
+        const orderCards = document.querySelectorAll('.order-card'); // These are static
+        if (orderFilters.length > 0 && orderCards.length > 0) {
+            orderFilters.forEach(filter => {
+                filter.addEventListener('click', function() {
+                    const filterValue = this.getAttribute('data-filter');
+                    orderFilters.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    orderCards.forEach(card => {
+                        const orderStatus = card.getAttribute('data-status');
+                        card.style.display = (filterValue === 'all' || orderStatus === filterValue) ? 'flex' : 'none';
+                    });
+                });
+            });
+        }
+    
+        // --- Review Filtering (Your existing code - keep as is, no API yet) ---
         const reviewFilters = document.querySelectorAll('[data-review-filter]');
         const pendingReviews = document.querySelector('.pending-reviews');
         const submittedReviews = document.querySelector('.submitted-reviews');
-
-        reviewFilters.forEach(filter => {
-            filter.addEventListener('click', function() {
-                // Get the filter value (pending, submitted)
-                const filterValue = this.getAttribute('data-review-filter');
-
-                // Update active filter button style
-                reviewFilters.forEach(btn => btn.classList.remove('active'));
-                this.classList.add('active');
-
-                // Show/hide the appropriate review sections
-                if (filterValue === 'pending') {
-                    pendingReviews.classList.remove('hidden');
-                    submittedReviews.classList.add('hidden');
-                } else {
-                    pendingReviews.classList.add('hidden');
-                    submittedReviews.classList.remove('hidden');
-                }
+        if (reviewFilters.length > 0 && pendingReviews && submittedReviews) {
+            reviewFilters.forEach(filter => {
+                filter.addEventListener('click', function() {
+                    const filterValue = this.getAttribute('data-review-filter');
+                    reviewFilters.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    if (filterValue === 'pending') {
+                        pendingReviews.classList.remove('hidden');
+                        submittedReviews.classList.add('hidden');
+                    } else {
+                        pendingReviews.classList.add('hidden');
+                        submittedReviews.classList.remove('hidden');
+                    }
+                });
             });
-        });
-
-        // --- Star Rating Functionality ---
+        }
+    
+        // --- Star Rating Functionality (Your existing code - keep as is, no API yet) ---
         const reviewCards = document.querySelectorAll('.review-card');
-
         reviewCards.forEach(card => {
-            // Find stars within this specific review card
             const stars = card.querySelectorAll('.star');
-
             stars.forEach(star => {
                 star.addEventListener('click', function() {
-                    // Get the rating value from the clicked star
                     const rating = parseInt(this.getAttribute('data-rating'));
-                    const starsContainer = this.parentElement; // Get the parent div (rating-input)
-                    const allStars = starsContainer.querySelectorAll('.star'); // Get all stars in this group
-
-                    // Update 'active' class based on the selected rating
-                    allStars.forEach(s => {
-                        if (parseInt(s.getAttribute('data-rating')) <= rating) {
-                            s.classList.add('active'); // Add 'active' class for stars up to the selected rating
-                        } else {
-                            s.classList.remove('active'); // Remove 'active' for stars above the selected rating
-                        }
+                    const allStarsInGroup = this.parentElement.querySelectorAll('.star');
+                    allStarsInGroup.forEach(s => {
+                        s.classList.toggle('active', parseInt(s.getAttribute('data-rating')) <= rating);
                     });
-                    // In a real application, you would store this rating value (e.g., in a hidden input or data attribute)
-                    // to send with the review submission.
                 });
             });
         });
-
-
-        // --- Modal Handling ---
-        // Get all modal elements and trigger/close buttons
+    
+        // --- Modal Handling (Your existing code - keep as is) ---
         const modals = document.querySelectorAll('.modal');
         const editProfileBtn = document.querySelector('.edit-profile-btn');
         const editProfileModal = document.getElementById('edit-profile-modal');
         const passwordModal = document.getElementById('password-modal');
-        const vendorModal = document.getElementById('become-vendor-modal');
+        const vendorModal = document.getElementById('become-vendor-modal'); // Make sure ID matches your HTML
         const modalCloseButtons = document.querySelectorAll('.modal-close');
         const cancelButtons = document.querySelectorAll('.cancel-btn');
         const infoEditButtons = document.querySelectorAll('.info-edit');
-        const vendorSection = document.getElementById('vendor-section');
-
-        // Open the main profile edit modal when the 'Edit Profile' button is clicked
-        editProfileBtn.addEventListener('click', function() {
-            editProfileModal.classList.add('active');
-        });
-
-        // Open specific modals or focus fields when 'Edit' buttons in profile info are clicked
-        infoEditButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const field = this.getAttribute('data-field');
-
-                if (field === 'password') {
-                    // Open the password change modal
-                    passwordModal.classList.add('active');
-                } else {
-                    // Open the main edit profile modal
-                    editProfileModal.classList.add('active');
-                    // Add a small delay before focusing to allow modal transition
-                    setTimeout(() => {
-                        // Find the corresponding input field by name and focus it
-                        const input = editProfileModal.querySelector(`[name="${field}"]`);
-                        if (input) {
-                            input.focus();
-                        }
-                    }, 300); // Adjust delay as needed
-                }
+    
+        if(editProfileBtn && editProfileModal) editProfileBtn.addEventListener('click', () => editProfileModal.classList.add('active'));
+        if(infoEditButtons.length > 0 && editProfileModal && passwordModal) {
+            infoEditButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const field = this.getAttribute('data-field');
+                    if (field === 'password') {
+                        passwordModal.classList.add('active');
+                    } else {
+                        editProfileModal.classList.add('active');
+                        setTimeout(() => {
+                            // Try to focus specific input based on data-field if it matches input's name or id
+                            const inputToFocus = editProfileModal.querySelector(`#input-${field}`) || editProfileModal.querySelector(`[name="${field}"]`);
+                            if (inputToFocus) inputToFocus.focus();
+                        }, 300);
+                    }
+                });
             });
-        });
-
-        // Open the become vendor modal/redirect when the sidebar item is clicked
-        vendorSection.addEventListener('click', function() {
-            // This is mock logic - in a real app, you'd check if the user is already a vendor
-            const isVendor = false; // Example: assume user is not yet a vendor
-            if (isVendor) {
-                // Redirect user to their vendor dashboard (implement actual redirect)
-                alert('Redirecting to vendor dashboard...');
-                // window.location.href = '/vendor-dashboard'; // Example redirect
-            } else {
-                // Show the 'Become a Vendor' modal
-                vendorModal.classList.add('active');
-            }
-        });
-
-        // Close modals when the 'X' button is clicked
-        modalCloseButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                // Find the closest parent modal and remove the 'active' class
-                this.closest('.modal').classList.remove('active');
-            });
-        });
-
-        // Close modals when a 'Cancel' button is clicked
-        cancelButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                // Find the closest parent modal and remove the 'active' class
-                this.closest('.modal').classList.remove('active');
-            });
-        });
-
-        // Close modal when clicking outside the modal content
-        modals.forEach(modal => {
-            modal.addEventListener('click', function(e) {
-                // Check if the click target is the modal backdrop itself (not the content)
-                if (e.target === this) {
-                    this.classList.remove('active');
-                }
-            });
-        });
-
-        // --- Cart Quantity Buttons ---
+        }
+        modalCloseButtons.forEach(button => button.addEventListener('click', function() { this.closest('.modal').classList.remove('active'); }));
+        cancelButtons.forEach(button => button.addEventListener('click', function() { this.closest('.modal').classList.remove('active'); }));
+        modals.forEach(modal => modal.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('active'); }));
+    
+        // --- Cart Quantity & Total (Your existing code - keep as is, no API yet) ---
         const quantityBtns = document.querySelectorAll('.quantity-btn');
-
-        quantityBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                // Find the quantity value span within the same cart item
-                const valueElement = this.parentElement.querySelector('.quantity-value');
-                let value = parseInt(valueElement.textContent); // Get current quantity
-
-                // Increase or decrease quantity
-                if (this.textContent === '+') {
-                    value++;
-                } else if (value > 1) { // Prevent quantity from going below 1
-                    value--;
-                }
-
-                valueElement.textContent = value; // Update displayed quantity
-                updateCartTotal(); // Recalculate and display total
+        if (quantityBtns.length > 0) {
+            quantityBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const valueElement = this.parentElement.querySelector('.quantity-value');
+                    if (!valueElement) return;
+                    let value = parseInt(valueElement.textContent);
+                    if (this.textContent === '+') value++;
+                    else if (value > 1) value--;
+                    valueElement.textContent = value;
+                    if (typeof updateCartTotal === 'function') updateCartTotal();
+                });
             });
-        });
-
-        // Function to update the cart total (Mock Functionality)
-        function updateCartTotal() {
-            const cartItems = document.querySelectorAll('.cart-item');
-            let total = 0;
-
-            cartItems.forEach(item => {
-                // Extract price from text and convert to number
-                const priceText = item.querySelector('.cart-item-price').textContent;
-                const price = parseFloat(priceText.replace('GH₵', '').trim());
-
-                // Get quantity
-                const quantity = parseInt(item.querySelector('.quantity-value').textContent);
-
-                // Calculate total for this item and add to overall total
-                total += price * quantity;
-            });
-
-            // Update the displayed total (formatted to 2 decimal places)
-            document.querySelector('.cart-total').textContent = 'Total: GH₵ ' + total.toFixed(2);
-        };
-
-        // Call updateCartTotal initially to show the correct total on page load
-        updateCartTotal();
-
-
-        // --- Form Submissions (Mock Functionality) ---
+        }
+        function updateCartTotal() { /* ... your existing updateCartTotal logic ... */
+            const cartTotalEl = document.querySelector('.cart-total');
+            if(!cartTotalEl) return; // Make sure element exists
+            // Your calculation logic here
+        }
+        if (typeof updateCartTotal === 'function') updateCartTotal();
+    
+    
+        // --- MODIFIED Form Submissions ---
         const profileForm = document.getElementById('profile-form');
         const passwordForm = document.getElementById('password-form');
         const vendorForm = document.getElementById('vendor-form');
-
-        // Profile form submission handler
-        profileForm.addEventListener('submit', function(e) {
-            e.preventDefault(); // Prevent actual form submission
-
-            // --- Mock Processing ---
-            // In a real application:
-            // 1. Gather form data (e.g., using new FormData(this))
-            // 2. Send data to your backend server using fetch() or XMLHttpRequest
-            // 3. Handle the backend response (success/failure)
-            // 4. Update UI based on response (e.g., show success message, update profile info on page)
-            // 5. Close modal on success
-
-            alert('Profile update logic would go here.'); // Placeholder alert
-            this.closest('.modal').classList.remove('active'); // Close modal (mock success)
-
-            // Mock updating displayed profile info (replace with real data binding)
-            // document.querySelector('.profile-name').textContent = this.elements.username.value;
-            // document.querySelector('.profile-email').textContent = this.elements.email.value;
-            // document.querySelector('.profile-whatsapp').textContent = this.elements.whatsapp.value;
-        });
-
+        const vendorSection = document.getElementById('vendor-section'); // Sidebar item
+    
+        // Profile form submission handler (Updates WhatsApp and Campus)
+        if (profileForm) {
+            profileForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const whatsappInput = document.getElementById('input-whatsapp');
+                const campusInput = document.getElementById('input-campus');
+                const whatsapp = whatsappInput ? whatsappInput.value.trim() : null;
+                const campus = campusInput ? campusInput.value.trim() : null;
+    
+                const dataToUpdate = {};
+                let hasChanges = false;
+                if (whatsapp !== null && whatsapp !== (loadedUserProfileData?.whatsapp || '')) {
+                    dataToUpdate.whatsapp = whatsapp;
+                    hasChanges = true;
+                }
+                if (campus !== null && campus !== (loadedUserProfileData?.campus || '')) {
+                    dataToUpdate.campus = campus;
+                    hasChanges = true;
+                }
+    
+                if (!hasChanges) {
+                    alert("No changes made to WhatsApp or Campus."); // Or use your showPopup
+                    this.closest('.modal').classList.remove('active');
+                    return;
+                }
+    
+                console.log("EMBEDDED SCRIPT: Submitting profile update. Data for API:", dataToUpdate);
+                const saveButton = document.getElementById('save-profile-btn');
+                if(saveButton) { saveButton.disabled = true; saveButton.textContent = 'Saving...'; }
+    
+                if (typeof updateUserProfileApi === 'function') {
+                    updateUserProfileApi(dataToUpdate).then(result => {
+                        if (result.success && result.data) {
+                            loadedUserProfileData = result.data; // IMPORTANT: Update global store
+                            if(typeof showPopup === 'function') showPopup('Success', 'Profile updated successfully!');
+                            else alert('Profile updated successfully!');
+    
+                            // Update display elements
+                            const displayWhatsappEl = document.getElementById('display-whatsapp');
+                            const displayCampusEl = document.getElementById('display-campus');
+                            if (displayWhatsappEl) displayWhatsappEl.textContent = result.data.whatsapp || 'Not set';
+                            if (displayCampusEl) displayCampusEl.textContent = result.data.campus || 'Not set';
+                            // Also update inputs in modal in case it's reopened
+                            if(whatsappInput) whatsappInput.value = result.data.whatsapp || '';
+                            if(campusInput) campusInput.value = result.data.campus || '';
+    
+                            this.closest('.modal').classList.remove('active');
+                        } else {
+                            console.error("EMBEDDED SCRIPT: Profile update failed:", result.message);
+                            if(typeof showPopup === 'function') showPopup('Update Failed', result.message || 'Could not update profile.');
+                            else alert(`Update Failed: ${result.message || 'Could not update profile.'}`);
+                        }
+                    }).finally(() => {
+                        if(saveButton) { saveButton.disabled = false; saveButton.textContent = 'Save Changes'; }
+                    });
+                } else {
+                    console.error("EMBEDDED SCRIPT: updateUserProfileApi function not found!");
+                    alert("Error: Cannot save profile. API function missing.");
+                    if(saveButton) { saveButton.disabled = false; saveButton.textContent = 'Save Changes'; }
+                }
+            });
+        }
+    
         // Password form submission handler
-        passwordForm.addEventListener('submit', function(e) {
-            e.preventDefault(); // Prevent actual form submission
+        if (passwordForm) {
+            passwordForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const currentPasswordInput = document.getElementById('input-current-password');
+                const newPasswordInput = document.getElementById('input-new-password');
+                const confirmPasswordInput = document.getElementById('input-confirm-password');
+    
+                if (!currentPasswordInput || !newPasswordInput || !confirmPasswordInput) {
+                     alert("Error: Password form fields missing."); return;
+                }
+                const currentPassword = currentPasswordInput.value;
+                const newPassword = newPasswordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+    
+                if (!currentPassword || !newPassword || !confirmPassword) {
+                    alert('Please fill in all password fields.'); return;
+                }
+                if (newPassword !== confirmPassword) {
+                    alert('New passwords do not match!'); return;
+                }
+    
+                console.log("EMBEDDED SCRIPT: Submitting password change via API...");
+                const changeButton = document.getElementById('change-password-btn');
+                if(changeButton) { changeButton.disabled = true; changeButton.textContent = 'Changing...'; }
+    
+                if (typeof changePasswordApi === 'function') {
+                    changePasswordApi(currentPassword, newPassword, confirmPassword).then(result => {
+                        if (result.success) {
+                            if(typeof showPopup === 'function') showPopup('Success', 'Password changed successfully!');
+                            else alert('Password changed successfully!');
+                            this.closest('.modal').classList.remove('active');
+                            this.reset();
+                        } else {
+                            console.error("EMBEDDED SCRIPT: Password change failed:", result.message, result.data);
+                             let errorMsg = result.message || 'Could not change password.';
+                             if (result.data && typeof result.data === 'object') {
+                                 errorMsg = Object.entries(result.data)
+                                 .map(([key, value]) => `${key.replace(/_/g,' ').replace(/\b\w/g, char => char.toUpperCase())}: ${Array.isArray(value) ? value.join(', ') : value}`)
+                                 .join('\n');
+                             }
+                            if(typeof showPopup === 'function') showPopup('Change Failed', errorMsg);
+                            else alert(`Password Change Failed:\n${errorMsg}`);
+                        }
+                    }).finally(() => {
+                        if(changeButton) { changeButton.disabled = false; changeButton.textContent = 'Change Password'; }
+                    });
+                } else {
+                    console.error("EMBEDDED SCRIPT: changePasswordApi function not found!");
+                    alert("Error: Cannot change password. API function missing.");
+                    if(changeButton) { changeButton.disabled = false; changeButton.textContent = 'Change Password'; }
+                }
+            });
+        }
+    
+        // MODIFIED Vendor Section Click Handler (Sidebar Link)
+        if (vendorSection) {
+            vendorSection.addEventListener('click', function() {
+                if (loadedUserProfileData && loadedUserProfileData.is_vendor === true) {
+                    console.log("User is a vendor. Redirecting to vendor dashboard.");
+                    window.location.href = 'vendor-dashboard.html'; // Replace with your actual vendor dashboard path
+                } else {
+                    console.log("User is not a vendor. Opening 'Become a Vendor' modal.");
+                    if (vendorModal) {
+                        vendorModal.classList.add('active');
+                    } else {
+                        console.error("Element with ID 'become-vendor-modal' not found!");
+                        alert("Error: Could not open vendor application form.");
+                    }
+                }
+            });
+        }
+    
+        // MODIFIED Vendor Form Submission (Modal Form)
+// Embedded script in account.html -> vendorForm event listener
+if (vendorForm) {
+    vendorForm.addEventListener('submit', function(e) {
+        e.preventDefault();
 
-            const newPassword = this.elements['new-password'].value;
-            const confirmPassword = this.elements['confirm-password'].value;
+        const businessNameInput = this.elements['business-name']; // Assuming your input has name="business-name"
+        const businessName = businessNameInput ? businessNameInput.value.trim() : '';
 
-            // Basic mock validation: check if new passwords match
-            if (newPassword !== confirmPassword) {
-                alert('New passwords do not match!');
-                // In a real app, show inline error messages near the fields
-                return; // Stop the submission process
-            }
+        if (!businessName) {
+            if(typeof showPopup === 'function') showPopup('Error', 'Business name is required to become a vendor.');
+            else alert('Business name is required.');
+            return;
+        }
 
-            // --- Mock Processing ---
-            // In a real application:
-            // 1. Gather current, new, and confirm passwords
-            // 2. Send data to your backend for validation and update
-            // 3. Handle the backend response
-            // 4. Close modal and show success/failure message
+        const submitButton = this.querySelector('button[type="submit"]'); // Or get by ID
+        if(submitButton) { submitButton.disabled = true; submitButton.textContent = "Submitting..."; }
 
-            alert('Password change logic would go here.'); // Placeholder alert
-            this.closest('.modal').classList.remove('active'); // Close modal (mock success)
-            this.reset(); // Clear form fields (mock success)
-        });
+        console.log("EMBEDDED SCRIPT: Calling becomeVendorApi with business name:", businessName);
+        if (typeof becomeVendorApi === 'function') {
+            becomeVendorApi(businessName).then(result => { // Pass businessName
+                if (result.success && result.data && result.data.profile) {
+                    if(typeof showPopup === 'function') showPopup('Success!', result.data.message || 'Vendor status updated!');
+                    else alert(result.data.message || 'Vendor status updated!');
 
-        // Vendor form submission handler
-        vendorForm.addEventListener('submit', function(e) {
-            e.preventDefault(); // Prevent actual form submission
+                    loadedUserProfileData = result.data.profile; // Update global profile data
 
-            // --- Mock Processing ---
-            // In a real application:
-            // 1. Gather business details
-            // 2. Send data to your backend for application processing
-            // 3. Handle the backend response
-            // 4. Close modal and show success/failure message (e.g., "Application submitted", "Already a vendor")
-            // 5. If successful, potentially update the sidebar link text to "View Vendor Dashboard"
+                    const vendorSectionElement = document.getElementById('vendor-section');
+                    if (vendorSectionElement && loadedUserProfileData.is_vendor) {
+                                vendorSectionElement.innerHTML = `
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
+                                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline>
+                                    </svg>
+                                    View Vendor Dashboard
+                                `;
+                            }
+                    // Also update display business name if you show it on profile page
+                    const displayBusinessNameEl = document.getElementById('display-business-name'); // Add this ID to your HTML
+                    if(displayBusinessNameEl) displayBusinessNameEl.textContent = loadedUserProfileData.business_name || 'N/A';
 
-            alert('Vendor application logic would go here.'); // Placeholder alert
-            this.closest('.modal').classList.remove('active'); // Close modal (mock submission)
-
-            // Mock updating the vendor button text after application (assuming success)
-            vendorSection.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                </svg>
-                View Vendor Dashboard
-            `;
-            this.reset(); // Clear form fields
-        });
-
-        /*
-        Note on Real-World Implementation:
-        - Data Fetching: Data for profile info, orders, reviews, cart, etc., would be fetched from a backend API on page load and when sections change.
-        - Data Binding: Displayed data would be dynamically updated using JavaScript or a framework (like React, Vue, Angular) based on fetched data and form submissions.
-        - State Management: For a complex app, consider state management patterns/libraries.
-        - Error Handling: Implement robust error handling for API calls and form validations.
-        - Security: Sanitize user inputs, use HTTPS, secure authentication/authorization.
-        - Accessibility: Ensure keyboard navigation, ARIA attributes, and proper focus management, especially for modals.
-        - Performance: Optimize images, lazy load content, minimize JS/CSS, use browser caching.
-        - Animations: For truly "Guinness World Record" level animations, consider libraries like GreenSock (GSAP) or using the Web Animations API, coordinated with section changes.
-        */
-
+                    this.closest('.modal').classList.remove('active');
+                        } else {
+                            console.error("EMBEDDED SCRIPT: Become vendor failed:", result.message);
+                            if(typeof showPopup === 'function') {
+                                showPopup('Application Failed', result.message || 'Could not process vendor application.');
+                            } else {
+                                alert(`Application Failed: ${result.message || 'Could not process vendor application.'}`);
+                            }
+                        }
+                    }).finally(() => {
+                        if(submitButton) { submitButton.disabled = false; submitButton.textContent = "Submit Application"; }
+                    });
+                } else {
+                    console.error("EMBEDDED SCRIPT: becomeVendorApi function not found!");
+                    alert("Error: Vendor application function missing.");
+                    if(submitButton) { submitButton.disabled = false; submitButton.textContent = "Submit Application"; }
+                }
+            });
+        }
+    
+        // Logout Button Functionality
+        const logoutButton = document.getElementById('userLogoutButton');
+        const logoutApiUrl = 'http://127.0.0.1:8000/api/auth/logout/';
+    
+        if (logoutButton) {
+            logoutButton.addEventListener('click', async () => {
+                console.log("Logout button clicked...");
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    window.location.href = 'singup.html'; // Adjust to your login/signup page
+                    return;
+                }
+                try {
+                    const response = await fetch(logoutApiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Token ${token}` }
+                    });
+                    if (response.ok) console.log("Logout successful via API.");
+                    else console.warn("Logout API call failed or returned an error:", response.status);
+                } catch (error) {
+                    console.error("Network error during logout:", error);
+                } finally {
+                    localStorage.removeItem('authToken');
+                    console.log("Auth token cleared. Redirecting to login/signup page.");
+                    window.location.href = 'singup.html'; // Adjust to your login/signup page
+                }
+            });
+        }
+    
+        console.log("Campus Connect Profile Dashboard Initialized with API integrations.");
     </script>
+    <script src="js/profile-api.js" defer></script>
 </body>
 </html>

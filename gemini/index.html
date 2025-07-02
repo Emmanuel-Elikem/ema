@@ -2,135 +2,101 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Product Detail - ema-Campus Shopping</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lighthouse City Church - Give Online</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-</head>
+    </head>
 <body>
-
-    <div class="product-detail-page" id="productDetailPage">
-        <div class="skeleton-loader">
-            <header class="skeleton-header">
-                <div class="skeleton skeleton-back-arrow"></div>
-            </header>
-            <div class="skeleton-gallery"></div>
-            <div class="skeleton-info">
-                <div class="skeleton skeleton-text skeleton-title"></div>
-                <div class="skeleton skeleton-text skeleton-price"></div>
-            </div>
-            <div class="skeleton-card">
-                <div class="skeleton skeleton-text"></div>
-                <div class="skeleton skeleton-text"></div>
-                <div class="skeleton skeleton-text"></div>
-            </div>
-            <div class="skeleton-card">
-                <div class="skeleton skeleton-text"></div>
-                <div class="skeleton skeleton-text"></div>
-                <div class="skeleton skeleton-text"></div>
-                <div class="skeleton skeleton-text skeleton-short"></div>
-            </div>
-             <div class="skeleton-card">
-                <div class="skeleton skeleton-text skeleton-short"></div>
-            </div>
-            <div class="skeleton-similar">
-                <div class="skeleton skeleton-text skeleton-title-short"></div>
-                <div class="skeleton-similar-items">
-                    <div class="skeleton skeleton-similar-item"></div>
-                    <div class="skeleton skeleton-similar-item"></div>
-                    <div class="skeleton skeleton-similar-item"></div>
+    <div class="background-overlay"></div> <header class="site-header">
+        <div class="header-content">
+            <div class="branding">
+                <a href="#" class="logo-placeholder" aria-label="Lighthouse City Church Home">
+                    <img src="placeholder-logo.png" alt="LCC Logo Placeholder" style="opacity: 0.5; height: 50px; width: auto;"> </a>
+                <div class="church-name">
+                    <span class="name-main">Lighthouse</span>
+                    <span class="name-sub">City Church</span>
                 </div>
             </div>
-        </div>
-        <div class="page-content" style="display: none;">
-            <header class="page-header">
-                <button class="back-button" aria-label="Go back">←</button>
-                </header>
-
-            <section class="product-gallery-container">
-                <div class="product-gallery" id="productGallery">
-                    </div>
-                <div class="gallery-dots" id="galleryDots">
-                    </div>
-                <button class="wishlist-button" id="wishlistBtn" aria-label="Add to Wishlist">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="heart-icon"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+            <nav class="navigation">
+                <button class="hamburger" aria-label="Open menu" aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </button>
-                 <button class="fullscreen-toggle" id="fullscreenToggle" aria-label="Toggle fullscreen image">⛶</button> </section>
+            </nav>
+        </div>
+    </header>
 
-            <section class="product-info">
-                <h1 class="product-name" id="productName"></h1>
-                <p class="product-price" id="productPrice"></p>
-            </section>
+    <aside class="nav-links-mobile">
+        <button class="close-nav" aria-label="Close menu">&times;</button>
+        <ul>
+            <li><a href="#" data-payment-type="Tithe">Give Tithe</a></li>
+            <li><a href="#" data-payment-type="Offering">Give Offering</a></li>
+            <li><a href="#" data-payment-type="BENMP">Give BENMP</a></li>
+            </ul>
+    </aside>
+    <div class="nav-overlay"></div> <main class="content-container">
+        <section id="welcome-section" class="active-section animated fade-in">
+            <h1>Welcome to Lighthouse City Church Giving</h1>
+            <p class="welcome-message">"God bless you as you give."</p>
+            <p>Please select your payment type to begin.</p>
+            <div class="payment-type-options initial-options">
+                 <button class="btn btn-primary btn-payment-type" data-payment-type="Tithe">Tithe</button>
+                 <button class="btn btn-primary btn-payment-type" data-payment-type="Offering">Offering</button>
+                 <button class="btn btn-primary btn-payment-type" data-payment-type="BENMP">BENMP</button>
+             </div>
+        </section>
 
-            <section class="product-variations card" id="productVariations" style="display: none;">
-                <h3 class="variation-title">Select Size:</h3>
-                <div class="variation-options" id="variationOptions">
-                    </div>
-            </section>
-
-            <section class="specs-card card">
-                <h3>Specifications</h3>
-                <ul class="specs-list" id="specsList">
-                    </ul>
-            </section>
-
-            <section class="description-card card">
-                <h3>Description</h3>
-                <div class="description-content" id="descriptionContent">
-                    <p id="productDescription"></p>
-                </div>
-                <button class="toggle-description" id="toggleDescriptionBtn">
-                    Show More <span class="arrow">▼</span>
+        <section id="country-section" class="hidden animated fade-in">
+            <h2>Select Your Country</h2>
+            <p>You are giving <strong id="selected-payment-type-text"></strong>.</p>
+            <div class="country-selection-grid">
+                <button class="country-card" data-country="Ghana">
+                    <span class="flag">🇬🇭</span>
+                    <span class="country-name">Ghana</span>
                 </button>
-            </section>
+                <button class="country-card" data-country="Kenya">
+                    <span class="flag">🇰🇪</span>
+                    <span class="country-name">Kenya</span>
+                </button>
+                <button class="country-card" data-country="Nigeria">
+                    <span class="flag">🇳🇬</span>
+                    <span class="country-name">Nigeria</span>
+                </button>
+                 <button class="country-card" data-country="Togo">
+                    <span class="flag">🇹🇬</span>
+                    <span class="country-name">Togo</span>
+                </button>
+                <button class="country-card" data-country="USA">
+                    <span class="flag">🇺🇸</span>
+                    <span class="country-name">USA</span>
+                </button>
+                <button class="country-card" data-country="UK">
+                    <span class="flag">🇬🇧</span>
+                    <span class="country-name">UK</span>
+                </button>
+                <button class="country-card" data-country="Other">
+                     <span class="flag">🌍</span>
+                     <span class="country-name">Other</span>
+                 </button>
+            </div>
+             <button class="btn btn-secondary btn-back" data-target="welcome-section">Back</button>
+        </section>
 
-            <section class="vendor-reviews-card card">
-                <div class="vendor-info" id="vendorInfo">
-                    </div>
-                <div class="reviews-preview">
-                    <h4>Customer Reviews</h4>
-                    <ul class="review-list" id="reviewList">
-                       </ul>
-                    <button class="view-all-reviews-btn" id="viewAllReviewsBtn">View All Reviews</button>
+        <section id="payment-options-section" class="hidden animated fade-in">
+            <h2>Payment Options</h2>
+            <p>Giving <strong id="final-payment-type"></strong> from <strong id="final-country"></strong>.</p>
+            <div id="payment-details">
                 </div>
-                <a href="#" class="report-link" id="reportLink">Report incorrect product details</a>
-            </section>
+             <p class="encouragement-message">"God bless you as you give."</p>
+             <button class="btn btn-secondary btn-back" data-target="country-section">Back</button>
+        </section>
 
-            <section class="similar-products">
-                <h3>Similar Products</h3>
-                <div class="similar-products-scroll" id="similarProductsScroll">
-                   </div>
-            </section>
+    </main>
 
-            <div class="content-spacer"></div>
-        </div>
-        <div class="bottom-action-bar">
-            <button class="action-button call-button" id="callVendorBtn" aria-label="Call Vendor">
-                📞 </button>
-            <button class="action-button order-button" id="orderNowBtn">Order Now</button>
-            <button class="action-button cart-button" id="addToCartBtn" aria-label="Add to Cart">
-                🛒 </button>
-        </div>
-
-        <div class="whatsapp-overlay" id="whatsappOverlay">
-            <div class="overlay-content">
-                 <button class="close-overlay-btn" id="closeOverlayBtn" aria-label="Close overlay">✕</button>
-                <h3>Confirm WhatsApp Order</h3>
-                <p class="whatsapp-intro">Review the message below and add any questions before sending.</p>
-                <textarea id="whatsappMessage" rows="8" readonly></textarea>
-                <textarea id="whatsappUserInput" rows="3" placeholder="Add your message or questions here..."></textarea>
-                <button class="confirm-whatsapp-btn" id="confirmWhatsappBtn">Send on WhatsApp</button>
-            </div>
-        </div>
-
-        <div class="fullscreen-viewer" id="fullscreenViewer">
-            <button class="close-fullscreen-btn" id="closeFullscreenBtn" aria-label="Close fullscreen view">✕</button>
-            <img src="" alt="Fullscreen product image" id="fullscreenImage">
-            </div>
-
-         <div class="toast-notification" id="toastNotification"></div>
-
-    </div>
+    <footer class="site-footer-bottom">
+        <p>&copy; <span id="current-year"></span> Lighthouse City Church. All Rights Reserved.</p>
+    </footer>
 
     <script src="script.js"></script>
 </body>

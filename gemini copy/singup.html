@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -665,8 +667,8 @@
                 <h5 class="form-title">Create an account <span class="highlight">today!</span></h5>
 
                 <div class="form-floating">
-                    <input type="text" class="form-control" id="signupName" placeholder="Full name" required>
-                    <label for="signupName">Full name</label>
+                    <input type="text" class="form-control" id="signupUsername" placeholder="Username" required>
+                    <label for="signupName">Username</label>
                 </div>
 
                 <div class="form-floating">
@@ -744,7 +746,7 @@
 
     <div class="popup-container" id="popupContainer">
         <div class="popup-box" id="popupBox">
-            <img src="data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5z:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve"><style type="text/css">.st0{fill:#FFCC08;}</style><circle class="st0" cx="256" cy="256" r="256"/><g><path fill="#FFFFFF" d="M416.3,163.7c-9.3-9.3-24.5-9.3-33.9,0l-192,192l-96-96c-9.3-9.3-24.5-9.3-33.9,0s-9.3,24.5,0,33.9l112,112c9.3,9.3,24.5,9.3,33.9,0l208-208C425.6,188.2,425.6,173,416.3,163.7z"/></g></svg>" alt="Success">
+            <img src="data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5z:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve"><style type="text/css">.st0{fill:#FFCC08;}</style><circle class="st0" cx="256" cy="256" r="256"/><g><path fill="#FFFFFF" d="M416.3,163.7c-9.3-9.3-24.5-9.3-33.9,0l-192,192l-96-96c-9.3-9.3-24.5-9.3-33.9,0s-9.3,24.5,0,33.9l112,112c9.3,9.3,24.5,9.3,33.9,0l208-208C425.6,188.2,425.6,173,416.3,163.7z"/></g></svg><alt="Success">
             <p><b id="popupTitle">Sign Up successful!</b> <span id="popupMessage">Join us today and start exploring amazing features.</span></p>
             <button class="continue-btn" onclick="closePopup()">Continue</button>
         </div>
@@ -973,119 +975,157 @@
         }
 
         // Login form submission handler
-        if (loginBtn) {
-            loginBtn.addEventListener('click', function(event) {
-                event.preventDefault();
+// Find this existing listener:
+if (loginBtn) {
+    loginBtn.addEventListener('click', function(event) {
+        event.preventDefault();
 
-                const email = document.getElementById('loginEmail').value.trim();
-                const password = document.getElementById('loginPassword').value.trim();
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value.trim(); // No need for trim on password
 
-                if (!email || !password) {
-                    showPopup('Login Error', 'Please fill in all fields.');
-                    return;
-                }
-
-                if (!validateEmail(email)) {
-                    showPopup('Login Error', 'Please enter a valid email address.');
-                    return;
-                }
-
-                // If "Remember me" is checked, store in localStorage
-                if (rememberMe && rememberMe.checked) {
-                    localStorage.setItem('rememberedEmail', email);
-                } else {
-                    localStorage.removeItem('rememberedEmail');
-                }
-
-                // Simulate success - normally would send to server
-                showPopup('Login Successful', 'Welcome back! You are now logged in.');
-
-                // Reset form after successful simulation (optional)
-                document.getElementById('loginEmail').value = '';
-                document.getElementById('loginPassword').value = '';
-                if(rememberMe) rememberMe.checked = false;
-            });
+        // Keep your basic validation
+        if (!email || !password) {
+             // Use your existing showPopup function for immediate feedback
+             if (typeof showPopup === 'function') {
+                 showPopup('Login Error', 'Please fill in all fields.');
+             } else {
+                 console.error("showPopup function not found!");
+             }
+            return;
         }
+
+        if (typeof validateEmail === 'function' && !validateEmail(email)) { // Check if validateEmail exists
+             if (typeof showPopup === 'function') {
+                showPopup('Login Error', 'Please enter a valid email address.');
+             } else {
+                 console.error("showPopup function not found!");
+             }
+            return;
+        }
+
+        // --- REMOVE OLD SIMULATED SUCCESS ---
+        // showPopup('Login Successful', 'Welcome back! You are now logged in.');
+
+        // --- ADD THIS CALL to the API function ---
+        // Disable button temporarily?
+        loginBtn.disabled = true; loginBtn.textContent = 'Logging in...';
+        handleApiLogin(email, password).then(result => {
+             // Re-enable button regardless of outcome (unless redirecting)
+             if (!result.success) {
+                  loginBtn.disabled = false; loginBtn.textContent = 'Log in';
+             }
+             // Feedback (popup) is handled inside handleApiLogin
+             // Redirect happens inside handleApiLogin on success
+        });
+
+
+        // Remember me logic (keep this if you want)
+        if (rememberMe && rememberMe.checked) {
+            localStorage.setItem('rememberedEmail', email);
+        } else {
+            localStorage.removeItem('rememberedEmail');
+        }
+
+        // Don't reset form fields here, wait for API response or redirect
+        // document.getElementById('loginEmail').value = '';
+        // document.getElementById('loginPassword').value = '';
+        // if(rememberMe) rememberMe.checked = false;
+    });
+}
 
 
         // Signup form submission handler
-         if (signupBtn) {
-            signupBtn.addEventListener('click', function(event) {
-                event.preventDefault();
+// Find this existing listener:
+if (signupBtn) {
+    signupBtn.addEventListener('click', function(event) {
+        event.preventDefault();
 
-                const name = document.getElementById('signupName').value.trim();
-                const email = document.getElementById('signupEmail').value.trim();
-                const password = document.getElementById('signupPassword').value.trim();
-                const confirmPassword = document.getElementById('confirmPassword').value.trim();
-                const agree = document.getElementById('agreeTerms').checked;
+        // --- CHANGE signupName to signupUsername ---
+        const username = document.getElementById('signupUsername').value.trim(); // Changed ID
+        const email = document.getElementById('signupEmail').value.trim();
+        const password = document.getElementById('signupPassword').value; // No trim needed
+        const confirmPassword = document.getElementById('confirmPassword').value; // No trim needed
+        const agree = document.getElementById('agreeTerms')?.checked; // Use optional chaining ?.
 
-                if (!name || !email || !password || !confirmPassword) {
-                    showPopup('Sign Up Error', 'Please fill out all fields.');
-                    return;
-                }
+        // Keep your basic validation
+        if (!username || !email || !password || !confirmPassword) {
+            if(typeof showPopup === 'function') showPopup('Sign Up Error', 'Please fill out all required fields.');
+            return;
+        }
+        if (typeof validateEmail === 'function' && !validateEmail(email)) {
+            if(typeof showPopup === 'function') showPopup('Sign Up Error', 'Please enter a valid email address.');
+            return;
+        }
+        if (password !== confirmPassword) {
+            if(typeof showPopup === 'function') showPopup('Sign Up Error', 'Passwords do not match.');
+            return;
+        }
+        if (!agree) {
+             if(typeof showPopup === 'function') showPopup('Sign Up Error', 'You must agree to the Terms.');
+            return;
+        }
 
-                if (!validateEmail(email)) {
-                    showPopup('Sign Up Error', 'Please enter a valid email address.');
-                    return;
-                }
+         // --- REMOVE OLD SIMULATED SUCCESS ---
+         // showPopup('Sign Up Successful', 'Your account has been created successfully!');
 
-                if (password !== confirmPassword) {
-                    showPopup('Sign Up Error', 'Passwords do not match.');
-                    return;
-                }
+         // --- ADD THIS CALL to the API function ---
+         signupBtn.disabled = true; signupBtn.textContent = 'Signing up...';
+         handleApiSignup(username, email, password, confirmPassword).then(result => {
+             signupBtn.disabled = false; signupBtn.textContent = 'Sign up';
+             if(result.success) {
+                  // Reset form only on successful API response
+                  document.getElementById('signupUsername').value = '';
+                  document.getElementById('signupEmail').value = '';
+                  document.getElementById('signupPassword').value = '';
+                  document.getElementById('confirmPassword').value = '';
+                  if(document.getElementById('agreeTerms')) document.getElementById('agreeTerms').checked = false;
+                  if(document.getElementById('signupUniversity')) document.getElementById('signupUniversity').value = ''; // Also reset university
+                  // Optionally switch to login after a delay?
+                  setTimeout(() => { if(typeof switchToLogin === 'function') switchToLogin(); }, 2000);
+             }
+             // Feedback (popup) is handled inside handleApiSignup
+         });
 
-                if (!agree) {
-                    showPopup('Sign Up Error', 'You must agree to the Terms of Service and Privacy Policy.');
-                    return;
-                }
-
-                // Simulate success - normally would send to server
-                showPopup('Sign Up Successful', 'Your account has been created successfully!');
-
-                 // Reset form after successful simulation (optional)
-                 document.getElementById('signupName').value = '';
-                 document.getElementById('signupEmail').value = '';
-                 document.getElementById('signupPassword').value = '';
-                 document.getElementById('confirmPassword').value = '';
-                 document.getElementById('agreeTerms').checked = false;
-
-            });
-         }
-
+        // Don't reset form fields here unless API call is successful
+    });
+}
 
         // Forgot password form submission handler
-         if (resetBtn) {
-            resetBtn.addEventListener('click', function(event) {
-                event.preventDefault();
+// Find this existing listener:
+if (resetBtn) {
+    resetBtn.addEventListener('click', function(event) {
+        event.preventDefault();
 
-                const email = document.getElementById('forgotEmail').value.trim();
+        const email = document.getElementById('forgotEmail').value.trim();
 
-                if (!email) {
-                    showPopup('Reset Error', 'Please enter your email address.');
-                    return;
-                }
+        // Keep your basic validation
+        if (!email) {
+             if(typeof showPopup === 'function') showPopup('Reset Error', 'Please enter your email address.');
+            return;
+        }
+        if (typeof validateEmail === 'function' && !validateEmail(email)) {
+             if(typeof showPopup === 'function') showPopup('Reset Error', 'Please enter a valid email address.');
+            return;
+        }
 
-                if (!validateEmail(email)) {
-                    showPopup('Reset Error', 'Please enter a valid email address.');
-                    return;
-                }
+        // --- REMOVE OLD SIMULATED SUCCESS ---
+        // showPopup('Password Reset', 'A password reset link has been sent to your email address.');
 
-                // Simulate success - normally would send to server
-                showPopup('Password Reset', 'A password reset link has been sent to your email address.');
+        // --- ADD THIS CALL to the API function ---
+        resetBtn.disabled = true; resetBtn.textContent = 'Sending...';
+        handleApiPasswordReset(email).then(result => {
+             resetBtn.disabled = false; resetBtn.textContent = 'Reset Password';
+             if(result.success) {
+                  document.getElementById('forgotEmail').value = ''; // Clear field on success
+                  // Optionally switch back to login after delay?
+                  // setTimeout(() => { if(typeof switchToLogin === 'function') switchToLogin(); }, 3000);
+             }
+             // Feedback (popup) is handled inside handleApiPasswordReset
+        });
 
-                // Reset form and go back to login after a delay (optional)
-                document.getElementById('forgotEmail').value = '';
-                setTimeout(() => {
-                    // Close the current popup first if it's still open
-                     closePopup();
-                     // Switch back to login after a brief moment
-                     setTimeout(() => {
-                         switchToLogin();
-                     }, 100); // Short delay
-                }, 2000); // Simulate email sending delay
-            });
-         }
-
+        // Don't reset form or switch view here, wait for API response
+    });
+}
 
         // Hide the popup when clicking outside the box
         if (popupContainer) {
@@ -1145,5 +1185,6 @@
 
 
     </script>
+    <script src="js/auth-api.js" defer></script>
 </body>
 </html>
